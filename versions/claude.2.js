@@ -124,12 +124,11 @@ async function callClaude(userPrompt) {
 const PROMPTS = {
 
   // ── Trend Intelligence ────────────────────────────────────
-  trends: ({ niche, region, topic }) => `
+  trends: ({ niche, region }) => `
 TREND INTELLIGENCE ENGINE — simulate Google Trends analysis.
-${niche ? `Niche: "${niche}"` : `Topic: "${topic}" — infer the niche from this topic, then apply trend analysis to that niche.`}
-Region: ${region}
+Niche: "${niche}" | Region: ${region}
 
-Generate 6 rising content angles a creator in ${region} should make TODAY for this niche.
+Generate 6 rising content angles a creator in ${region} should make TODAY for the ${niche} niche.
 Each must be specific and searchable — not generic.
 Bad: "AI side hustle" → Good: "AI side hustle for NHS nurses in the UK"
 
@@ -137,17 +136,13 @@ For each: phrase (specific searchable angle), why (1 sentence, specific to ${reg
 status ("hot"=breakout|"rising"=growing|"stable"), emotion (awe|anger|anxiety|amusement|inspiration|surprise),
 vrin (0-100, how rare content on this angle would be).
 
-Return JSON: {"inferred_niche":"...","angles":[{"phrase":"...","why":"...","status":"hot","emotion":"...","vrin":0}]}`,
+Return JSON: {"angles":[{"phrase":"...","why":"...","status":"hot","emotion":"...","vrin":0}]}`,
 
   // ── Virality Analysis ─────────────────────────────────────
   analyze: ({ topic, niche, goal, tone, platform, trendAngle }) => `
 VIRALITY INTELLIGENCE ANALYSIS — apply all 10 layers including VRIN and Trend Intelligence.
 Topic: "${topic}"
-${niche
-  ? `Niche: "${niche}"`
-  : `Niche: NOT PROVIDED. Infer the single most specific niche this topic belongs to.
-     Be precise — not "health" but "women's hormonal health"; not "money" but "UK first-time buyer mortgages".
-     Use that inferred niche for all decisions and return it in the inferred_niche field.`}
+Niche: "${niche || 'general'}"
 Goal: ${goal}
 Tone: ${tone}
 Platform: ${platform}
@@ -165,7 +160,6 @@ TASKS:
 
 Return JSON:
 {
-  "inferred_niche":"${niche ? niche : 'the niche you inferred — leave blank string if niche was provided'}",
   "primary_format":"...","backup_format":"...",
   "reason":"2-3 sentences why this exact format for this topic+goal+emotion+platform",
   "recommended_structure":["Hook","Perspective Shift","...","Payoff"],
@@ -185,9 +179,7 @@ Return JSON:
 CONTENT GENERATION — punchiest, most optimized version. Final version, not a draft.
 
 Topic: "${topic}"
-${niche
-  ? `Niche: "${niche}"`
-  : `Niche: Infer from topic. Write with the specific insider authority of someone who knows this niche deeply — use its real language, real pain points, real context.`}
+Niche: "${niche || 'general'}"
 Goal: ${goal}
 Tone: "${tone}" — embody this in every word and sentence rhythm
 Platform: ${platform}
