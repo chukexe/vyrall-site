@@ -515,6 +515,103 @@ select optgroup { font-style:normal; font-weight:500; font-size:9px; color:var(-
 ::-webkit-scrollbar-track{background:transparent;}
 ::-webkit-scrollbar-thumb{background:var(--b2);border-radius:2px;}
 
+/* ── LEARN MORE MODAL ── */
+.modal-overlay {
+  position:fixed; inset:0; z-index:1000;
+  background:rgba(8,8,10,.88);
+  backdrop-filter:blur(6px);
+  display:flex; align-items:center; justify-content:center;
+  opacity:0; pointer-events:none;
+  transition:opacity .25s ease;
+}
+.modal-overlay.open { opacity:1; pointer-events:all; }
+.modal {
+  background:var(--s1); border:1px solid var(--b1);
+  border-radius:6px; width:min(720px,92vw);
+  max-height:84vh; overflow-y:auto;
+  display:flex; flex-direction:column;
+  transform:translateY(12px);
+  transition:transform .25s ease;
+}
+.modal-overlay.open .modal { transform:translateY(0); }
+.modal-top {
+  display:flex; align-items:center; justify-content:space-between;
+  padding:18px 24px; border-bottom:1px solid var(--b1);
+  background:var(--s2); position:sticky; top:0; z-index:2;
+}
+.modal-title { font-family:'Syne',sans-serif; font-size:15px; font-weight:700; color:var(--ink); }
+.modal-close {
+  width:28px; height:28px; border-radius:3px;
+  border:1px solid var(--b1); background:transparent;
+  color:var(--ink3); font-size:14px; cursor:pointer;
+  display:flex; align-items:center; justify-content:center;
+  transition:all .15s;
+}
+.modal-close:hover { border-color:var(--b3); color:var(--ink); }
+.modal-body { padding:28px 24px; display:flex; flex-direction:column; gap:28px; }
+
+.modal-section { display:flex; flex-direction:column; gap:12px; }
+.modal-section-eye {
+  font-size:8.5px; letter-spacing:.25em; text-transform:uppercase;
+  color:var(--g2); display:flex; align-items:center; gap:7px;
+}
+.modal-section-eye::after { content:''; flex:1; height:1px; background:var(--b1); }
+.modal-section-title { font-family:'Syne',sans-serif; font-size:13px; font-weight:700; color:var(--ink); margin-top:2px; }
+.modal-section-body { font-size:11.5px; color:var(--ink2); line-height:1.85; }
+.modal-section-body strong { color:var(--ink); }
+
+.modal-trio {
+  display:grid; grid-template-columns:repeat(3,1fr); gap:1px;
+  background:var(--b1); border-radius:4px; overflow:hidden;
+}
+.modal-trio-cell { background:var(--s2); padding:14px 16px; }
+.modal-trio-label { font-size:9px; letter-spacing:.18em; text-transform:uppercase; color:var(--ink3); margin-bottom:6px; }
+.modal-trio-val { font-size:11px; color:var(--ink); line-height:1.6; }
+
+.modal-layers { display:flex; flex-direction:column; gap:0; border:1px solid var(--b1); border-radius:4px; overflow:hidden; }
+.modal-layer { display:grid; grid-template-columns:28px 1fr; border-bottom:1px solid var(--b1); }
+.modal-layer:last-child { border-bottom:none; }
+.modal-layer-n {
+  display:flex; align-items:center; justify-content:center;
+  background:var(--s2); border-right:1px solid var(--b1);
+  font-family:'Syne',sans-serif; font-size:11px;
+  font-weight:700; color:var(--ink3);
+}
+.modal-layer-c { padding:10px 14px; }
+.modal-layer-name { font-size:10.5px; color:var(--ink); font-weight:500; margin-bottom:2px; }
+.modal-layer-desc { font-size:10px; color:var(--ink3); line-height:1.5; }
+
+.modal-casino {
+  background:linear-gradient(135deg,rgba(0,229,160,.06),rgba(0,229,160,.02));
+  border:1px solid var(--g3); border-radius:4px;
+  padding:18px 20px;
+}
+.modal-casino-headline {
+  font-family:'Fraunces',serif; font-size:18px; font-style:italic;
+  color:var(--g); line-height:1.4; margin-bottom:10px;
+}
+.modal-casino-body { font-size:11.5px; color:var(--ink2); line-height:1.85; }
+.modal-casino-body strong { color:var(--ink); }
+
+.modal-formula {
+  display:flex; align-items:center; justify-content:center;
+  gap:10px; flex-wrap:wrap;
+  padding:14px; background:var(--s2); border-radius:4px;
+  border:1px solid var(--b1);
+}
+.mf-part { font-family:'Syne',sans-serif; font-size:12px; font-weight:700; color:var(--g); }
+.mf-op { font-size:14px; color:var(--ink3); }
+.mf-eq { font-size:11px; color:var(--ink3); padding:0 4px; }
+
+.learn-btn {
+  background:transparent; border:1px solid var(--b2);
+  color:var(--ink3); font-family:'DM Mono',monospace;
+  font-size:9.5px; letter-spacing:.1em;
+  padding:6px 14px; border-radius:3px; cursor:pointer;
+  transition:all .2s; display:inline-flex; align-items:center; gap:6px;
+}
+.learn-btn:hover { border-color:var(--g2); color:var(--g); }
+
 @media(max-width:800px){
   .app{grid-template-columns:1fr;}
   .sidebar{max-height:none;position:static;}
@@ -724,13 +821,35 @@ select optgroup { font-style:normal; font-weight:500; font-size:9px; color:var(-
     <!-- GENERATE VIEW -->
     <div id="genView">
       <div id="welcomeEl" class="welcome">
+
         <div class="wv">V</div>
+
         <div class="wt">Content built to spread.</div>
-        <div class="ws">The only content tool combining Brendan Kane's virality framework with Jonah Berger's emotion science, social currency theory, platform mechanics, and share trigger psychology — fully automated.</div>
-        <div class="w-pill"><span>TREND → FORMAT → VRIN → EMOTION → REMIX → SEQUENCE</span> = <span>DOMINANCE</span></div>
-        <div class="ai-note">
-          <strong>What's new in v4:</strong> Discover trending angles in your niche before writing a word. Every script is VRIN-scored for rarity and inimitability — the framework Tai Lopez charges £2,000+ to teach. The Remix Engine turns one idea into 5 trend-targeted variations. The 30-Day Sequence Builder maps your full content calendar. API secured through Netlify proxy — your key stays server-side, invisible to users.
+
+        <div class="ws">
+          Virality isn't predictable. But it is engineerable.<br>
+          You can't know which post explodes — you can stack the odds it will.
         </div>
+
+        <div class="modal-formula">
+          <span class="mf-part">Volume</span>
+          <span class="mf-op">×</span>
+          <span class="mf-part">Clarity</span>
+          <span class="mf-op">×</span>
+          <span class="mf-part">Emotional Precision</span>
+          <span class="mf-eq">=</span>
+          <span class="mf-part" style="color:var(--amber)">Probability</span>
+        </div>
+
+        <div class="w-pill">
+          <span>TREND → FORMAT → VRIN → EMOTION → REMIX → SEQUENCE</span>
+          <span style="color:var(--ink3)">= stacked odds</span>
+        </div>
+
+        <button class="learn-btn" onclick="openModal()">
+          <span>◈</span> How it works — what to expect
+        </button>
+
       </div>
 
       <div id="outEl" class="out" style="display:none">
@@ -817,6 +936,11 @@ select optgroup { font-style:normal; font-weight:500; font-size:9px; color:var(-
               <div class="as-lbl">AI Selected Emotion</div>
               <div class="as-val" id="as-emo">—</div>
               <div class="as-reason" id="as-emo-why">—</div>
+            </div>
+            <div class="ai-sel-cell">
+              <div class="as-lbl">Hook Category</div>
+              <div class="as-val" id="as-hook-cat" style="color:var(--teal);font-size:11px">—</div>
+              <div class="as-reason" id="as-hook-cat-why" style="margin-top:4px">—</div>
             </div>
             <div class="ai-sel-cell">
               <div class="as-lbl">Share Triggers Activated</div>
@@ -1330,6 +1454,10 @@ function renderAnalysis(data){
   emoEl.textContent=emo?(emo.charAt(0).toUpperCase()+emo.slice(1)):'—';
   emoEl.className='as-val '+(EMO_COLORS[emo]||'');
   document.getElementById('as-emo-why').textContent=data.emotion_reasoning||'';
+
+  // Hook Category (Layer 11)
+  document.getElementById('as-hook-cat').textContent=data.hook_category||'—';
+  document.getElementById('as-hook-cat-why').textContent=data.hook_category_reason||'';
 
   // Triggers
   const trigs=data.selected_triggers||[];
@@ -1877,5 +2005,206 @@ async function run(){
 // Init history count
 (async()=>{try{const r=await window.storage.get('vyrall:idx').catch(()=>null);if(r){const ids=JSON.parse(r.value);updHC(ids.length);}}catch(e){}})();
 </script>
+<!-- ══════════ LEARN MORE MODAL ══════════ -->
+<div class="modal-overlay" id="learnModal" onclick="closeModalOuter(event)">
+  <div class="modal">
+
+    <div class="modal-top">
+      <div class="modal-title">What to expect from VYRALL</div>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+
+    <div class="modal-body">
+
+      <!-- THE HONEST TRUTH -->
+      <div class="modal-section">
+        <div class="modal-section-eye">The honest truth</div>
+        <div class="modal-casino">
+          <div class="modal-casino-headline">"Think casino, not calendar."</div>
+          <div class="modal-casino-body">
+            Virality is not predictable. If it were, creators wouldn't panic-post, agencies wouldn't spray 100 ideas for 1 hit, and platforms wouldn't call it algorithm magic.<br><br>
+            Virality happens at the intersection of <strong>human psychology</strong> + <strong>platform incentives</strong> + <strong>timing chaos</strong>. You can't control all three. But you can stack them.<br><br>
+            VYRALL controls what is controllable. The timing chaos — that's on you. <strong>Post more.</strong>
+          </div>
+        </div>
+      </div>
+
+      <!-- THE FORMULA -->
+      <div class="modal-section">
+        <div class="modal-section-eye">The formula</div>
+        <div class="modal-formula" style="justify-content:flex-start;gap:14px;">
+          <div style="display:flex;flex-direction:column;gap:3px">
+            <span class="mf-part">Volume</span>
+            <span style="font-size:9.5px;color:var(--ink3)">Post more smart tickets</span>
+          </div>
+          <span class="mf-op" style="padding-top:2px">×</span>
+          <div style="display:flex;flex-direction:column;gap:3px">
+            <span class="mf-part">Clarity</span>
+            <span style="font-size:9.5px;color:var(--ink3)">One sharp idea per post</span>
+          </div>
+          <span class="mf-op" style="padding-top:2px">×</span>
+          <div style="display:flex;flex-direction:column;gap:3px">
+            <span class="mf-part">Emotional Precision</span>
+            <span style="font-size:9.5px;color:var(--ink3)">Right trigger, right audience</span>
+          </div>
+          <span class="mf-eq" style="padding-top:2px">=</span>
+          <div style="display:flex;flex-direction:column;gap:3px">
+            <span class="mf-part" style="color:var(--amber)">Probability</span>
+            <span style="font-size:9.5px;color:var(--ink3)">Not certainty — stacked odds</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- ATTENTION ENGINEERING -->
+      <div class="modal-section">
+        <div class="modal-section-eye">Layer 11 — Attention Engineering</div>
+        <div class="modal-casino">
+          <div class="modal-casino-headline">"Social media doesn't addict you by giving you something good. It addicts you by making you feel like something great might happen."</div>
+          <div class="modal-casino-body">
+            Dopamine spikes harder in <strong>anticipation</strong> than in reward. The Sapolsky experiment showed dopamine levels doubled when a reward was only possible 50% of the time — compared to when it was certain. This is the slot machine principle. It's also why you can't stop scrolling.<br><br>
+            VYRALL uses this the other way. Three mechanics applied to every script:
+          </div>
+        </div>
+        <div class="modal-trio">
+          <div class="modal-trio-cell">
+            <div class="modal-trio-label" style="color:var(--teal)">Near-Miss Structure</div>
+            <div class="modal-trio-val">At the midpoint, the payoff feels imminent but isn't delivered yet. "I'll tell you exactly what this means — but first you need to see why..." This compels completion.</div>
+          </div>
+          <div class="modal-trio-cell">
+            <div class="modal-trio-label" style="color:var(--teal)">Variable Reward Pacing</div>
+            <div class="modal-trio-val">Insights drop unevenly — early spike, then withhold, then another drop, then payoff faster than expected. Unpredictable spacing doubles the dopamine response vs evenly-spaced content.</div>
+          </div>
+          <div class="modal-trio-cell">
+            <div class="modal-trio-label" style="color:var(--teal)">Zero-Friction Entry</div>
+            <div class="modal-trio-val">The hook requires zero prior context. A mid-scroll viewer has 1.5 seconds. Any hook that needs setup has already lost. VYRALL tests every hook against this before outputting.</div>
+          </div>
+        </div>
+        <div class="modal-section-body" style="margin-top:4px">
+          <strong>Hook categories VYRALL selects from:</strong> "You're Being Manipulated" · Anticipation Gap · Near-Miss Reveal · System Expose · Identity Reframe · Consequence Preview. The AI selects whichever hits hardest for the specific topic — shown in the analysis card after every generation.
+        </div>
+      </div>
+
+      <!-- 10 LAYERS -->
+      <div class="modal-section">
+        <div class="modal-section-eye">What VYRALL applies to every generation — 11 layers</div>
+        <div class="modal-layers">
+          <div class="modal-layer">
+            <div class="modal-layer-n">1</div>
+            <div class="modal-layer-c">
+              <div class="modal-layer-name">Brendan Kane — Format & Hook</div>
+              <div class="modal-layer-desc">Selects the storytelling format and enforces the "Wait…what?" hook. Context beats content every time.</div>
+            </div>
+          </div>
+          <div class="modal-layer">
+            <div class="modal-layer-n">2</div>
+            <div class="modal-layer-c">
+              <div class="modal-layer-name">Jonah Berger STEPPS — Emotion</div>
+              <div class="modal-layer-desc">High-arousal emotions (awe, anger, anxiety, amusement, inspiration, surprise) drive sharing. Low-arousal suppresses it. AI selects autonomously.</div>
+            </div>
+          </div>
+          <div class="modal-layer">
+            <div class="modal-layer-n">3</div>
+            <div class="modal-layer-c">
+              <div class="modal-layer-name">Social Currency — Design for the sharer</div>
+              <div class="modal-layer-desc">People share what makes them look good. VYRALL designs for the person forwarding it — not just the person watching.</div>
+            </div>
+          </div>
+          <div class="modal-layer">
+            <div class="modal-layer-n">4</div>
+            <div class="modal-layer-c">
+              <div class="modal-layer-name">Share Trigger Psychology</div>
+              <div class="modal-layer-desc">The gap between "great content" and "I'm sharing this" requires specific triggers. VYRALL activates 2-3 overlapping ones simultaneously.</div>
+            </div>
+          </div>
+          <div class="modal-layer">
+            <div class="modal-layer-n">5</div>
+            <div class="modal-layer-c">
+              <div class="modal-layer-name">Platform Mechanics — Algorithm signals</div>
+              <div class="modal-layer-desc">TikTok rewards rewatch. LinkedIn rewards dwell time in comments. Facebook rewards reshares. Each platform gets a native script, not a resized one.</div>
+            </div>
+          </div>
+          <div class="modal-layer">
+            <div class="modal-layer-n">6</div>
+            <div class="modal-layer-c">
+              <div class="modal-layer-name">Identity-Based Virality</div>
+              <div class="modal-layer-desc">Hyper-specific niche content often spreads further than broad content. Intense tribal identification seeds it outward aggressively.</div>
+            </div>
+          </div>
+          <div class="modal-layer">
+            <div class="modal-layer-n">7</div>
+            <div class="modal-layer-c">
+              <div class="modal-layer-name">Network Seeding Theory</div>
+              <div class="modal-layer-desc">Where content starts matters as much as what it says. VYRALL angles scripts to appeal to connectors who span multiple communities.</div>
+            </div>
+          </div>
+          <div class="modal-layer">
+            <div class="modal-layer-n">8</div>
+            <div class="modal-layer-c">
+              <div class="modal-layer-name">Information Density — Compression</div>
+              <div class="modal-layer-desc">One strong idea. Every sentence adds new value. Dense, compressed insights feel more intelligent and more shareable. Work-to-wow ratio: minimal.</div>
+            </div>
+          </div>
+          <div class="modal-layer">
+            <div class="modal-layer-n">9</div>
+            <div class="modal-layer-c">
+              <div class="modal-layer-name">VRIN — Rarity & Inimitability</div>
+              <div class="modal-layer-desc">Borrowed from competitive strategy. Low VRIN = the algorithm ignores you. High VRIN = you stand out in a saturated niche. Every script is scored.</div>
+            </div>
+          </div>
+          <div class="modal-layer" style="border-bottom:none">
+            <div class="modal-layer-n" style="color:var(--teal)">10</div>
+            <div class="modal-layer-c">
+              <div class="modal-layer-name" style="color:var(--teal)">Trend Intelligence</div>
+              <div class="modal-layer-desc">Rising trends get 40%+ higher engagement. VYRALL surfaces what's actually rising in your niche and region before you write a word.</div>
+            </div>
+          </div>
+          <div class="modal-layer" style="border-bottom:none">
+            <div class="modal-layer-n" style="color:var(--teal)">11</div>
+            <div class="modal-layer-c">
+              <div class="modal-layer-name" style="color:var(--teal)">Attention Engineering</div>
+              <div class="modal-layer-desc">Near-miss structure, variable reward pacing, zero-friction entry, and hook category selection — the Sapolsky dopamine mechanics applied to content. Every script engineered for the brain's anticipation response.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- WHAT'S PREDICTABLE -->
+      <div class="modal-section">
+        <div class="modal-section-eye">What is and isn't predictable</div>
+        <div class="modal-trio">
+          <div class="modal-trio-cell">
+            <div class="modal-trio-label" style="color:var(--g)">Engineerable ✓</div>
+            <div class="modal-trio-val">Hook strength. Emotion selection. Share trigger activation. Platform fit. Content rarity. Format choice.</div>
+          </div>
+          <div class="modal-trio-cell">
+            <div class="modal-trio-label" style="color:var(--red)">Not predictable ✗</div>
+            <div class="modal-trio-val">Timing. Platform mood cycles. Cultural resonance windows. Which specific post explodes.</div>
+          </div>
+          <div class="modal-trio-cell">
+            <div class="modal-trio-label" style="color:var(--amber)">The real strategy</div>
+            <div class="modal-trio-val">Farm patterns, not miracles. Post 30 variations of one sharp idea. Let the audience choose for you.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TOOLS -->
+      <div class="modal-section">
+        <div class="modal-section-eye">The six on-demand tools</div>
+        <div class="modal-section-body">
+          After every generation, six tools unlock. <strong>Thumbnail Concepts</strong> gives three click-driving visual ideas using different psychological triggers. <strong>Shot List</strong> breaks your script into a scene-by-scene filming guide for a solo creator with a phone. <strong>Platform Adaptation</strong> rewrites natively for other platforms — restructured for each algorithm, not just resized. <strong>Caption Variants</strong> produces five hook styles for the caption. <strong>Remix Engine</strong> generates five trend-targeted variations of your script — the same insight from five different entry angles, multiplying one idea into five pieces of content. <strong>30-Day Sequence Builder</strong> maps a full posting calendar with hook ideas, CTA types by week, and rest days built in.
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script>
+function openModal(){ document.getElementById('learnModal').classList.add('open'); document.body.style.overflow='hidden'; }
+function closeModal(){ document.getElementById('learnModal').classList.remove('open'); document.body.style.overflow=''; }
+function closeModalOuter(e){ if(e.target===document.getElementById('learnModal')) closeModal(); }
+document.addEventListener('keydown',e=>{ if(e.key==='Escape') closeModal(); });
+</script>
+
 </body>
 </html>

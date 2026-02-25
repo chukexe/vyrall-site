@@ -68,6 +68,37 @@ Spike-response principle: produce while wave is still rising.
 Remix principle: same insight, different trend-angle entry points = 5x content from one idea.
 Sequence principle: group into mini-series, space angles, map CTAs.
 
+LAYER 11 — ATTENTION ENGINEERING (Sapolsky / Variable Reward Science):
+Dopamine spikes HARDER in anticipation than in reward. The brain is wired for "something great
+might happen" — not "something good just happened." This is the slot machine principle applied to content.
+
+NEAR-MISS STRUCTURE: At the midpoint of every script, the viewer must feel the payoff is imminent
+but not yet delivered. The answer is coming — but not yet. This compels completion.
+"I'll tell you exactly what it is in a second — but first you need to understand why..."
+
+VARIABLE REWARD PACING: Insights must NOT be evenly spaced. Drop an unexpected insight early,
+then withhold, then drop another, then slow down, then deliver the payoff faster than expected.
+Unpredictable pacing = higher dopamine response = longer watch time = algorithm reward.
+
+ZERO-FRICTION ENTRY: The hook must require absolutely zero prior context. A viewer mid-scroll
+with 1.5 seconds has no patience for setup. Any hook that requires explanation before the tension
+lands has already lost. Test: "Could someone who knows nothing about this topic feel immediate
+tension from word one?" If no — rewrite.
+
+HOOK CATEGORIES (use the most potent for the topic):
+— "You're Being Manipulated" → "You're not addicted — you're being engineered."
+— Anticipation Gap → "I'm about to tell you something that will change how you see [X] forever."
+— Near-Miss Reveal → "I almost missed this. Most people do."
+— System Expose → "Here's what [platform/company/industry] doesn't want you to figure out."
+— Identity Reframe → "You're not [negative label] — you're [reframe that flatters]."
+— Consequence Preview → "This one thing is quietly costing you [specific loss]."
+
+ANTIDOTE CTA PHILOSOPHY: When a creator has an offer, the most powerful CTA framing is not
+a pitch — it is positioning the offer as the antidote to the manipulation or problem exposed in the content.
+Instead of: "DM me to join my program."
+Use: "If you want to take back control of [X], I've built something for exactly that."
+This converts because the viewer has just been shown the problem viscerally — the CTA becomes relief.
+
 FORMAT MATRIX:
 Virality → Walking Listicle, Myth-Busting, Narrative Hook, Absurd Success Story, Short-Form Explainer
 Authority → Professional Advice, Zero-Click Educational, Case Study, Tutorial/How-To
@@ -75,17 +106,20 @@ Trust → Philosophical FaceTime, Storytime, Day in the Life, Confessional
 Sales → Testimonial, Case Study, If You Struggle With X, BTS
 Relatability → POV, Skit/Micro-Drama, Man-on-Street, 3 Mistakes You're Making
 Inspiration → Transformation, Things I Wish I Knew, Absurd Success Story
+Attention Literacy → System Expose, Hidden Mechanism Reveal, Compare Two Systems, Offer the Antidote
 
 META RULES:
 1. NEVER ask user to choose emotion or share triggers — select autonomously.
 2. Select SINGLE highest-arousal emotion that authentically fits topic.
 3. Activate 2-3 share triggers naturally.
 4. Generate punchiest, most optimized version FIRST. Never produce a mediocre draft.
-5. All 10 layers applied simultaneously.
+5. All 11 layers applied simultaneously.
 6. Always think: "What would make this impossible NOT to share?"
+7. Apply near-miss structure at midpoint. Apply variable reward pacing throughout.
+8. Hook must pass zero-friction entry test — no setup, immediate tension from word one.
 `;
 
-const SYS = `${KB}\nYou are VYRALL's proprietary AI engine. Apply ALL 10 virality layers. Return ONLY valid JSON. No markdown fences, no explanation — raw JSON only.`;
+const SYS = `${KB}\nYou are VYRALL's proprietary AI engine. Apply ALL 11 virality layers including Attention Engineering. Return ONLY valid JSON. No markdown fences, no explanation — raw JSON only.`;
 
 // ── JSON PARSER ───────────────────────────────────────────────
 function parseJSON(txt) {
@@ -154,21 +188,25 @@ Platform: ${platform}
 ${trendAngle ? `Trend Context: This angle is "${trendAngle.status}" in the selected region. Lean into it.` : ''}
 
 TASKS:
-1. Select single best storytelling format from the Format Matrix.
+1. Select single best storytelling format from the Format Matrix (including Attention Literacy pillar).
 2. Autonomously select optimal high-arousal emotion (Layer 2 rules).
 3. Autonomously select 2-3 share triggers (Layer 4).
 4. Define social currency strategy (Layer 3).
-5. Score 5 dimensions (0-100): hook_strength, emotion_arousal, share_trigger, platform_fit, vrin_score.
-6. VRIN breakdown — score Valuable/Rare/Inimitable/Non-substitutable (0-100) with one-sentence note each.
-7. Generate 4 strategic insights (mix: 2 good, 1 info, 1 warn).
-8. Generate 5 format requirements with <strong>bold term</strong> — explanation format.
+5. Select the strongest hook category for this topic (Layer 11):
+   "You're Being Manipulated" / Anticipation Gap / Near-Miss Reveal / System Expose / Identity Reframe / Consequence Preview
+6. Score 5 dimensions (0-100): hook_strength, emotion_arousal, share_trigger, platform_fit, vrin_score.
+7. VRIN breakdown — score Valuable/Rare/Inimitable/Non-substitutable (0-100) with one-sentence note each.
+8. Generate 4 strategic insights (mix: 2 good, 1 info, 1 warn).
+9. Generate 5 format requirements with <strong>bold term</strong> — explanation format.
 
 Return JSON:
 {
   "inferred_niche":"${niche ? niche : 'the niche you inferred — leave blank string if niche was provided'}",
   "primary_format":"...","backup_format":"...",
   "reason":"2-3 sentences why this exact format for this topic+goal+emotion+platform",
-  "recommended_structure":["Hook","Perspective Shift","...","Payoff"],
+  "recommended_structure":["Hook","Perspective Shift","Near-Miss Bridge","...","Payoff"],
+  "hook_category":"the hook category selected from Layer 11",
+  "hook_category_reason":"one sentence why this hook category hits hardest for this topic",
   "format_requirements":["<strong>Term</strong> — explanation","...×5"],
   "selected_emotion":"awe|anger|anxiety|amusement|inspiration|surprise",
   "emotion_reasoning":"one sentence",
@@ -199,16 +237,26 @@ Social currency: ${socialCurrency}
 ${offer ? `Offer: "${offer}" | CTA: "${cta || 'natural next step'}"` : 'No offer — pure value content.'}
 ${trendAngle ? `Trend angle: "${trendAngle.phrase}" — lean into this specific angle throughout.` : ''}
 
-GENERATION RULES (all 10 layers simultaneously):
+GENERATION RULES (all 11 layers simultaneously):
 — Hook: 1-2 sentences. "Wait…what?" in first 3 words. No greetings. Immediate tension.
+  ZERO-FRICTION TEST: requires zero prior context. Mid-scroll viewer with 1.5s must feel tension instantly.
+  Choose from hook categories: "You're Being Manipulated" / Anticipation Gap / Near-Miss Reveal /
+  System Expose / Identity Reframe / Consequence Preview — whichever hits hardest for this topic.
 — Perspective Shift: Most surprising, counterintuitive angle. NOT what they expect.
 — Core: Tight, compressed. Every sentence adds new value. Nothing redundant.
+— NEAR-MISS STRUCTURE: At the midpoint, the payoff must feel imminent but not yet delivered.
+  Use a bridge like "I'll tell you exactly what this means in a second — but first you need to see why..."
+  This compels completion. Do not skip this.
+— VARIABLE REWARD PACING: Drop an unexpected insight early. Then withhold. Then drop another.
+  Slow down briefly. Then deliver the payoff faster than expected. Uneven spacing = higher dopamine response.
 — Self-Reflection: Viewer evaluates their own life situation specifically.
-— Payoff: Clear, satisfying, memorable aha moment.
-— Micro-hooks: Every 3-7 seconds of spoken content.
+— Payoff: Clear, satisfying, memorable aha moment. Arrives faster than expected.
+— Micro-hooks: Every 3-7 seconds of spoken content — a new tension or surprise.
 — Emotion ${emotion}: Activated through word choice and rhythm — never stated.
 — Platform ${platform}: Optimize for this platform's specific algorithm mechanics.
-${offer ? '— Offer: weave naturally. CTA feels like viewer would seek it themselves.' : '— End with thought-provoking question that makes viewer reflect AND share.'}
+${offer
+  ? '— CTA (Antidote framing): Position the offer as the relief to the problem just exposed — not as a pitch. "If you want to take back control of [X]..." not "DM me to join..."'
+  : '— End with thought-provoking question that makes viewer reflect AND share.'}
 — Social currency: The sharer gains social benefit. Design for the sharer.
 
 Return JSON:
@@ -314,11 +362,19 @@ Return JSON: {"weeks":[{"week":1,"theme":"...","days":[{"day":1,"type":"awarenes
 
   // ── Hook Rewrite ──────────────────────────────────────────
   regenHook: ({ script, emotion }) => `
-HOOK OPTIMIZER. Selected emotion: ${emotion}.
+HOOK OPTIMIZER (Layer 11 — Attention Engineering). Selected emotion: ${emotion}.
 Rewrite ONLY the hook. Keep body unchanged.
-Must: trigger "Wait…what?" in first 3 words. Activate ${emotion} immediately. 1-2 sentences max. No greetings.
+
+REQUIREMENTS:
+— Zero-friction entry: requires no prior context whatsoever. Mid-scroll viewer, 1.5 seconds, immediate tension.
+— "Wait…what?" activated in first 3 words.
+— ${emotion} felt from word one — never stated.
+— 1-2 sentences max. No greetings. No setup.
+— Choose the hook category that hits hardest for this content:
+  "You're Being Manipulated" / Anticipation Gap / Near-Miss Reveal / System Expose / Identity Reframe / Consequence Preview
+
 Current full script: ${script}
-Return JSON: {"improved_hook":"...","reason":"one sentence on why this hook is stronger"}`,
+Return JSON: {"improved_hook":"...","hook_category":"...","reason":"one sentence on why this hook category and why it is stronger"}`,
 
   // ── Full Regeneration ─────────────────────────────────────
   regenFull: ({ topic, goal, tone, platform, format, emotion, offer, cta, original }) => `

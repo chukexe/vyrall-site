@@ -1,0 +1,1372 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#08080a">
+<title>VYRALL</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=Fraunces:ital,opsz,wght@1,9..144,300&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#08080a;--s1:#0f0f12;--s2:#16161a;--s3:#1e1e24;
+  --b1:#2a2a34;--b2:#38383f;--b3:#4a4a55;
+  --ink:#eeece6;--ink2:#9e9c96;--ink3:#5e5c58;
+  --g:#00e5a0;--g2:#00b880;--g3:rgba(0,229,160,.12);--g4:rgba(0,229,160,.06);
+  --amber:#f0a030;--amber2:rgba(240,160,48,.08);--amber3:rgba(240,160,48,.22);
+  --red:#ff5555;--blue:#4a9eff;--blue2:rgba(74,158,255,.08);
+  --purple:#b06aff;--purple2:rgba(176,106,255,.08);
+  --yellow:#ffd060;--teal:#00d4d4;--teal2:rgba(0,212,212,.1);--teal3:rgba(0,212,212,.25);
+  --nav-h:64px;--top-h:52px;
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+html,body{height:100%;overflow:hidden;background:var(--bg);}
+body{color:var(--ink);font-family:'DM Mono',monospace;font-size:13px;}
+
+/* ── TOP BAR ── */
+.topbar{position:fixed;top:0;left:0;right:0;height:var(--top-h);background:var(--s1);border-bottom:1px solid var(--b1);display:flex;align-items:center;justify-content:space-between;padding:0 16px;z-index:200;}
+.logo{font-family:'Syne',sans-serif;font-weight:800;font-size:18px;letter-spacing:.14em;}
+.logo em{color:var(--g);font-style:normal;}
+.topbar-right{display:flex;align-items:center;gap:8px;}
+.topbar-badge{font-size:8px;padding:3px 8px;border-radius:2px;border:1px solid var(--g3);color:var(--g2);letter-spacing:.1em;}
+.info-btn{width:26px;height:26px;border-radius:50%;border:1px solid var(--b2);background:transparent;color:var(--ink3);font-size:12px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s;}
+.info-btn:active{border-color:var(--g2);color:var(--g);}
+
+/* ── SCROLL + PAGES ── */
+.scroll{position:fixed;top:var(--top-h);bottom:var(--nav-h);left:0;right:0;overflow-y:auto;-webkit-overflow-scrolling:touch;}
+.page{display:none;padding:16px;padding-bottom:28px;min-height:100%;flex-direction:column;gap:14px;}
+.page.active{display:flex;}
+
+/* ── BOTTOM NAV ── */
+.bottom-nav{position:fixed;bottom:0;left:0;right:0;height:var(--nav-h);background:var(--s1);border-top:1px solid var(--b1);display:grid;grid-template-columns:repeat(3,1fr);z-index:200;}
+.bnav-btn{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;background:transparent;border:none;cursor:pointer;padding:8px 0;}
+.bnav-icon{font-size:18px;color:var(--ink3);transition:color .2s;}
+.bnav-lbl{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink3);transition:color .2s;}
+.bnav-btn.on .bnav-icon,.bnav-btn.on .bnav-lbl{color:var(--g);}
+
+/* ── CARDS ── */
+.card{background:var(--s1);border:1px solid var(--b1);border-radius:8px;overflow:hidden;}
+.card-hdr{padding:12px 14px;background:var(--s2);border-bottom:1px solid var(--b1);display:flex;align-items:center;justify-content:space-between;}
+.card-eye{font-size:8px;letter-spacing:.22em;text-transform:uppercase;color:var(--ink3);}
+.card-title{font-family:'Syne',sans-serif;font-size:13px;font-weight:700;color:var(--ink);margin-top:2px;}
+
+/* ── FORM ── */
+.form-group{display:flex;flex-direction:column;gap:6px;}
+.form-label{font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink2);}
+input[type=text],select{background:var(--s2);border:1px solid var(--b1);color:var(--ink);font-family:'DM Mono',monospace;font-size:14px;padding:12px 14px;border-radius:6px;outline:none;width:100%;-webkit-appearance:none;appearance:none;transition:border-color .15s;}
+input[type=text]:focus,select:focus{border-color:var(--g2);}
+input.err{border-color:var(--red)!important;}
+select{padding-right:36px;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%235e5c58' d='M6 8L1 3h10z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;}
+select option{background:var(--s2);}
+select optgroup{font-style:normal;color:var(--ink3);font-size:10px;}
+
+/* ── TOGGLE ── */
+.toggle-row{display:flex;align-items:center;gap:10px;padding:14px;background:var(--s2);border-radius:6px;cursor:pointer;}
+.toggle-track{width:44px;height:24px;background:var(--b2);border-radius:12px;position:relative;flex-shrink:0;transition:background .2s;}
+.toggle-track.on{background:var(--g);}
+.toggle-thumb{width:18px;height:18px;background:var(--bg);border-radius:50%;position:absolute;top:3px;left:3px;transition:transform .2s;box-shadow:0 1px 4px rgba(0,0,0,.5);}
+.toggle-track.on .toggle-thumb{transform:translateX(20px);}
+.toggle-lbl{font-size:13px;color:var(--ink2);}
+
+/* ── GEN BUTTON ── */
+.gen-btn{background:var(--g);color:var(--bg);border:none;padding:16px 20px;font-family:'Syne',sans-serif;font-size:13px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;border-radius:8px;width:100%;cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:8px;}
+.gen-btn:disabled{background:var(--b1);color:var(--ink3);}
+.gen-btn:active:not(:disabled){transform:scale(0.98);}
+
+/* ── STATUS ── */
+.status-bar{display:flex;align-items:center;gap:8px;padding:10px 14px;background:var(--s2);border-radius:6px;font-size:10.5px;color:var(--ink3);}
+.sdot{width:6px;height:6px;border-radius:50%;background:var(--b2);flex-shrink:0;}
+.sdot.run{background:var(--g);animation:blink 1.1s infinite;}
+.sdot.ok{background:var(--g);}
+.sdot.fail{background:var(--red);}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.15}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+@keyframes shim{0%{background-position:200% 0}100%{background-position:-200% 0}}
+
+/* ── WELCOME SCREEN ── */
+.welcome-m{display:flex;flex-direction:column;align-items:center;text-align:center;padding:32px 20px 24px;gap:16px;animation:fadeUp .5s ease;}
+.welcome-v{font-family:'Syne',sans-serif;font-weight:800;font-size:64px;letter-spacing:.08em;color:var(--g);line-height:1;text-shadow:0 0 60px rgba(0,229,160,.2);}
+.welcome-t{font-family:'Fraunces',serif;font-size:20px;font-weight:300;color:var(--ink);letter-spacing:.03em;}
+.welcome-s{font-size:11.5px;color:var(--ink3);line-height:1.85;max-width:300px;}
+.welcome-formula{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:7px;background:var(--s2);border:1px solid var(--b1);border-radius:6px;padding:12px 14px;width:100%;}
+.wf-part{font-family:'Syne',sans-serif;font-size:11px;font-weight:700;color:var(--g);}
+.wf-op{font-size:13px;color:var(--ink3);}
+.wf-eq{font-size:10px;color:var(--ink3);padding:0 2px;}
+.welcome-learn{background:transparent;border:1px solid var(--b2);color:var(--ink3);font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.1em;padding:9px 18px;border-radius:6px;cursor:pointer;display:inline-flex;align-items:center;gap:6px;transition:all .2s;}
+.welcome-learn:active{border-color:var(--g2);color:var(--g);}
+
+/* ── TREND INTELLIGENCE ── */
+.trend-card-m{background:var(--s1);border:1px solid var(--teal3);border-radius:8px;overflow:hidden;}
+.trend-hdr-m{padding:12px 14px;background:linear-gradient(135deg,rgba(0,212,212,.08),transparent);border-bottom:1px solid rgba(0,212,212,.15);display:flex;align-items:center;gap:8px;}
+.trend-icon{font-size:16px;color:var(--teal);}
+.trend-eye{font-size:8px;letter-spacing:.2em;text-transform:uppercase;color:var(--teal);}
+.trend-title-m{font-family:'Syne',sans-serif;font-size:13px;font-weight:700;color:var(--ink);margin-top:1px;}
+.trend-btn-m{background:var(--teal2);border:1px solid var(--teal3);color:var(--teal);font-family:'Syne',sans-serif;font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;padding:12px 16px;border-radius:6px;width:100%;cursor:pointer;transition:all .2s;margin-top:10px;}
+.trend-btn-m:disabled{opacity:.4;}
+.trend-angle-m{padding:12px 14px;background:var(--s2);border:1px solid var(--b1);border-radius:6px;cursor:pointer;transition:all .15s;margin-top:6px;}
+.trend-angle-m.sel{border-color:var(--teal);background:rgba(0,212,212,.08);}
+.ta-phrase-m{font-size:12px;color:var(--ink);font-weight:500;margin-bottom:4px;}
+.ta-why-m{font-size:11px;color:var(--ink3);line-height:1.45;margin-bottom:6px;}
+.ta-meta-m{display:flex;align-items:center;justify-content:space-between;}
+.ta-badge-m{font-size:9px;padding:2px 8px;border-radius:3px;}
+.ta-badge-m.hot{background:rgba(255,85,85,.1);color:var(--red);border:1px solid rgba(255,85,85,.2);}
+.ta-badge-m.rising{background:var(--amber2);color:var(--amber);border:1px solid rgba(240,160,48,.2);}
+.ta-badge-m.stable{background:var(--blue2);color:var(--blue);border:1px solid rgba(74,158,255,.2);}
+.ta-vrin-m{font-size:9px;color:var(--teal);}
+.inferred-lbl{font-size:10px;color:var(--teal);padding:0 0 4px;letter-spacing:.05em;}
+
+/* ── AI BADGE ── */
+.ai-badge-m{display:flex;align-items:center;gap:8px;padding:10px 14px;background:var(--g4);border:1px solid var(--g3);border-radius:6px;font-size:11px;color:var(--g2);}
+
+/* ── SCORES ── */
+.scores-list{display:flex;flex-direction:column;gap:0;}
+.score-row{display:flex;align-items:center;gap:12px;padding:12px 14px;border-bottom:1px solid var(--b1);}
+.score-row:last-child{border-bottom:none;}
+.score-lbl-m{font-size:10px;color:var(--ink3);width:116px;flex-shrink:0;}
+.score-bar-w{flex:1;height:4px;background:var(--b1);border-radius:2px;}
+.score-bar-f{height:100%;border-radius:2px;transition:width .7s ease;}
+.score-val-m{font-family:'Syne',sans-serif;font-size:14px;font-weight:700;color:var(--ink);width:38px;text-align:right;flex-shrink:0;}
+
+/* ── VRIN ── */
+.vrin-pills{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:14px;}
+.vrin-pill{background:var(--s2);border:1px solid rgba(255,208,96,.2);border-radius:6px;padding:10px 12px;}
+.vrin-pill-ltr{font-family:'Syne',sans-serif;font-size:20px;font-weight:800;color:var(--yellow);}
+.vrin-pill-word{font-size:8px;letter-spacing:.15em;text-transform:uppercase;color:var(--ink3);margin-bottom:5px;}
+.vrin-pill-bar{height:3px;background:var(--b1);border-radius:2px;margin-bottom:5px;}
+.vrin-pill-fill{height:100%;background:var(--yellow);border-radius:2px;transition:width .7s ease;}
+.vrin-pill-score{font-size:14px;font-weight:700;color:var(--yellow);}
+.vrin-pill-note{font-size:9.5px;color:var(--ink3);line-height:1.4;margin-top:4px;}
+
+/* ── AI SELECTIONS ── */
+.ai-sel-list{display:flex;flex-direction:column;}
+.ai-sel-item{padding:12px 14px;border-bottom:1px solid var(--b1);}
+.ai-sel-item:last-child{border-bottom:none;}
+.ai-sel-lbl{font-size:8.5px;letter-spacing:.18em;text-transform:uppercase;color:var(--ink3);margin-bottom:5px;}
+.ai-sel-val{font-size:13px;font-weight:500;}
+.emo-awe{color:var(--blue);}
+.emo-anger{color:var(--red);}
+.emo-anxiety{color:var(--purple);}
+.emo-amusement{color:var(--yellow);}
+.emo-inspiration{color:var(--g);}
+.emo-surprise{color:var(--amber);}
+.ai-sel-note{font-size:11px;color:var(--ink3);line-height:1.5;margin-top:3px;}
+.trigger-pills{display:flex;flex-wrap:wrap;gap:5px;margin-top:5px;}
+.tpill{font-size:9.5px;padding:3px 9px;border-radius:3px;border:1px solid rgba(176,106,255,.25);color:var(--purple);background:rgba(176,106,255,.08);}
+
+/* ── INSIGHTS ── */
+.insights-m{display:flex;flex-wrap:wrap;gap:5px;padding:12px 14px;}
+.insight-pill{font-size:10px;padding:4px 10px;border-radius:4px;}
+.insight-pill.good{border:1px solid rgba(0,229,160,.2);color:var(--g);}
+.insight-pill.warn{border:1px solid rgba(240,160,48,.2);color:var(--amber);}
+.insight-pill.info{border:1px solid rgba(74,158,255,.2);color:var(--blue);}
+
+/* ── PLATFORM TIPS ── */
+.plat-tips-m{background:rgba(240,160,48,.05);border-top:1px solid var(--b1);}
+.plat-tips-lbl{font-size:8.5px;letter-spacing:.2em;text-transform:uppercase;color:var(--amber);padding:10px 14px 4px;}
+.plat-tip-item{font-size:11px;color:var(--ink2);line-height:1.5;padding:3px 14px 3px 26px;position:relative;}
+.plat-tip-item::before{content:'→';position:absolute;left:14px;color:var(--amber);font-size:9px;}
+.plat-tip-item:last-child{padding-bottom:12px;}
+
+/* ── SCRIPT ── */
+.hook-block-m{border-left:3px solid var(--g);padding:12px 14px;background:var(--s2);border-radius:0 6px 6px 0;margin:14px;}
+.hook-lbl{font-size:8px;letter-spacing:.2em;text-transform:uppercase;color:var(--g2);margin-bottom:5px;}
+.hook-txt{font-family:'Fraunces',serif;font-size:17px;font-style:italic;line-height:1.45;color:var(--ink);}
+.script-body-m{font-size:13px;line-height:1.9;color:var(--ink2);white-space:pre-wrap;padding:14px;word-break:break-word;}
+.cta-block-m{margin:0 14px 14px;background:var(--amber2);border:1px solid var(--amber3);border-radius:6px;padding:12px 14px;}
+.cta-lbl-m{font-size:8px;letter-spacing:.2em;text-transform:uppercase;color:var(--amber);margin-bottom:5px;}
+.cta-txt-m{font-family:'Fraunces',serif;font-size:15px;font-style:italic;color:var(--amber);line-height:1.5;}
+.share-block-m{margin:0 14px 14px;background:rgba(176,106,255,.08);border:1px solid rgba(176,106,255,.2);border-radius:6px;padding:12px 14px;}
+.share-lbl-m{font-size:8px;letter-spacing:.2em;text-transform:uppercase;color:var(--purple);margin-bottom:5px;}
+.share-txt-m{font-size:12px;color:var(--ink2);line-height:1.6;}
+.trend-used-m{background:var(--s1);border:1px solid var(--teal3);border-radius:8px;overflow:hidden;}
+.trend-used-hdr{padding:10px 14px;background:linear-gradient(135deg,rgba(0,212,212,.08),transparent);border-bottom:1px solid rgba(0,212,212,.12);display:flex;align-items:center;gap:7px;}
+.trend-used-phrase{font-family:'Syne',sans-serif;font-size:12px;font-weight:700;color:var(--teal);}
+.trend-used-why{padding:8px 14px;font-size:11px;color:var(--ink3);line-height:1.55;}
+
+/* ── ACTIONS ── */
+.action-row{display:flex;gap:6px;padding:12px 14px;border-top:1px solid var(--b1);flex-wrap:wrap;}
+.abtn-m{background:var(--s2);border:1px solid var(--b1);color:var(--ink2);font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.08em;padding:9px 14px;cursor:pointer;border-radius:6px;transition:all .15s;white-space:nowrap;flex-shrink:0;}
+.abtn-m:active{background:var(--s3);}
+.abtn-m.primary{background:var(--g);color:var(--bg);border-color:var(--g);font-weight:500;}
+.abtn-m:disabled{opacity:.35;cursor:not-allowed;}
+
+/* ── FEATURE TOOLS ── */
+.feat-section-lbl{font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:var(--ink3);}
+.feat-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.feat-card-m{background:var(--s2);border:1px solid var(--b1);border-radius:8px;padding:14px;cursor:pointer;transition:all .15s;display:flex;flex-direction:column;gap:6px;-webkit-user-select:none;}
+.feat-card-m:active{transform:scale(0.97);}
+.feat-card-m.teal-feat{border-color:rgba(0,212,212,.3);}
+.feat-card-m.amber-feat{border-color:rgba(240,160,48,.3);}
+.feat-icon-m{font-size:22px;}
+.feat-name-m{font-size:11px;color:var(--ink);font-weight:500;}
+.feat-desc-m{font-size:10px;color:var(--ink3);line-height:1.4;}
+
+/* ── FEATURE OUTPUT CARDS ── */
+.thumb-item-m{padding:14px;border-bottom:1px solid var(--b1);}
+.thumb-item-m:last-child{border-bottom:none;}
+.thumb-num-m{font-size:8.5px;letter-spacing:.15em;text-transform:uppercase;color:var(--ink3);margin-bottom:6px;}
+.thumb-headline-m{font-family:'Syne',sans-serif;font-weight:700;font-size:16px;color:var(--ink);line-height:1.3;margin-bottom:8px;}
+.thumb-visual-m{font-size:12px;color:var(--ink2);line-height:1.55;margin-bottom:6px;}
+.thumb-why-m{font-size:11px;color:var(--amber);line-height:1.5;font-style:italic;margin-bottom:10px;}
+
+.shot-item-m{padding:14px;border-bottom:1px solid var(--b1);}
+.shot-item-m:last-child{border-bottom:none;}
+.shot-num-hdr{display:flex;align-items:center;gap:8px;margin-bottom:8px;}
+.shot-num-badge{background:var(--s2);border:1px solid var(--b1);border-radius:4px;width:28px;height:28px;display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-size:12px;font-weight:700;color:var(--ink3);}
+.shot-type-m{font-size:9.5px;letter-spacing:.15em;text-transform:uppercase;color:var(--blue);}
+.shot-desc-m{font-size:13px;color:var(--ink);line-height:1.55;margin-bottom:8px;}
+.shot-tags-m{display:flex;gap:5px;flex-wrap:wrap;}
+.shot-tag-m{font-size:10px;padding:3px 9px;border-radius:3px;border:1px solid var(--b1);color:var(--ink3);}
+
+.plat-pills{display:flex;flex-wrap:wrap;gap:6px;padding:14px;}
+.aplat-m{padding:8px 14px;border-radius:5px;border:1px solid var(--b1);background:var(--s2);font-family:'DM Mono',monospace;font-size:11px;color:var(--ink3);cursor:pointer;transition:all .15s;}
+.aplat-m.sel{border-color:var(--purple);color:var(--purple);background:rgba(176,106,255,.08);}
+.adapt-run-m{background:var(--purple);color:var(--bg);border:none;padding:13px 16px;font-family:'Syne',sans-serif;font-size:12px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;cursor:pointer;border-radius:6px;width:calc(100% - 28px);margin:0 14px 14px;display:block;transition:all .2s;}
+.adapt-run-m:disabled{background:var(--b1);color:var(--ink3);}
+.adapt-result-m{padding:14px;border-top:1px solid var(--b1);}
+.adapt-plat-m{font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:var(--purple);margin-bottom:8px;}
+.adapt-script-m{font-size:13px;color:var(--ink2);line-height:1.85;white-space:pre-wrap;margin-bottom:10px;}
+
+.capt-item-m{padding:14px;border-bottom:1px solid var(--b1);}
+.capt-item-m:last-child{border-bottom:none;}
+.capt-style-m{font-size:9px;letter-spacing:.18em;text-transform:uppercase;color:var(--g2);margin-bottom:6px;}
+.capt-txt-m{font-size:13px;color:var(--ink);line-height:1.7;margin-bottom:6px;}
+.capt-hash-m{font-size:11px;color:var(--ink3);font-style:italic;margin-bottom:10px;}
+
+.remix-item-m{padding:14px;border-bottom:1px solid var(--b1);}
+.remix-item-m:last-child{border-bottom:none;}
+.remix-angle-m{font-size:9px;letter-spacing:.15em;text-transform:uppercase;color:var(--teal);margin-bottom:5px;}
+.remix-hook-m{font-family:'Fraunces',serif;font-size:15px;font-style:italic;color:var(--ink);line-height:1.4;margin-bottom:8px;}
+.remix-body-m{font-size:12px;color:var(--ink2);line-height:1.7;margin-bottom:6px;}
+.remix-why-m{font-size:11px;color:var(--teal);font-style:italic;margin-bottom:10px;}
+
+.seq-week-lbl-m{padding:10px 14px;background:var(--s2);font-size:9px;letter-spacing:.18em;text-transform:uppercase;color:var(--amber);border-bottom:1px solid var(--b1);}
+.seq-day-m{display:flex;gap:0;border-bottom:1px solid var(--b1);}
+.seq-day-m:last-child{border-bottom:none;}
+.seq-num-m{width:48px;flex-shrink:0;display:flex;flex-direction:column;align-items:center;justify-content:center;background:var(--s2);border-right:1px solid var(--b1);padding:10px 0;}
+.seq-n{font-family:'Syne',sans-serif;font-size:15px;font-weight:700;color:var(--amber);}
+.seq-l{font-size:8px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink3);}
+.seq-content-m{padding:10px 12px;flex:1;}
+.seq-type-m{font-size:9px;letter-spacing:.14em;text-transform:uppercase;margin-bottom:4px;}
+.seq-hook-m{font-size:12px;color:var(--ink);line-height:1.5;margin-bottom:4px;}
+.seq-cta-m{font-size:11px;color:var(--amber);font-style:italic;margin-bottom:4px;}
+.seq-note-m{font-size:10px;color:var(--ink3);}
+
+/* ── HISTORY ── */
+.hist-item-m{background:var(--s1);border:1px solid var(--b1);border-radius:8px;overflow:hidden;}
+.hist-hdr-m{padding:12px 14px;background:var(--s2);border-bottom:1px solid var(--b1);}
+.hist-topic-m{font-family:'Syne',sans-serif;font-size:13px;font-weight:600;color:var(--ink);}
+.hist-meta-m{font-size:10px;color:var(--ink3);margin-top:2px;}
+.hist-prev-m{padding:12px 14px;font-family:'Fraunces',serif;font-size:13px;font-style:italic;color:var(--ink2);line-height:1.6;}
+.hist-tags-m{padding:8px 14px;display:flex;gap:5px;flex-wrap:wrap;border-top:1px solid var(--b1);}
+.htag-m{font-size:9.5px;padding:3px 9px;border-radius:3px;border:1px solid var(--b1);color:var(--ink3);}
+.hist-acts-m{display:flex;gap:6px;padding:10px 14px;border-top:1px solid var(--b1);}
+.hbtn-m{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.06em;padding:8px 14px;border-radius:6px;border:1px solid var(--b1);background:transparent;color:var(--ink3);cursor:pointer;flex:1;text-align:center;}
+.hbtn-m.hl{border-color:var(--g3);color:var(--g);}
+
+/* ── SKELETON + ERRORS ── */
+.skel-m{display:flex;flex-direction:column;gap:9px;padding:16px;}
+.sk-m{height:12px;background:linear-gradient(90deg,var(--s2) 25%,var(--s3) 50%,var(--s2) 75%);background-size:200% 100%;animation:shim 1.4s infinite;border-radius:3px;}
+.err-m{color:var(--red);font-size:12px;line-height:1.7;padding:14px;background:rgba(255,85,85,.08);border-top:1px solid rgba(255,85,85,.15);}
+.empty-state{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:200px;gap:10px;color:var(--ink3);text-align:center;padding:20px;}
+
+/* ── BOTTOM SHEET (Learn More) ── */
+.sheet-overlay{position:fixed;inset:0;z-index:500;background:rgba(8,8,10,.8);backdrop-filter:blur(4px);opacity:0;pointer-events:none;transition:opacity .25s ease;}
+.sheet-overlay.open{opacity:1;pointer-events:all;}
+.sheet{position:fixed;bottom:0;left:0;right:0;z-index:501;background:var(--s1);border-top:1px solid var(--b1);border-radius:16px 16px 0 0;max-height:88vh;overflow-y:auto;-webkit-overflow-scrolling:touch;transform:translateY(100%);transition:transform .3s cubic-bezier(.32,.72,0,1);}
+.sheet-overlay.open .sheet{transform:translateY(0);}
+.sheet-handle{width:36px;height:4px;background:var(--b2);border-radius:2px;margin:12px auto 0;}
+.sheet-top{display:flex;align-items:center;justify-content:space-between;padding:16px 18px 12px;}
+.sheet-title{font-family:'Syne',sans-serif;font-size:15px;font-weight:700;color:var(--ink);}
+.sheet-close{width:28px;height:28px;border-radius:50%;border:1px solid var(--b1);background:transparent;color:var(--ink3);font-size:13px;cursor:pointer;display:flex;align-items:center;justify-content:center;}
+.sheet-body{padding:0 18px 40px;display:flex;flex-direction:column;gap:24px;}
+
+.sheet-section{display:flex;flex-direction:column;gap:10px;}
+.sheet-eye{font-size:8.5px;letter-spacing:.25em;text-transform:uppercase;color:var(--g2);display:flex;align-items:center;gap:7px;}
+.sheet-eye::after{content:'';flex:1;height:1px;background:var(--b1);}
+
+.sheet-casino{background:linear-gradient(135deg,rgba(0,229,160,.06),rgba(0,229,160,.02));border:1px solid var(--g3);border-radius:8px;padding:16px;}
+.sheet-casino-hl{font-family:'Fraunces',serif;font-size:17px;font-style:italic;color:var(--g);line-height:1.4;margin-bottom:10px;}
+.sheet-casino-body{font-size:12px;color:var(--ink2);line-height:1.85;}
+.sheet-casino-body strong{color:var(--ink);}
+
+.sheet-formula{display:flex;flex-wrap:wrap;align-items:center;gap:8px;padding:14px;background:var(--s2);border-radius:6px;border:1px solid var(--b1);}
+.sf-part{font-family:'Syne',sans-serif;font-size:11px;font-weight:700;color:var(--g);}
+.sf-op{font-size:13px;color:var(--ink3);}
+.sf-eq{font-size:10px;color:var(--ink3);}
+
+.sheet-layers{display:flex;flex-direction:column;gap:0;border:1px solid var(--b1);border-radius:8px;overflow:hidden;}
+.sheet-layer{display:grid;grid-template-columns:28px 1fr;border-bottom:1px solid var(--b1);}
+.sheet-layer:last-child{border-bottom:none;}
+.sl-num{display:flex;align-items:center;justify-content:center;background:var(--s2);border-right:1px solid var(--b1);font-family:'Syne',sans-serif;font-size:11px;font-weight:700;color:var(--ink3);}
+.sl-body{padding:10px 12px;}
+.sl-name{font-size:11px;color:var(--ink);font-weight:500;margin-bottom:2px;}
+.sl-desc{font-size:10px;color:var(--ink3);line-height:1.5;}
+
+.sheet-trio{display:flex;flex-direction:column;gap:8px;}
+.sheet-trio-cell{background:var(--s2);border-radius:6px;padding:12px 14px;border:1px solid var(--b1);}
+.sheet-trio-lbl{font-size:9px;letter-spacing:.18em;text-transform:uppercase;margin-bottom:6px;}
+.sheet-trio-val{font-size:11.5px;color:var(--ink);line-height:1.65;}
+
+.sheet-tools-body{font-size:12px;color:var(--ink2);line-height:1.85;}
+.sheet-tools-body strong{color:var(--ink);}
+
+::-webkit-scrollbar{display:none;}
+</style>
+</head>
+<body>
+
+<!-- TOP BAR -->
+<div class="topbar">
+  <div class="logo">VYR<em>ALL</em></div>
+  <div class="topbar-right">
+    <div class="topbar-badge">v4</div>
+    <button class="info-btn" onclick="mOpenSheet()">?</button>
+  </div>
+</div>
+
+<!-- SCROLL AREA -->
+<div class="scroll" id="mainScroll">
+
+  <!-- ═══ PAGE: GENERATE ═══ -->
+  <div class="page active" id="pg-generate">
+
+    <!-- WELCOME (shown until first generate) -->
+    <div id="m-welcome" class="welcome-m">
+      <div class="welcome-v">V</div>
+      <div class="welcome-t">Content built to spread.</div>
+      <div class="welcome-s">Virality isn't predictable. But it is engineerable. Stack the odds.</div>
+      <div class="welcome-formula">
+        <span class="wf-part">Volume</span>
+        <span class="wf-op">×</span>
+        <span class="wf-part">Clarity</span>
+        <span class="wf-op">×</span>
+        <span class="wf-part">Emotion</span>
+        <span class="wf-eq">=</span>
+        <span class="wf-part" style="color:var(--amber)">Probability</span>
+      </div>
+      <button class="welcome-learn" onclick="mOpenSheet()">
+        <span>◈</span> How it works
+      </button>
+    </div>
+
+    <!-- TREND INTELLIGENCE -->
+    <div class="trend-card-m">
+      <div class="trend-hdr-m">
+        <span class="trend-icon">◎</span>
+        <div>
+          <div class="trend-eye">00 · Trend Intelligence</div>
+          <div class="trend-title-m">Discover Trending Angles</div>
+        </div>
+      </div>
+      <div style="padding:14px;display:flex;flex-direction:column;gap:10px;">
+        <div class="form-group">
+          <label class="form-label">Your Niche <span style="color:var(--ink3);font-size:9px">(optional — topic works too)</span></label>
+          <input type="text" id="m-niche" placeholder="e.g. personal finance, fitness, AI tools…"/>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Region</label>
+          <select id="m-region">
+            <option value="United Kingdom">United Kingdom 🇬🇧</option>
+            <option value="United States">United States 🇺🇸</option>
+            <option value="Nigeria">Nigeria 🇳🇬</option>
+            <option value="Global">Global / Worldwide 🌍</option>
+            <option value="Canada">Canada 🇨🇦</option>
+            <option value="Australia">Australia 🇦🇺</option>
+            <option value="South Africa">South Africa 🇿🇦</option>
+            <option value="Ghana">Ghana 🇬🇭</option>
+          </select>
+        </div>
+        <button class="trend-btn-m" id="m-trendBtn" onclick="mGetTrends()">◎  Discover Trending Angles</button>
+        <div id="m-trendAngles"></div>
+      </div>
+    </div>
+
+    <!-- TOPIC -->
+    <div class="card">
+      <div class="card-hdr">
+        <div><div class="card-eye">01 · Your Idea</div><div class="card-title">Topic</div></div>
+      </div>
+      <div style="padding:14px;">
+        <div class="form-group">
+          <input type="text" id="m-topic" placeholder="e.g. why most people never save money"/>
+        </div>
+      </div>
+    </div>
+
+    <!-- STRATEGY -->
+    <div class="card">
+      <div class="card-hdr">
+        <div><div class="card-eye">02–04 · Strategy</div><div class="card-title">Goal, Tone & Platform</div></div>
+      </div>
+      <div style="padding:14px;display:flex;flex-direction:column;gap:10px;">
+        <div class="form-group">
+          <label class="form-label">Goal</label>
+          <select id="m-goal">
+            <optgroup label="── REACH & GROWTH ──">
+              <option>Virality — maximize reach &amp; views</option>
+              <option>Discoverability — reach new audiences</option>
+              <option>Shareability — content people pass on</option>
+            </optgroup>
+            <optgroup label="── CREDIBILITY ──">
+              <option>Authority — position as expert</option>
+              <option>Thought Leadership — shape industry thinking</option>
+              <option>Education — teach a skill or concept</option>
+            </optgroup>
+            <optgroup label="── RELATIONSHIP ──">
+              <option>Trust — build emotional connection</option>
+              <option>Relatability — make people feel seen</option>
+            </optgroup>
+            <optgroup label="── CONVERSION ──">
+              <option>Sales Alignment — support backend offer</option>
+              <option>Lead Generation — attract prospects</option>
+            </optgroup>
+            <optgroup label="── IDENTITY ──">
+              <option>Inspiration — motivate &amp; activate identity</option>
+              <option>Brand Awareness — establish presence</option>
+            </optgroup>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Tone</label>
+          <select id="m-tone">
+            <optgroup label="── CALM ──">
+              <option>Calm &amp; Thoughtful</option>
+              <option>Philosophical / Meditative</option>
+              <option>Introspective / Vulnerable</option>
+            </optgroup>
+            <optgroup label="── DIRECT ──">
+              <option>Direct &amp; Tactical</option>
+              <option>Bold &amp; Declarative</option>
+              <option>No-Nonsense / Blunt</option>
+            </optgroup>
+            <optgroup label="── ENERGETIC ──">
+              <option>High Energy / Enthusiastic</option>
+              <option>Conversational &amp; Warm</option>
+              <option>Humorous &amp; Witty</option>
+              <option>Provocative / Edgy</option>
+            </optgroup>
+            <optgroup label="── NARRATIVE ──">
+              <option>Storytelling / Narrative</option>
+              <option>Confessional / Personal</option>
+              <option>Contrarian / Myth-busting</option>
+            </optgroup>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Platform</label>
+          <select id="m-plat">
+            <option value="any">Any platform</option>
+            <option value="tiktok">TikTok</option>
+            <option value="instagram_reels">Instagram Reels</option>
+            <option value="instagram_carousel">Instagram Carousel</option>
+            <option value="youtube_shorts">YouTube Shorts</option>
+            <option value="youtube_longform">YouTube Long Form</option>
+            <option value="facebook">Facebook</option>
+            <option value="linkedin">LinkedIn</option>
+            <option value="twitter_x">Twitter / X</option>
+            <option value="podcast">Podcast</option>
+            <option value="newsletter">Newsletter / Email</option>
+          </select>
+        </div>
+        <div class="ai-badge-m">
+          <span>◈</span><span>AI selects emotion &amp; share triggers autonomously</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- OFFER -->
+    <div class="card">
+      <div class="card-hdr">
+        <div><div class="card-eye">05 · Optional</div><div class="card-title">Backend Offer</div></div>
+      </div>
+      <div style="padding:14px;display:flex;flex-direction:column;gap:10px;">
+        <div class="toggle-row" onclick="mTogOffer()">
+          <div class="toggle-track" id="m-offerTog"><div class="toggle-thumb"></div></div>
+          <span class="toggle-lbl">I have an offer to promote</span>
+        </div>
+        <div id="m-offerF" style="display:none;flex-direction:column;gap:10px;">
+          <div class="form-group">
+            <label class="form-label">Your Offer</label>
+            <input type="text" id="m-offer" placeholder="e.g. coaching program, course…"/>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Call To Action</label>
+            <input type="text" id="m-cta" placeholder="e.g. DM me READY, link in bio…"/>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <button class="gen-btn" id="m-genBtn" onclick="mRun()">
+      <span>▶</span><span>Generate Content</span>
+    </button>
+
+    <div class="status-bar" id="m-statusBar">
+      <div class="sdot" id="m-sdot"></div>
+      <span id="m-stxt">Ready — 10 virality layers standing by</span>
+    </div>
+
+  </div>
+
+  <!-- ═══ PAGE: OUTPUT ═══ -->
+  <div class="page" id="pg-output">
+
+    <div id="m-trendUsed" class="trend-used-m" style="display:none">
+      <div class="trend-used-hdr">
+        <span style="font-size:12px;color:var(--teal)">◎</span>
+        <div>
+          <div style="font-size:8px;letter-spacing:.2em;text-transform:uppercase;color:var(--teal)">Trend Angle Applied</div>
+          <div class="trend-used-phrase" id="m-trendUsedPhrase">—</div>
+        </div>
+      </div>
+      <div class="trend-used-why" id="m-trendUsedWhy"></div>
+    </div>
+
+    <div class="card" id="m-analysisCard">
+      <div class="card-hdr">
+        <div><div class="card-eye">Virality Intelligence Report</div><div class="card-title" id="m-fmtName">—</div></div>
+        <div id="m-vrinTotal" style="font-family:'Syne',sans-serif;font-size:15px;font-weight:700;color:var(--yellow)">—</div>
+      </div>
+      <div class="scores-list" id="m-scoresList"></div>
+      <div class="vrin-pills" id="m-vrinPills"></div>
+      <div class="ai-sel-list" id="m-aiSelList"></div>
+      <div class="insights-m" id="m-insights"></div>
+      <div id="m-platTips"></div>
+    </div>
+
+    <div class="card" id="m-scriptCard">
+      <div class="card-hdr">
+        <div><div class="card-eye">VYRALL Output</div><div class="card-title">Final Script</div></div>
+        <div class="sdot" id="m-scriptDot"></div>
+      </div>
+      <div id="m-scriptBody">
+        <div class="skel-m">${['52%','88%','70%','93%','64%'].map(w=>`<div class="sk-m" style="width:${w}"></div>`).join('')}</div>
+      </div>
+      <div class="action-row" id="m-actions" style="display:none">
+        <button class="abtn-m" onclick="mRegenHook()">↺ Hook</button>
+        <button class="abtn-m" onclick="mRegen()">↺ Regen</button>
+        <button class="abtn-m" onclick="mShiftEmo()">◈ Emotion</button>
+        <button class="abtn-m primary" id="m-copyBtn">Copy</button>
+      </div>
+    </div>
+
+    <div id="m-featStrip" style="display:none;flex-direction:column;gap:10px;">
+      <div class="feat-section-lbl">On-Demand Tools</div>
+      <div class="feat-grid">
+        <div class="feat-card-m" onclick="mGenThumbs()">
+          <span class="feat-icon-m">◧</span>
+          <span class="feat-name-m">Thumbnails</span>
+          <span class="feat-desc-m">3 click-driving concepts</span>
+        </div>
+        <div class="feat-card-m" onclick="mGenShots()">
+          <span class="feat-icon-m">◫</span>
+          <span class="feat-name-m">Shot List</span>
+          <span class="feat-desc-m">Scene-by-scene guide</span>
+        </div>
+        <div class="feat-card-m" onclick="mShowAdapt()">
+          <span class="feat-icon-m">◈</span>
+          <span class="feat-name-m">Adapt</span>
+          <span class="feat-desc-m">Other platforms</span>
+        </div>
+        <div class="feat-card-m" onclick="mGenCapts()">
+          <span class="feat-icon-m">◉</span>
+          <span class="feat-name-m">Captions</span>
+          <span class="feat-desc-m">5 hook styles</span>
+        </div>
+        <div class="feat-card-m teal-feat" onclick="mGenRemix()">
+          <span class="feat-icon-m" style="color:var(--teal)">⟳</span>
+          <span class="feat-name-m">Remix Engine</span>
+          <span class="feat-desc-m">5 trend variations</span>
+        </div>
+        <div class="feat-card-m amber-feat" onclick="mGenSeq()">
+          <span class="feat-icon-m" style="color:var(--amber)">▤</span>
+          <span class="feat-name-m">30-Day Sequence</span>
+          <span class="feat-desc-m">Full content calendar</span>
+        </div>
+      </div>
+    </div>
+
+    <div id="m-thumbCard" style="display:none" class="card">
+      <div class="card-hdr"><div><div class="card-eye" style="color:var(--amber)">Thumbnail Concepts</div><div class="card-title">3 Click-Driving Ideas</div></div><button class="abtn-m" onclick="mCopy(document.getElementById('m-thumbCopy').textContent,this)">Copy All</button></div>
+      <div id="m-thumbList"></div>
+      <div id="m-thumbCopy" style="display:none"></div>
+    </div>
+
+    <div id="m-shotsCard" style="display:none" class="card">
+      <div class="card-hdr"><div><div class="card-eye" style="color:var(--blue)">Shot List</div><div class="card-title">Filming Guide</div></div><button class="abtn-m" onclick="mCopy(document.getElementById('m-shotsCopy').textContent,this)">Copy All</button></div>
+      <div id="m-shotsList"></div>
+      <div id="m-shotsCopy" style="display:none"></div>
+    </div>
+
+    <div id="m-adaptCard" style="display:none" class="card">
+      <div class="card-hdr"><div><div class="card-eye" style="color:var(--purple)">Platform Adaptation</div><div class="card-title">Rewrite for Other Platforms</div></div></div>
+      <div class="plat-pills" id="m-platPills">
+        <button class="aplat-m" data-p="tiktok" onclick="this.classList.toggle('sel')">TikTok</button>
+        <button class="aplat-m" data-p="instagram_reels" onclick="this.classList.toggle('sel')">IG Reels</button>
+        <button class="aplat-m" data-p="instagram_carousel" onclick="this.classList.toggle('sel')">IG Carousel</button>
+        <button class="aplat-m" data-p="youtube_shorts" onclick="this.classList.toggle('sel')">YT Shorts</button>
+        <button class="aplat-m" data-p="youtube_longform" onclick="this.classList.toggle('sel')">YT Long</button>
+        <button class="aplat-m" data-p="facebook" onclick="this.classList.toggle('sel')">Facebook</button>
+        <button class="aplat-m" data-p="linkedin" onclick="this.classList.toggle('sel')">LinkedIn</button>
+        <button class="aplat-m" data-p="twitter_x" onclick="this.classList.toggle('sel')">Twitter/X</button>
+        <button class="aplat-m" data-p="newsletter" onclick="this.classList.toggle('sel')">Newsletter</button>
+      </div>
+      <button class="adapt-run-m" id="m-adaptRunBtn" onclick="mRunAdapt()">Adapt for Selected Platforms</button>
+      <div id="m-adaptResults"></div>
+    </div>
+
+    <div id="m-captsCard" style="display:none" class="card">
+      <div class="card-hdr"><div><div class="card-eye" style="color:var(--g)">Caption Variants</div><div class="card-title">5 Hook Styles</div></div></div>
+      <div id="m-captsList"></div>
+    </div>
+
+    <div id="m-remixCard" style="display:none" class="card">
+      <div class="card-hdr"><div><div class="card-eye" style="color:var(--teal)">Remix Engine</div><div class="card-title">5 Trend Variations</div></div><button class="abtn-m" onclick="mCopy(document.getElementById('m-remixCopy').textContent,this)">Copy All</button></div>
+      <div id="m-remixList"></div>
+      <div id="m-remixCopy" style="display:none"></div>
+    </div>
+
+    <div id="m-seqCard" style="display:none" class="card">
+      <div class="card-hdr"><div><div class="card-eye" style="color:var(--amber)">30-Day Sequence</div><div class="card-title">Content Calendar</div></div><button class="abtn-m" onclick="mCopy(document.getElementById('m-seqCopy').textContent,this)">Copy</button></div>
+      <div id="m-seqBody"></div>
+      <div id="m-seqCopy" style="display:none"></div>
+    </div>
+
+  </div>
+
+  <!-- ═══ PAGE: HISTORY ═══ -->
+  <div class="page" id="pg-history">
+    <div id="m-histContent">
+      <div class="empty-state">
+        <div style="font-size:36px;opacity:.25">◈</div>
+        <div style="font-size:14px">No history yet</div>
+        <div style="font-size:11px;margin-top:4px">Generate content and it'll appear here</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- BOTTOM NAV -->
+<nav class="bottom-nav">
+  <button class="bnav-btn on" id="bn-gen" onclick="mSw('generate')">
+    <span class="bnav-icon">◎</span>
+    <span class="bnav-lbl">Generate</span>
+  </button>
+  <button class="bnav-btn" id="bn-out" onclick="mSw('output')">
+    <span class="bnav-icon">◈</span>
+    <span class="bnav-lbl">Output</span>
+  </button>
+  <button class="bnav-btn" id="bn-hist" onclick="mSw('history')">
+    <span class="bnav-icon">▤</span>
+    <span class="bnav-lbl">History</span>
+  </button>
+</nav>
+
+<!-- ═══ LEARN MORE BOTTOM SHEET ═══ -->
+<div class="sheet-overlay" id="m-sheetOverlay" onclick="mCloseSheetOuter(event)">
+  <div class="sheet" id="m-sheet">
+    <div class="sheet-handle"></div>
+    <div class="sheet-top">
+      <div class="sheet-title">What to expect from VYRALL</div>
+      <button class="sheet-close" onclick="mCloseSheet()">✕</button>
+    </div>
+    <div class="sheet-body">
+
+      <div class="sheet-section">
+        <div class="sheet-eye">The honest truth</div>
+        <div class="sheet-casino">
+          <div class="sheet-casino-hl">"Think casino, not calendar."</div>
+          <div class="sheet-casino-body">
+            Virality is not predictable. It happens at the intersection of <strong>human psychology</strong> + <strong>platform incentives</strong> + <strong>timing chaos</strong>. You can't control all three. But you can stack them.<br><br>
+            VYRALL controls what is controllable. The timing chaos is on you. <strong>Post more.</strong>
+          </div>
+        </div>
+      </div>
+
+      <div class="sheet-section">
+        <div class="sheet-eye">The formula</div>
+        <div class="sheet-formula">
+          <span class="sf-part">Volume</span>
+          <span class="sf-op">×</span>
+          <span class="sf-part">Clarity</span>
+          <span class="sf-op">×</span>
+          <span class="sf-part">Emotional Precision</span>
+          <span class="sf-eq">=</span>
+          <span class="sf-part" style="color:var(--amber)">Probability</span>
+        </div>
+        <div style="font-size:11px;color:var(--ink3);line-height:1.7">Not certainty. Stacked odds. Farm patterns, not miracles — 30 variations of one sharp idea beats one perfect post every time.</div>
+      </div>
+
+      <div class="sheet-section">
+        <div class="sheet-eye">10 layers applied to every generation</div>
+        <div class="sheet-layers">
+          <div class="sheet-layer"><div class="sl-num">1</div><div class="sl-body"><div class="sl-name">Brendan Kane — Format & Hook</div><div class="sl-desc">Selects format and enforces "Wait…what?" hook. Context beats content.</div></div></div>
+          <div class="sheet-layer"><div class="sl-num">2</div><div class="sl-body"><div class="sl-name">Berger STEPPS — Emotion</div><div class="sl-desc">High-arousal emotions drive sharing. AI selects autonomously — you never choose.</div></div></div>
+          <div class="sheet-layer"><div class="sl-num">3</div><div class="sl-body"><div class="sl-name">Social Currency</div><div class="sl-desc">Design for the sharer, not just the viewer. People share what makes them look good.</div></div></div>
+          <div class="sheet-layer"><div class="sl-num">4</div><div class="sl-body"><div class="sl-name">Share Trigger Psychology</div><div class="sl-desc">2-3 overlapping triggers activated simultaneously per script.</div></div></div>
+          <div class="sheet-layer"><div class="sl-num">5</div><div class="sl-body"><div class="sl-name">Platform Mechanics</div><div class="sl-desc">TikTok, LinkedIn, Facebook, YouTube — each platform gets a native script, not a resized one.</div></div></div>
+          <div class="sheet-layer"><div class="sl-num">6</div><div class="sl-body"><div class="sl-name">Identity-Based Virality</div><div class="sl-desc">Hyper-specific niche content travels further. Tribal identification seeds it outward.</div></div></div>
+          <div class="sheet-layer"><div class="sl-num">7</div><div class="sl-body"><div class="sl-name">Network Seeding Theory</div><div class="sl-desc">Where content starts matters as much as what it says.</div></div></div>
+          <div class="sheet-layer"><div class="sl-num">8</div><div class="sl-body"><div class="sl-name">Information Density</div><div class="sl-desc">One strong idea. Every sentence adds value. Work-to-wow ratio: minimal.</div></div></div>
+          <div class="sheet-layer"><div class="sl-num">9</div><div class="sl-body"><div class="sl-name">VRIN — Rarity Score</div><div class="sl-desc">Low VRIN = algorithm ignores you. High VRIN = you stand out. Every script scored.</div></div></div>
+          <div class="sheet-layer"><div class="sl-num" style="color:var(--teal)">10</div><div class="sl-body"><div class="sl-name" style="color:var(--teal)">Trend Intelligence</div><div class="sl-desc">Rising trends get 40%+ higher engagement. Discover what's rising in your niche before you write.</div></div></div>
+          <div class="sheet-layer"><div class="sl-num" style="color:var(--teal)">11</div><div class="sl-body"><div class="sl-name" style="color:var(--teal)">Attention Engineering</div><div class="sl-desc">Near-miss structure, variable reward pacing, zero-friction hooks, and hook category selection. The Sapolsky dopamine mechanics applied to content.</div></div></div>
+        </div>
+      </div>
+
+      <div class="sheet-section">
+        <div class="sheet-eye">Layer 11 — why it works</div>
+        <div class="sheet-casino">
+          <div class="sheet-casino-hl">"Dopamine spikes harder in anticipation than in reward."</div>
+          <div class="sheet-casino-body">
+            The Sapolsky experiment: dopamine doubled when a reward was only <strong>possible</strong> 50% of the time vs when it was certain. Slot machines use this. Social media uses this. VYRALL uses it in your content.<br><br>
+            Three mechanics applied to every script: <strong>Near-Miss Structure</strong> at the midpoint (payoff feels close but not yet delivered), <strong>Variable Reward Pacing</strong> (uneven insight drops = higher dopamine response), and <strong>Zero-Friction Entry</strong> (hook works with zero context in 1.5 seconds flat).
+          </div>
+        </div>
+      </div>
+
+      <div class="sheet-section">
+        <div class="sheet-eye">Predictable vs not</div>
+        <div class="sheet-trio">
+          <div class="sheet-trio-cell"><div class="sheet-trio-lbl" style="color:var(--g)">Engineerable ✓</div><div class="sheet-trio-val">Hook, emotion, triggers, platform fit, content rarity, format.</div></div>
+          <div class="sheet-trio-cell"><div class="sheet-trio-lbl" style="color:var(--red)">Not predictable ✗</div><div class="sheet-trio-val">Timing. Platform mood cycles. Which specific post explodes.</div></div>
+          <div class="sheet-trio-cell"><div class="sheet-trio-lbl" style="color:var(--amber)">The strategy</div><div class="sheet-trio-val">Post 30 variations of one sharp idea. Let the audience choose for you.</div></div>
+        </div>
+      </div>
+
+      <div class="sheet-section">
+        <div class="sheet-eye">6 on-demand tools</div>
+        <div class="sheet-tools-body">
+          <strong>Thumbnails</strong> — three click-driving concepts using curiosity gap, bold claim, and emotional reaction triggers.<br><br>
+          <strong>Shot List</strong> — scene-by-scene filming guide for a solo creator with a phone.<br><br>
+          <strong>Platform Adaptation</strong> — native rewrites for other platforms, restructured for each algorithm.<br><br>
+          <strong>Caption Variants</strong> — five hook styles for the caption.<br><br>
+          <strong>Remix Engine</strong> — five trend-targeted variations of your script. One idea, five pieces of content.<br><br>
+          <strong>30-Day Sequence</strong> — full posting calendar with hooks, CTA types per week, and rest days.
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════════════
+// API — All prompt assembly server-side via Netlify function.
+// Client sends action + clean params only. Key never in browser.
+// ═══════════════════════════════════════════════════════════════
+async function vyrallCall(action, params) {
+  const r = await fetch('/.netlify/functions/claude', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ action, params })
+  });
+  const d = await r.json();
+  if (d.error) throw new Error(d.error);
+  return d.result;
+}
+
+function pj(txt) {
+  if (typeof txt === 'object') return txt;
+  const c = txt.replace(/```json|```/g, '').trim();
+  try { return JSON.parse(c); } catch(e) {
+    const m = c.match(/\{[\s\S]*\}/); if (m) return JSON.parse(m[0]); throw e;
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════════════════════════
+let mOfferOn=false, mScript='', mCta='', mFmtData=null, mEmo='',
+    mTrendAngle=null, mNiche='', mCurTopic='';
+
+const PLAT_TIPS={
+  tiktok:['Completion + rewatch rate = primary signals','First 0-3s determines algorithmic seeding'],
+  instagram_reels:['Save rate stronger than likes','Trending audio carries existing momentum'],
+  instagram_carousel:['First slide = hook — each slide earns the next swipe'],
+  youtube_shorts:['Swipe-away in first 2s critical — no slow builds'],
+  youtube_longform:['CTR from thumbnail is primary metric before watch time'],
+  facebook:['Reshare rate = primary viral mechanic','First 3s must hook silently (autoplay muted)'],
+  linkedin:['Dwell time in comments > likes','End with question to drive comments'],
+  twitter_x:['Reply velocity in first 30 mins critical','Bookmarks signal value more than retweets'],
+  newsletter:['Subject line = only initial metric'],
+  podcast:['First 90s determines listener commitment'],
+};
+
+// ═══════════════════════════════════════════════════════════════
+// NAVIGATION
+// ═══════════════════════════════════════════════════════════════
+function mSw(page) {
+  ['generate','output','history'].forEach(p => {
+    document.getElementById(`pg-${p}`).classList.toggle('active', p===page);
+  });
+  const map = {generate:'gen', output:'out', history:'hist'};
+  Object.entries(map).forEach(([pg,id]) => {
+    document.getElementById(`bn-${id}`).classList.toggle('on', pg===page);
+  });
+  document.getElementById('mainScroll').scrollTop = 0;
+  if (page==='history') mRenderHist();
+}
+
+function mSetSt(s, t) {
+  document.getElementById('m-sdot').className = 'sdot ' + (s||'');
+  document.getElementById('m-stxt').textContent = t || 'Ready';
+}
+
+function mCopy(txt, btn) {
+  navigator.clipboard.writeText(txt||'').then(() => {
+    if (btn) { const o=btn.textContent; btn.textContent='Copied ✓'; setTimeout(()=>btn.textContent=o, 2000); }
+  });
+}
+
+function mSkel() {
+  return `<div class="skel-m">${['52%','88%','70%','93%','64%','81%'].map(w=>`<div class="sk-m" style="width:${w}"></div>`).join('')}</div>`;
+}
+
+function mTogOffer() {
+  mOfferOn = !mOfferOn;
+  document.getElementById('m-offerTog').classList.toggle('on', mOfferOn);
+  document.getElementById('m-offerF').style.display = mOfferOn ? 'flex' : 'none';
+}
+
+// ═══════════════════════════════════════════════════════════════
+// BOTTOM SHEET
+// ═══════════════════════════════════════════════════════════════
+function mOpenSheet() { document.getElementById('m-sheetOverlay').classList.add('open'); document.body.style.overflow='hidden'; }
+function mCloseSheet() { document.getElementById('m-sheetOverlay').classList.remove('open'); document.body.style.overflow=''; }
+function mCloseSheetOuter(e) { if (e.target===document.getElementById('m-sheetOverlay')) mCloseSheet(); }
+
+// ═══════════════════════════════════════════════════════════════
+// TREND INTELLIGENCE
+// ═══════════════════════════════════════════════════════════════
+async function mGetTrends() {
+  const niche  = document.getElementById('m-niche').value.trim();
+  const topic  = document.getElementById('m-topic').value.trim();
+  const region = document.getElementById('m-region').value;
+  const seed   = niche || topic;
+
+  if (!seed) {
+    document.getElementById('m-trendAngles').innerHTML =
+      `<div style="font-size:11px;color:var(--amber);padding:4px 0">Enter a niche or topic first.</div>`;
+    return;
+  }
+
+  mNiche = seed;
+  const btn = document.getElementById('m-trendBtn');
+  btn.disabled = true; btn.textContent = '◎  Discovering…';
+  document.getElementById('m-trendAngles').innerHTML = mSkel();
+
+  try {
+    const d = await vyrallCall('trends', { niche, topic, region });
+    const angles = d.angles || [];
+    const container = document.getElementById('m-trendAngles');
+    container.innerHTML = '';
+
+    if (!niche && d.inferred_niche) {
+      document.getElementById('m-niche').value = d.inferred_niche;
+      mNiche = d.inferred_niche;
+      const lbl = document.createElement('div');
+      lbl.className = 'inferred-lbl';
+      lbl.textContent = `◎ Niche inferred: ${d.inferred_niche}`;
+      container.appendChild(lbl);
+    }
+
+    angles.forEach(a => {
+      const el = document.createElement('div');
+      el.className = 'trend-angle-m';
+      el.innerHTML = `
+        <div class="ta-phrase-m">${a.phrase}</div>
+        <div class="ta-why-m">${a.why}</div>
+        <div class="ta-meta-m">
+          <span class="ta-badge-m ${a.status}">${a.status==='hot'?'🔥 HOT':a.status==='rising'?'↑ RISING':'→ STABLE'}</span>
+          <span class="ta-vrin-m">VRIN ${a.vrin}%</span>
+        </div>`;
+      el.onclick = () => {
+        document.querySelectorAll('.trend-angle-m').forEach(x => x.classList.remove('sel'));
+        el.classList.add('sel'); mTrendAngle = a;
+        document.getElementById('m-topic').value = a.phrase;
+        document.getElementById('m-topic').style.borderColor = 'var(--teal)';
+        setTimeout(() => document.getElementById('m-topic').style.borderColor = '', 1500);
+      };
+      container.appendChild(el);
+    });
+  } catch(e) {
+    document.getElementById('m-trendAngles').innerHTML =
+      `<div class="err-m">${e.message}</div>`;
+  }
+  btn.disabled = false; btn.textContent = '◎  Discover Trending Angles';
+}
+
+// ═══════════════════════════════════════════════════════════════
+// MAIN PIPELINE
+// ═══════════════════════════════════════════════════════════════
+async function mRun() {
+  const topic  = document.getElementById('m-topic').value.trim();
+  const niche  = document.getElementById('m-niche').value.trim();
+  const goal   = document.getElementById('m-goal').selectedOptions[0].text;
+  const tone   = document.getElementById('m-tone').selectedOptions[0].text;
+  const platVal= document.getElementById('m-plat').value;
+  const platTxt= document.getElementById('m-plat').selectedOptions[0].text;
+  const offer  = mOfferOn ? document.getElementById('m-offer').value.trim() : '';
+  const cta    = mOfferOn ? document.getElementById('m-cta').value.trim()   : '';
+
+  if (!topic) {
+    const i = document.getElementById('m-topic');
+    i.classList.add('err'); setTimeout(()=>i.classList.remove('err'), 1500); return;
+  }
+
+  mCurTopic = topic; mNiche = niche || mNiche;
+
+  const btn = document.getElementById('m-genBtn');
+  btn.disabled = true; btn.innerHTML = '<span>⟳</span><span>Generating…</span>';
+  mSetSt('run', 'Running virality intelligence…');
+
+  // Hide welcome, switch to output tab
+  document.getElementById('m-welcome').style.display = 'none';
+  mSw('output');
+
+  // Reset outputs
+  ['m-thumbCard','m-shotsCard','m-adaptCard','m-captsCard','m-remixCard','m-seqCard']
+    .forEach(id => { const e=document.getElementById(id); if(e) e.style.display='none'; });
+  document.getElementById('m-featStrip').style.display = 'none';
+  document.getElementById('m-actions').style.display = 'none';
+  document.getElementById('m-scriptBody').innerHTML = mSkel();
+  document.getElementById('m-adaptResults').innerHTML = '';
+
+  // Trend used banner
+  if (mTrendAngle) {
+    document.getElementById('m-trendUsed').style.display = 'block';
+    document.getElementById('m-trendUsedPhrase').textContent = mTrendAngle.phrase;
+    document.getElementById('m-trendUsedWhy').textContent = mTrendAngle.why;
+  } else {
+    document.getElementById('m-trendUsed').style.display = 'none';
+  }
+
+  // ── STEP 1: ANALYSIS ──
+  let fmtData;
+  try {
+    fmtData = await vyrallCall('analyze', {
+      topic, niche, goal, tone, platform: platTxt,
+      trendAngle: mTrendAngle || null
+    });
+    mFmtData = fmtData; mEmo = fmtData.selected_emotion || '';
+
+    if (!niche && fmtData.inferred_niche) {
+      document.getElementById('m-niche').value = fmtData.inferred_niche;
+      mNiche = fmtData.inferred_niche;
+    }
+
+    mRenderAnalysis(fmtData, platVal, platTxt);
+    mSetSt('run', 'Writing optimized content…');
+  } catch(e) {
+    document.getElementById('m-scriptBody').innerHTML = `<div class="err-m">Analysis failed: ${e.message}</div>`;
+    btn.disabled=false; btn.innerHTML='<span>▶</span><span>Generate Content</span>'; return;
+  }
+
+  // ── STEP 2: GENERATE ──
+  try {
+    const fd = await vyrallCall('generate', {
+      topic, niche: mNiche, goal, tone, platform: platTxt, platVal,
+      format: fmtData.primary_format,
+      structure: fmtData.recommended_structure || [],
+      emotion: fmtData.selected_emotion,
+      triggers: fmtData.selected_triggers || [],
+      socialCurrency: fmtData.social_currency_strategy,
+      offer, cta, trendAngle: mTrendAngle || null
+    });
+
+    mRenderScript(fd, mOfferOn && !!offer);
+    document.getElementById('m-featStrip').style.display = 'flex';
+    document.getElementById('m-actions').style.display = 'flex';
+    mSetSt('ok', 'Done');
+
+    mSaveHist({
+      topic, format: fmtData.primary_format, goal, platform: platTxt,
+      emotion: fmtData.selected_emotion, triggers: fmtData.selected_triggers||[],
+      trend: mTrendAngle ? mTrendAngle.phrase : '',
+      aligned_script: fd.aligned_script, cta: fd.cta||'',
+      share_explanation: fd.share_explanation||'',
+      hook: (fd.aligned_script||'').split('\n\n')[0],
+      fmtData, timestamp: Date.now()
+    });
+  } catch(e) {
+    document.getElementById('m-scriptBody').innerHTML = `<div class="err-m">Generation failed: ${e.message}</div>`;
+    mSetSt('fail', 'Failed');
+  }
+
+  btn.disabled=false; btn.innerHTML='<span>▶</span><span>Generate Content</span>';
+}
+
+// ═══════════════════════════════════════════════════════════════
+// RENDER
+// ═══════════════════════════════════════════════════════════════
+function mRenderAnalysis(data, platVal, platTxt) {
+  document.getElementById('m-fmtName').textContent = data.primary_format || '—';
+  document.getElementById('m-vrinTotal').textContent = (data.scores?.vrin_score || 0) + '%';
+
+  const sc = data.scores || {};
+  const scores = [
+    {lbl:'Hook Strength',  val:sc.hook_strength||0,  color:'var(--g)'},
+    {lbl:'Emotion Arousal',val:sc.emotion_arousal||0, color:'var(--amber)'},
+    {lbl:'Share Trigger',  val:sc.share_trigger||0,  color:'var(--blue)'},
+    {lbl:'Platform Fit',   val:sc.platform_fit||0,   color:'var(--purple)'},
+    {lbl:'VRIN Score',     val:sc.vrin_score||0,     color:'var(--yellow)'},
+  ];
+  const sl = document.getElementById('m-scoresList');
+  sl.innerHTML = '';
+  scores.forEach(s => {
+    const row = document.createElement('div'); row.className = 'score-row';
+    row.innerHTML = `<div class="score-lbl-m">${s.lbl}</div>
+      <div class="score-bar-w"><div class="score-bar-f" style="width:0%;background:${s.color}" data-w="${s.val}"></div></div>
+      <div class="score-val-m">${s.val}%</div>`;
+    sl.appendChild(row);
+  });
+  setTimeout(() => document.querySelectorAll('.score-bar-f').forEach(b => b.style.width = b.dataset.w + '%'), 80);
+
+  const vrin = data.vrin || {};
+  document.getElementById('m-vrinPills').innerHTML = [
+    ['V','Valuable','valuable'],['R','Rare','rare'],
+    ['I','Inimitable','inimitable'],['N','Non-sub','non_substitutable']
+  ].map(([l,w,k]) => `<div class="vrin-pill">
+    <div class="vrin-pill-ltr">${l}</div>
+    <div class="vrin-pill-word">${w}</div>
+    <div class="vrin-pill-bar"><div class="vrin-pill-fill" style="width:${vrin[k]||0}%"></div></div>
+    <div class="vrin-pill-score">${vrin[k]||0}%</div>
+    <div class="vrin-pill-note">${vrin[k+'_note']||''}</div>
+  </div>`).join('');
+
+  const emo = data.selected_emotion || '';
+  document.getElementById('m-aiSelList').innerHTML = `
+    <div class="ai-sel-item">
+      <div class="ai-sel-lbl">AI Selected Emotion</div>
+      <div class="ai-sel-val ${emo?'emo-'+emo:''}">${emo ? emo.charAt(0).toUpperCase()+emo.slice(1) : '—'}</div>
+      <div class="ai-sel-note">${data.emotion_reasoning||''}</div>
+    </div>
+    <div class="ai-sel-item">
+      <div class="ai-sel-lbl">Hook Category — Layer 11</div>
+      <div class="ai-sel-val" style="color:var(--teal);font-size:11px">${data.hook_category||'—'}</div>
+      <div class="ai-sel-note">${data.hook_category_reason||''}</div>
+    </div>
+    <div class="ai-sel-item">
+      <div class="ai-sel-lbl">Share Triggers Activated</div>
+      <div class="trigger-pills">${(data.selected_triggers||[]).map(t=>`<span class="tpill">${t.replace(/_/g,' ')}</span>`).join('')}</div>
+      <div class="ai-sel-note" style="margin-top:6px">${data.trigger_reasoning||''}</div>
+    </div>
+    <div class="ai-sel-item">
+      <div class="ai-sel-lbl">Social Currency Strategy</div>
+      <div class="ai-sel-note">${data.social_currency_strategy||''}</div>
+    </div>`;
+
+  document.getElementById('m-insights').innerHTML = (data.insights||[]).map(i =>
+    `<span class="insight-pill ${i.type}">${i.type==='good'?'✓':i.type==='warn'?'⚠':'→'} ${i.text}</span>`
+  ).join('');
+
+  const tips = PLAT_TIPS[platVal] || [];
+  const pt = document.getElementById('m-platTips');
+  if (tips.length && platVal !== 'any') {
+    pt.className = 'plat-tips-m';
+    pt.innerHTML = `<div class="plat-tips-lbl">${platTxt} — Algorithm Tips</div>
+      ${tips.map(t=>`<div class="plat-tip-item">${t}</div>`).join('')}
+      <div style="height:8px"></div>`;
+  } else { pt.innerHTML = ''; }
+}
+
+function mRenderScript(data, hasOffer) {
+  const script = data.aligned_script || '';
+  const cta    = data.cta || '';
+  mScript = script; mCta = cta;
+
+  const hm = script.match(/^(.{20,280}?[.!?])\n\n([\s\S]+)$/);
+  const hookHtml = hm ? `<div class="hook-block-m"><div class="hook-lbl">Hook</div><div class="hook-txt">${hm[1]}</div></div>` : '';
+  const bodyTxt  = hm ? hm[2] : script;
+  const ctaHtml  = hasOffer && cta ? `<div class="cta-block-m"><div class="cta-lbl-m">Call To Action</div><div class="cta-txt-m">${cta}</div></div>` : '';
+  const shareHtml= data.share_explanation ? `<div class="share-block-m"><div class="share-lbl-m">Why They'll Share It</div><div class="share-txt-m">${data.share_explanation}</div></div>` : '';
+
+  document.getElementById('m-scriptBody').innerHTML =
+    `${hookHtml}<div class="script-body-m">${bodyTxt.replace(/\n/g,'<br>')}</div>${ctaHtml}${shareHtml}`;
+
+  const full = script + (cta ? '\n\n' + cta : '');
+  const copyBtn = document.getElementById('m-copyBtn');
+  copyBtn.onclick = () => mCopy(full, copyBtn);
+}
+
+// ═══════════════════════════════════════════════════════════════
+// ITERATION BUTTONS
+// ═══════════════════════════════════════════════════════════════
+async function mRegenHook() {
+  if (!mScript) return;
+  mSetSt('run','Rewriting hook…');
+  try {
+    const d = await vyrallCall('regenHook', { script: mScript, emotion: mEmo });
+    const ns = d.improved_hook + '\n\n' + mScript.replace(/^.+?\n\n/, '');
+    mScript = ns; mRenderScript({aligned_script:ns, cta:mCta}, !!mCta);
+    mSetSt('ok','Hook updated');
+  } catch(e) { mSetSt('fail','Failed'); }
+}
+
+async function mRegen() {
+  const topic = document.getElementById('m-topic').value.trim();
+  if (!topic) { mRun(); return; }
+  document.getElementById('m-scriptBody').innerHTML = mSkel();
+  mSetSt('run','Regenerating…');
+  try {
+    const d = await vyrallCall('regenFull', {
+      topic, goal: document.getElementById('m-goal').selectedOptions[0].text,
+      tone: document.getElementById('m-tone').selectedOptions[0].text,
+      platform: document.getElementById('m-plat').selectedOptions[0].text,
+      format: mFmtData?.primary_format||'', emotion: mEmo,
+      original: mScript.substring(0,200)
+    });
+    mRenderScript(d, false); mSetSt('ok','Done');
+  } catch(e) { mSetSt('fail','Failed'); }
+}
+
+async function mShiftEmo() {
+  if (!mScript) return;
+  const emos = ['awe','anger','anxiety','amusement','inspiration','surprise'];
+  const next = emos.find(e => e !== mEmo) || 'awe';
+  mSetSt('run',`Shifting to ${next}…`);
+  try {
+    const d = await vyrallCall('shiftEmotion', { script:mScript, cta:mCta, fromEmo:mEmo, toEmo:next });
+    mScript = d.aligned_script; mEmo = next;
+    mRenderScript(d, !!mCta); mSetSt('ok',`◈ ${next} applied`);
+  } catch(e) { mSetSt('fail','Failed'); }
+}
+
+// ═══════════════════════════════════════════════════════════════
+// FEATURE TOOLS
+// ═══════════════════════════════════════════════════════════════
+async function mGenThumbs() {
+  const card = document.getElementById('m-thumbCard'); card.style.display = 'block';
+  document.getElementById('m-thumbList').innerHTML = mSkel();
+  try {
+    const d = await vyrallCall('thumbnails', {
+      script: mScript, format: mFmtData?.primary_format||'',
+      platform: document.getElementById('m-plat').selectedOptions[0].text, emotion: mEmo
+    });
+    let copyAll = '';
+    document.getElementById('m-thumbList').innerHTML = (d.concepts||[]).map((c,i) => {
+      copyAll += `CONCEPT ${i+1}\n${c.headline}\n${c.visual}\n${c.why}\n\n`;
+      return `<div class="thumb-item-m">
+        <div class="thumb-num-m">Concept ${i+1}</div>
+        <div class="thumb-headline-m">${c.headline}</div>
+        <div class="thumb-visual-m">${c.visual}</div>
+        <div class="thumb-why-m">${c.why}</div>
+        <button class="abtn-m" onclick="mCopy(${JSON.stringify(c.headline+'\n'+c.visual)},this)">Copy</button>
+      </div>`;
+    }).join('');
+    document.getElementById('m-thumbCopy').textContent = copyAll;
+  } catch(e) { document.getElementById('m-thumbList').innerHTML = `<div class="err-m">${e.message}</div>`; }
+}
+
+async function mGenShots() {
+  const card = document.getElementById('m-shotsCard'); card.style.display = 'block';
+  document.getElementById('m-shotsList').innerHTML = mSkel();
+  try {
+    const d = await vyrallCall('shotlist', {
+      script: mScript, format: mFmtData?.primary_format||'',
+      platform: document.getElementById('m-plat').selectedOptions[0].text, emotion: mEmo
+    });
+    let copyAll = 'SHOT LIST\n\n';
+    document.getElementById('m-shotsList').innerHTML = (d.shots||[]).map((s,i) => {
+      copyAll += `SHOT ${i+1} — ${s.type}\n${s.description}\nCamera: ${s.camera}\nPacing: ${s.pacing}\n\n`;
+      return `<div class="shot-item-m">
+        <div class="shot-num-hdr">
+          <div class="shot-num-badge">${i+1}</div>
+          <div class="shot-type-m">${s.type}</div>
+        </div>
+        <div class="shot-desc-m">${s.description}</div>
+        <div class="shot-tags-m">
+          <span class="shot-tag-m">📷 ${s.camera}</span>
+          ${s.broll?`<span class="shot-tag-m">🎬 ${s.broll}</span>`:''}
+          <span class="shot-tag-m">⏱ ${s.pacing}</span>
+        </div>
+      </div>`;
+    }).join('');
+    document.getElementById('m-shotsCopy').textContent = copyAll;
+  } catch(e) { document.getElementById('m-shotsList').innerHTML = `<div class="err-m">${e.message}</div>`; }
+}
+
+function mShowAdapt() { document.getElementById('m-adaptCard').style.display = 'block'; }
+
+async function mRunAdapt() {
+  const sel = [...document.querySelectorAll('.aplat-m.sel')].map(b => b.dataset.p);
+  if (!sel.length) return;
+  const btn = document.getElementById('m-adaptRunBtn');
+  btn.disabled = true; btn.textContent = 'Adapting…';
+  document.getElementById('m-adaptResults').innerHTML = mSkel();
+  try {
+    const d = await vyrallCall('adapt', { script: mScript, platforms: sel, emotion: mEmo });
+    document.getElementById('m-adaptResults').innerHTML = (d.adaptations||[]).map(a =>
+      `<div class="adapt-result-m">
+        <div class="adapt-plat-m">${a.platform}</div>
+        <div class="adapt-script-m">${(a.script||'').replace(/\n/g,'<br>')}</div>
+        <button class="abtn-m" onclick="mCopy(${JSON.stringify(a.script||'')},this)">Copy ${a.platform}</button>
+      </div>`
+    ).join('');
+  } catch(e) { document.getElementById('m-adaptResults').innerHTML = `<div class="err-m">${e.message}</div>`; }
+  btn.disabled = false; btn.textContent = 'Adapt for Selected Platforms';
+}
+
+async function mGenCapts() {
+  const card = document.getElementById('m-captsCard'); card.style.display = 'block';
+  document.getElementById('m-captsList').innerHTML = mSkel();
+  try {
+    const d = await vyrallCall('captions', {
+      script: mScript,
+      platform: document.getElementById('m-plat').selectedOptions[0].text, emotion: mEmo
+    });
+    document.getElementById('m-captsList').innerHTML = (d.captions||[]).map(c =>
+      `<div class="capt-item-m">
+        <div class="capt-style-m">${c.style}</div>
+        <div class="capt-txt-m">${c.text}</div>
+        <div class="capt-hash-m">${c.hashtag_note||''}</div>
+        <button class="abtn-m" onclick="mCopy(${JSON.stringify(c.text||'')},this)">Copy</button>
+      </div>`
+    ).join('');
+  } catch(e) { document.getElementById('m-captsList').innerHTML = `<div class="err-m">${e.message}</div>`; }
+}
+
+async function mGenRemix() {
+  const card = document.getElementById('m-remixCard'); card.style.display = 'block';
+  document.getElementById('m-remixList').innerHTML = mSkel();
+  try {
+    const d = await vyrallCall('remix', {
+      script: mScript, niche: mNiche||'general',
+      region: document.getElementById('m-region').value,
+      platform: document.getElementById('m-plat').selectedOptions[0].text, emotion: mEmo
+    });
+    let copyAll = 'REMIX ENGINE\n\n';
+    document.getElementById('m-remixList').innerHTML = (d.remixes||[]).map((r,i) => {
+      copyAll += `REMIX ${i+1} — ${r.angle}\n${r.hook}\n\n${r.script}\n\n`;
+      return `<div class="remix-item-m">
+        <div class="remix-angle-m">${r.angle}</div>
+        <div class="remix-hook-m">${r.hook}</div>
+        <div class="remix-body-m">${r.script}</div>
+        <div class="remix-why-m">${r.why}</div>
+        <button class="abtn-m" onclick="mCopy(${JSON.stringify(r.hook+'\n\n'+r.script)},this)">Copy</button>
+      </div>`;
+    }).join('');
+    document.getElementById('m-remixCopy').textContent = copyAll;
+  } catch(e) { document.getElementById('m-remixList').innerHTML = `<div class="err-m">${e.message}</div>`; }
+}
+
+async function mGenSeq() {
+  const card = document.getElementById('m-seqCard'); card.style.display = 'block';
+  document.getElementById('m-seqBody').innerHTML = mSkel();
+  const typeColors = {awareness:'var(--g)',tactical:'var(--blue)',objection:'var(--purple)',conversion:'var(--amber)',rest:'var(--ink3)'};
+  try {
+    const d = await vyrallCall('sequence', {
+      script: mScript,
+      platform: document.getElementById('m-plat').selectedOptions[0].text,
+      niche: mNiche||'general', emotion: mEmo
+    });
+    const weeks = d.weeks || []; let copyAll = '30-DAY SEQUENCE\n\n';
+    document.getElementById('m-seqBody').innerHTML = weeks.map(w => {
+      copyAll += `WEEK ${w.week} — ${w.theme}\n\n`;
+      return `<div class="seq-week-lbl-m">Week ${w.week} — ${w.theme}</div>
+        ${(w.days||[]).map(day => {
+          if (day.type==='rest') {
+            copyAll += `Day ${day.day}: REST\n\n`;
+            return `<div class="seq-day-m">
+              <div class="seq-num-m"><div class="seq-n">${day.day}</div><div class="seq-l">REST</div></div>
+              <div class="seq-content-m"><div class="seq-type-m" style="color:var(--ink3)">REST</div><div class="seq-hook-m" style="color:var(--ink3);font-style:italic">Rest day — let the algorithm breathe</div></div>
+            </div>`;
+          }
+          copyAll += `Day ${day.day} [${day.type}]: ${day.hook}\nCTA: ${day.cta}\n\n`;
+          return `<div class="seq-day-m">
+            <div class="seq-num-m"><div class="seq-n">${day.day}</div><div class="seq-l">DAY</div></div>
+            <div class="seq-content-m">
+              <div class="seq-type-m" style="color:${typeColors[day.type]||'var(--ink3)'}">${(day.type||'').toUpperCase()}</div>
+              <div class="seq-hook-m">${day.hook}</div>
+              <div class="seq-cta-m">CTA: ${day.cta}</div>
+              ${day.note?`<div class="seq-note-m">${day.note}</div>`:''}
+            </div>
+          </div>`;
+        }).join('')}`;
+    }).join('');
+    document.getElementById('m-seqCopy').textContent = copyAll;
+  } catch(e) { document.getElementById('m-seqBody').innerHTML = `<div class="err-m">${e.message}</div>`; }
+}
+
+// ═══════════════════════════════════════════════════════════════
+// HISTORY
+// ═══════════════════════════════════════════════════════════════
+function mTimeAgo(ts) {
+  if (!ts) return '';
+  const d = Date.now()-ts, m=Math.floor(d/60000), h=Math.floor(d/3600000), dy=Math.floor(d/86400000);
+  if (m<1) return 'just now'; if (m<60) return `${m}m ago`;
+  if (h<24) return `${h}h ago`; return `${dy}d ago`;
+}
+
+async function mSaveHist(entry) {
+  try {
+    const r = await window.storage.get('vyrall:idx').catch(()=>null);
+    const ids = r ? JSON.parse(r.value) : [];
+    const id = 'vyrall:i:' + Date.now();
+    await window.storage.set(id, JSON.stringify(entry));
+    ids.unshift(id);
+    await window.storage.set('vyrall:idx', JSON.stringify(ids.slice(0,20)));
+  } catch(e) {}
+}
+
+async function mRenderHist() {
+  const c = document.getElementById('m-histContent');
+  c.innerHTML = '<div class="empty-state"><div style="font-size:24px;opacity:.25">⟳</div><div>Loading…</div></div>';
+  try {
+    const r = await window.storage.get('vyrall:idx').catch(()=>null);
+    if (!r) { c.innerHTML = '<div class="empty-state"><div style="font-size:36px;opacity:.25">◈</div><div style="font-size:14px">No history yet</div></div>'; return; }
+    const ids = JSON.parse(r.value); const items = [];
+    for (const id of ids) {
+      try { const x = await window.storage.get(id); if(x) items.push({id,...JSON.parse(x.value)}); } catch(e) {}
+    }
+    if (!items.length) { c.innerHTML = '<div class="empty-state"><div style="font-size:36px;opacity:.25">◈</div><div style="font-size:14px">No history yet</div></div>'; return; }
+
+    c.innerHTML = '';
+    const list = document.createElement('div');
+    list.style.cssText = 'display:flex;flex-direction:column;gap:10px;';
+    items.forEach(item => {
+      const el = document.createElement('div'); el.className = 'hist-item-m';
+      const prev = (item.hook||item.aligned_script||'').substring(0,120) + '…';
+      el.innerHTML = `
+        <div class="hist-hdr-m">
+          <div class="hist-topic-m">${item.topic||'Untitled'}</div>
+          <div class="hist-meta-m">${item.format||''} · ${mTimeAgo(item.timestamp)}</div>
+        </div>
+        <div class="hist-prev-m">${prev}</div>
+        <div class="hist-tags-m">
+          ${item.emotion?`<span class="htag-m">◈ ${item.emotion}</span>`:''}
+          ${item.trend?`<span class="htag-m" style="color:var(--teal);border-color:rgba(0,212,212,.3)">◎ ${item.trend}</span>`:''}
+          ${item.platform?`<span class="htag-m">${item.platform}</span>`:''}
+        </div>
+        <div class="hist-acts-m">
+          <button class="hbtn-m hl" onclick="mLoadHist('${item.id}')">Load</button>
+          <button class="hbtn-m" onclick="mCopy(${JSON.stringify((item.aligned_script||'')+(item.cta?'\n\n'+item.cta:''))},this)">Copy</button>
+        </div>`;
+      list.appendChild(el);
+    });
+    c.appendChild(list);
+  } catch(e) { c.innerHTML = '<div class="empty-state">Failed to load history</div>'; }
+}
+
+async function mLoadHist(id) {
+  try {
+    const r = await window.storage.get(id); if (!r) return;
+    const item = JSON.parse(r.value);
+    if (item.fmtData) mRenderAnalysis(item.fmtData, document.getElementById('m-plat').value, document.getElementById('m-plat').selectedOptions[0].text);
+    if (item.aligned_script) {
+      mRenderScript({aligned_script:item.aligned_script, cta:item.cta||'', share_explanation:item.share_explanation||''}, !!item.cta);
+      mFmtData = item.fmtData; mEmo = item.emotion||'';
+      mScript = item.aligned_script; mCta = item.cta||'';
+      document.getElementById('m-featStrip').style.display = 'flex';
+      document.getElementById('m-actions').style.display = 'flex';
+    }
+    mSw('output');
+  } catch(e) {}
+}
+</script>
+</body>
+</html>
