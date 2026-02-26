@@ -623,6 +623,69 @@ select optgroup { font-style:normal; font-weight:500; font-size:9px; color:var(-
   .ai-sel-row{flex-wrap:wrap;}
   .ai-sel-cell{border-bottom:1px solid var(--b1);}
 }
+
+/* ── AUDIENCE PERSONA BUILDER ── */
+.apb-trigger{
+  display:flex;align-items:center;gap:10px;padding:10px 14px;
+  background:var(--s2);border:1px solid var(--b1);border-radius:6px;
+  cursor:pointer;transition:all .15s;
+}
+.apb-trigger:hover{border-color:var(--g2);}
+.apb-dot{width:8px;height:8px;border-radius:50%;background:var(--b2);flex-shrink:0;}
+.apb-dot.set{background:var(--g);}
+.apb-trigger-lbl{font-size:11px;color:var(--ink2);flex:1;}
+.apb-trigger-action{font-size:10px;color:var(--ink3);letter-spacing:.08em;}
+
+.apb-modal-overlay{
+  position:fixed;inset:0;z-index:600;
+  background:rgba(8,8,10,.85);backdrop-filter:blur(6px);
+  display:none;align-items:center;justify-content:center;padding:20px;
+}
+.apb-modal-overlay.open{display:flex;}
+.apb-modal{
+  background:var(--s1);border:1px solid var(--b1);border-radius:12px;
+  width:100%;max-width:560px;max-height:88vh;overflow-y:auto;
+  display:flex;flex-direction:column;
+}
+.apb-modal-top{
+  padding:20px 24px 16px;border-bottom:1px solid var(--b1);
+  display:flex;align-items:flex-start;justify-content:space-between;gap:12px;
+  position:sticky;top:0;background:var(--s1);z-index:1;
+}
+.apb-modal-title{font-family:'Syne',sans-serif;font-size:15px;font-weight:700;}
+.apb-modal-sub{font-size:11px;color:var(--ink3);margin-top:3px;line-height:1.6;}
+.apb-close{
+  width:28px;height:28px;border-radius:50%;border:1px solid var(--b1);
+  background:transparent;color:var(--ink3);cursor:pointer;font-size:14px;
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;
+  transition:all .15s;
+}
+.apb-close:hover{border-color:var(--g2);color:var(--g);}
+.apb-body{padding:20px 24px 28px;display:flex;flex-direction:column;gap:20px;}
+.apb-q{display:flex;flex-direction:column;gap:7px;}
+.apb-q-num{font-size:8.5px;letter-spacing:.22em;text-transform:uppercase;color:var(--g2);}
+.apb-q-text{font-family:'Fraunces',serif;font-size:15px;font-style:italic;color:var(--ink);line-height:1.45;}
+.apb-q-hint{font-size:10.5px;color:var(--ink3);line-height:1.6;}
+.apb-q-input{
+  width:100%;background:var(--s2);border:1px solid var(--b1);border-radius:6px;
+  color:var(--ink);font-family:'DM Mono',monospace;font-size:13px;line-height:1.65;
+  padding:12px 14px;resize:none;outline:none;transition:border-color .2s;min-height:72px;
+}
+.apb-q-input:focus{border-color:var(--g2);}
+.apb-q-input::placeholder{color:var(--ink3);}
+.apb-save{
+  background:var(--g);color:var(--bg);border:none;
+  padding:13px 24px;font-family:'Syne',sans-serif;font-size:12px;
+  font-weight:700;letter-spacing:.16em;text-transform:uppercase;
+  border-radius:6px;cursor:pointer;transition:all .2s;align-self:flex-start;
+}
+.apb-save:hover{background:#00ffb3;}
+.apb-persona-badge{
+  display:flex;align-items:center;gap:8px;padding:8px 12px;
+  background:var(--g4);border:1px solid var(--g3);border-radius:5px;
+  font-size:10px;color:var(--g2);line-height:1.5;
+}
+
 </style>
 </head>
 <body>
@@ -678,6 +741,15 @@ select optgroup { font-style:normal; font-weight:500; font-size:9px; color:var(-
       <div class="field">
         <label class="fl">Niche <span style="color:var(--ink3);font-size:9px">(optional)</span></label>
         <input type="text" id="nicheInput" placeholder="finance, fitness, real estate…"/>
+      </div>
+      <div class="field">
+        <label class="fl">Audience Persona <span style="color:var(--ink3);font-size:9px">(optional — sharpens every output)</span></label>
+        <div class="apb-trigger" onclick="openAPB()">
+          <div class="apb-dot" id="apbDot"></div>
+          <span class="apb-trigger-lbl" id="apbTriggerLbl">Not set — click to define your audience</span>
+          <span class="apb-trigger-action" id="apbTriggerAction">Set up →</span>
+        </div>
+        <div id="apbBadge" class="apb-persona-badge" style="display:none"></div>
       </div>
     </div>
 
@@ -1686,7 +1758,8 @@ async function genRemix(){
   const plat=document.getElementById('platSel').selectedOptions[0].text;
   try{
     const d=await vyrallCall('remix', {
-      script: curScript, niche, region, platform: plat, emotion: curEmo
+      script: curScript, niche, region, platform: plat, emotion: curEmo,
+      persona: curPersona || null
     });const remixes=d.remixes||[];
     let copyAll='REMIX ENGINE OUTPUT\n\n';
     document.getElementById('remixGrid').innerHTML=remixes.map((r,i)=>{
@@ -1949,7 +2022,8 @@ async function run(){
   try{
     fmtData = await vyrallCall('analyze', {
       topic, niche, goal: goalTxt, tone: toneTxt,
-      platform: platTxt, trendAngle: curTrendAngle || null
+      platform: platTxt, trendAngle: curTrendAngle || null,
+      persona: curPersona || null
     });
     curFmtData=fmtData; curEmo=fmtData.selected_emotion||'';
 
@@ -1979,7 +2053,8 @@ async function run(){
       emotion: fmtData.selected_emotion,
       triggers: fmtData.selected_triggers || [],
       socialCurrency: fmtData.social_currency_strategy,
-      offer, cta, trendAngle: curTrendAngle || null
+      offer, cta, trendAngle: curTrendAngle || null,
+      persona: curPersona || null
     });
     renderFinal(fd, offerOn && !!offer);
     document.getElementById('featureStrip').style.display='flex';
@@ -2206,5 +2281,148 @@ function closeModalOuter(e){ if(e.target===document.getElementById('learnModal')
 document.addEventListener('keydown',e=>{ if(e.key==='Escape') closeModal(); });
 </script>
 
+
+<!-- ══ AUDIENCE PERSONA BUILDER MODAL ══ -->
+<div class="apb-modal-overlay" id="apbOverlay" onclick="closeAPBOuter(event)">
+  <div class="apb-modal">
+    <div class="apb-modal-top">
+      <div>
+        <div class="apb-modal-title">Audience Persona Builder</div>
+        <div class="apb-modal-sub">Five questions. Set once. Every output becomes sharper — forever.</div>
+      </div>
+      <button class="apb-close" onclick="closeAPB()">✕</button>
+    </div>
+    <div class="apb-body">
+
+      <div class="apb-q">
+        <div class="apb-q-num">Question 1</div>
+        <div class="apb-q-text">Who is your ideal viewer?</div>
+        <div class="apb-q-hint">Age, occupation, life situation. Be specific — not "entrepreneurs" but "female founders aged 28-40 running service businesses in the UK."</div>
+        <textarea class="apb-q-input" id="apb-who" rows="2" placeholder="e.g. male personal trainers aged 25-35, self-employed, living in UK cities, trying to build an online presence alongside their in-person clients"></textarea>
+      </div>
+
+      <div class="apb-q">
+        <div class="apb-q-num">Question 2</div>
+        <div class="apb-q-text">What is their primary pain point?</div>
+        <div class="apb-q-hint">The thing that keeps them up at night. The frustration they feel every week. Not the surface problem — the real one underneath it.</div>
+        <textarea class="apb-q-input" id="apb-pain" rows="2" placeholder="e.g. they know they should be posting content to grow online but don't know what to say, run out of ideas, and feel like everything they make looks amateur compared to bigger creators"></textarea>
+      </div>
+
+      <div class="apb-q">
+        <div class="apb-q-num">Question 3</div>
+        <div class="apb-q-text">What have they already tried that hasn't worked?</div>
+        <div class="apb-q-hint">Failed solutions matter. Mentioning what didn't work signals you understand their journey — not just their problem.</div>
+        <textarea class="apb-q-input" id="apb-tried" rows="2" placeholder="e.g. bought a content course that gave generic advice, tried posting daily for two weeks then gave up, copied other creators' styles and felt inauthentic"></textarea>
+      </div>
+
+      <div class="apb-q">
+        <div class="apb-q-num">Question 4</div>
+        <div class="apb-q-text">What do they secretly want to believe about themselves?</div>
+        <div class="apb-q-hint">This is the identity beneath the problem. The self-image they're reaching toward. Content that reflects this back to them is the content they share.</div>
+        <textarea class="apb-q-input" id="apb-belief" rows="2" placeholder="e.g. that they have real expertise worth sharing, that they're capable of building something beyond their local client base, that they're not too late to build an audience"></textarea>
+      </div>
+
+      <div class="apb-q">
+        <div class="apb-q-num">Question 5</div>
+        <div class="apb-q-text">What sentence would make them stop scrolling and say <em>"that's exactly me"</em>?</div>
+        <div class="apb-q-hint">One sentence. Specific enough to feel written for them personally. This becomes the invisible north star for every hook VYRALL writes.</div>
+        <textarea class="apb-q-input" id="apb-mirror" rows="2" placeholder="e.g. you're a great trainer but a terrible marketer — not because you're bad at it, but because nobody ever taught you how to turn what you know into content people actually watch"></textarea>
+      </div>
+
+      <button class="apb-save" onclick="saveAPB()">✦ &nbsp;Save Persona</button>
+
+    </div>
+  </div>
+</div>
+
+<script>
+
+// ══ AUDIENCE PERSONA BUILDER ══
+let curPersona = null;
+
+// Load saved persona from localStorage on startup
+(function loadPersona(){
+  try {
+    const saved = localStorage.getItem('vyrall_persona');
+    if (saved) {
+      curPersona = JSON.parse(saved);
+      updateAPBIndicator();
+    }
+  } catch(e) {}
+})();
+
+function openAPB(){
+  // Pre-fill if persona exists
+  if (curPersona) {
+    document.getElementById('apb-who').value    = curPersona.who    || '';
+    document.getElementById('apb-pain').value   = curPersona.pain   || '';
+    document.getElementById('apb-tried').value  = curPersona.tried  || '';
+    document.getElementById('apb-belief').value = curPersona.belief || '';
+    document.getElementById('apb-mirror').value = curPersona.mirror || '';
+  }
+  document.getElementById('apbOverlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeAPB(){
+  document.getElementById('apbOverlay').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+function closeAPBOuter(e){
+  if (e.target === document.getElementById('apbOverlay')) closeAPB();
+}
+
+function saveAPB(){
+  const who    = document.getElementById('apb-who').value.trim();
+  const pain   = document.getElementById('apb-pain').value.trim();
+  const tried  = document.getElementById('apb-tried').value.trim();
+  const belief = document.getElementById('apb-belief').value.trim();
+  const mirror = document.getElementById('apb-mirror').value.trim();
+
+  // Need at least who + pain to be useful
+  if (!who || !pain) {
+    document.getElementById('apb-who').style.borderColor = 'var(--red)';
+    document.getElementById('apb-pain').style.borderColor = 'var(--red)';
+    setTimeout(() => {
+      document.getElementById('apb-who').style.borderColor = '';
+      document.getElementById('apb-pain').style.borderColor = '';
+    }, 1800);
+    return;
+  }
+
+  curPersona = { who, pain, tried, belief, mirror };
+  try { localStorage.setItem('vyrall_persona', JSON.stringify(curPersona)); } catch(e){}
+  updateAPBIndicator();
+  closeAPB();
+}
+
+function updateAPBIndicator(){
+  const dot    = document.getElementById('apbDot');
+  const lbl    = document.getElementById('apbTriggerLbl');
+  const action = document.getElementById('apbTriggerAction');
+  const badge  = document.getElementById('apbBadge');
+
+  if (curPersona && curPersona.who) {
+    dot.classList.add('set');
+    lbl.textContent = curPersona.who.substring(0, 52) + (curPersona.who.length > 52 ? '…' : '');
+    lbl.style.color = 'var(--ink)';
+    action.textContent = 'Edit →';
+    badge.style.display = 'flex';
+    badge.textContent = '✦ Persona active — all outputs are calibrated for this audience';
+  } else {
+    dot.classList.remove('set');
+    lbl.textContent = 'Not set — click to define your audience';
+    lbl.style.color = '';
+    action.textContent = 'Set up →';
+    badge.style.display = 'none';
+  }
+}
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') { closeAPB(); closeModal(); }
+});
+
+</script>
 </body>
 </html>

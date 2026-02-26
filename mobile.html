@@ -366,6 +366,14 @@ select optgroup{font-style:normal;color:var(--ink3);font-size:10px;}
           <input type="text" id="m-niche" placeholder="e.g. personal finance, fitness, AI tools…"/>
         </div>
         <div class="form-group">
+          <label class="form-label">Audience Persona <span style="color:var(--ink3);font-size:9px">(sharpens every output)</span></label>
+          <div onclick="openAPB()" style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--s2);border:1px solid var(--b1);border-radius:6px;cursor:pointer;">
+            <div id="m-apbDot" style="width:8px;height:8px;border-radius:50%;background:var(--b2);flex-shrink:0;"></div>
+            <span id="m-apbLbl" style="font-size:11px;color:var(--ink2);flex:1;">Not set — tap to define your audience</span>
+            <span style="font-size:10px;color:var(--ink3);">→</span>
+          </div>
+        </div>
+        <div class="form-group">
           <label class="form-label">Region</label>
           <select id="m-region">
             <option value="United Kingdom">United Kingdom 🇬🇧</option>
@@ -950,7 +958,8 @@ async function mRun() {
   try {
     fmtData = await vyrallCall('analyze', {
       topic, niche, goal, tone, platform: platTxt,
-      trendAngle: mTrendAngle || null
+      trendAngle: mTrendAngle || null,
+      persona: curPersona || null
     });
     mFmtData = fmtData; mEmo = fmtData.selected_emotion || '';
 
@@ -975,7 +984,8 @@ async function mRun() {
       emotion: fmtData.selected_emotion,
       triggers: fmtData.selected_triggers || [],
       socialCurrency: fmtData.social_currency_strategy,
-      offer, cta, trendAngle: mTrendAngle || null
+      offer, cta, trendAngle: mTrendAngle || null,
+      persona: curPersona || null
     });
 
     mRenderScript(fd, mOfferOn && !!offer);
@@ -1368,5 +1378,143 @@ async function mLoadHist(id) {
   } catch(e) {}
 }
 </script>
+
+<!-- ══ APB MODAL (shared web + mobile) ══ -->
+<div class="apb-modal-overlay" id="apbOverlay" onclick="closeAPBOuter(event)" style="position:fixed;inset:0;z-index:900;background:rgba(8,8,10,.88);backdrop-filter:blur(6px);display:none;align-items:center;justify-content:center;padding:16px;">
+  <div style="background:var(--s1);border:1px solid var(--b1);border-radius:12px;width:100%;max-width:520px;max-height:90vh;overflow-y:auto;display:flex;flex-direction:column;">
+    <div style="padding:18px 20px 14px;border-bottom:1px solid var(--b1);display:flex;align-items:flex-start;justify-content:space-between;gap:12px;position:sticky;top:0;background:var(--s1);">
+      <div>
+        <div style="font-family:'Syne',sans-serif;font-size:14px;font-weight:700;">Audience Persona Builder</div>
+        <div style="font-size:10px;color:var(--ink3);margin-top:3px;line-height:1.6;">Set once. Every generation becomes sharper.</div>
+      </div>
+      <button onclick="closeAPB()" style="width:26px;height:26px;border-radius:50%;border:1px solid var(--b1);background:transparent;color:var(--ink3);cursor:pointer;font-size:13px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">✕</button>
+    </div>
+    <div style="padding:18px 20px 28px;display:flex;flex-direction:column;gap:18px;">
+
+      <div style="display:flex;flex-direction:column;gap:7px;">
+        <div style="font-size:8.5px;letter-spacing:.2em;text-transform:uppercase;color:var(--g2);">Question 1</div>
+        <div style="font-size:14px;color:var(--ink);line-height:1.45;">Who is your ideal viewer?</div>
+        <div style="font-size:10px;color:var(--ink3);line-height:1.6;">Age, occupation, life situation. Be specific.</div>
+        <textarea id="apb-who" rows="2" style="width:100%;background:var(--s2);border:1px solid var(--b1);border-radius:6px;color:var(--ink);font-family:'DM Mono',monospace;font-size:12px;line-height:1.65;padding:11px 13px;resize:none;outline:none;min-height:68px;" placeholder="e.g. female nurse practitioners aged 30-45, NHS employed, interested in career development…"></textarea>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:7px;">
+        <div style="font-size:8.5px;letter-spacing:.2em;text-transform:uppercase;color:var(--g2);">Question 2</div>
+        <div style="font-size:14px;color:var(--ink);line-height:1.45;">What is their primary pain point?</div>
+        <div style="font-size:10px;color:var(--ink3);line-height:1.6;">The real frustration underneath the surface problem.</div>
+        <textarea id="apb-pain" rows="2" style="width:100%;background:var(--s2);border:1px solid var(--b1);border-radius:6px;color:var(--ink);font-family:'DM Mono',monospace;font-size:12px;line-height:1.65;padding:11px 13px;resize:none;outline:none;min-height:68px;" placeholder="e.g. they feel overlooked for promotion despite experience, unsure how to advocate for themselves professionally…"></textarea>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:7px;">
+        <div style="font-size:8.5px;letter-spacing:.2em;text-transform:uppercase;color:var(--g2);">Question 3</div>
+        <div style="font-size:14px;color:var(--ink);line-height:1.45;">What have they already tried that failed?</div>
+        <div style="font-size:10px;color:var(--ink3);line-height:1.6;">Failed solutions signal you understand their full journey.</div>
+        <textarea id="apb-tried" rows="2" style="width:100%;background:var(--s2);border:1px solid var(--b1);border-radius:6px;color:var(--ink);font-family:'DM Mono',monospace;font-size:12px;line-height:1.65;padding:11px 13px;resize:none;outline:none;min-height:68px;" placeholder="e.g. attended leadership courses that felt generic, asked managers for feedback and got vague answers…"></textarea>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:7px;">
+        <div style="font-size:8.5px;letter-spacing:.2em;text-transform:uppercase;color:var(--g2);">Question 4</div>
+        <div style="font-size:14px;color:var(--ink);line-height:1.45;">What do they secretly want to believe about themselves?</div>
+        <div style="font-size:10px;color:var(--ink3);line-height:1.6;">The identity they are reaching toward.</div>
+        <textarea id="apb-belief" rows="2" style="width:100%;background:var(--s2);border:1px solid var(--b1);border-radius:6px;color:var(--ink);font-family:'DM Mono',monospace;font-size:12px;line-height:1.65;padding:11px 13px;resize:none;outline:none;min-height:68px;" placeholder="e.g. that their clinical instincts and patient care skills are genuinely leadership-grade, that they deserve a seat at the table…"></textarea>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:7px;">
+        <div style="font-size:8.5px;letter-spacing:.2em;text-transform:uppercase;color:var(--g2);">Question 5</div>
+        <div style="font-size:14px;color:var(--ink);line-height:1.45;">What sentence makes them say <em>"that is exactly me"</em>?</div>
+        <div style="font-size:10px;color:var(--ink3);line-height:1.6;">One sentence. Specific enough to feel personal.</div>
+        <textarea id="apb-mirror" rows="2" style="width:100%;background:var(--s2);border:1px solid var(--b1);border-radius:6px;color:var(--ink);font-family:'DM Mono',monospace;font-size:12px;line-height:1.65;padding:11px 13px;resize:none;outline:none;min-height:68px;" placeholder="e.g. you have ten years of experience that management still does not fully see — and you are not sure how to change that…"></textarea>
+      </div>
+
+      <button onclick="saveAPB()" style="background:var(--g);color:var(--bg);border:none;padding:13px 24px;font-family:'Syne',sans-serif;font-size:12px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;border-radius:6px;cursor:pointer;align-self:flex-start;">✦ &nbsp;Save Persona</button>
+
+    </div>
+  </div>
+</div>
+
+<script>
+// ══ AUDIENCE PERSONA BUILDER ══
+let curPersona = null;
+
+(function loadPersona(){
+  try {
+    const saved = localStorage.getItem('vyrall_persona');
+    if (saved) { curPersona = JSON.parse(saved); updateAPBIndicator(); }
+  } catch(e) {}
+})();
+
+function openAPB(){
+  if (curPersona) {
+    document.getElementById('apb-who').value    = curPersona.who    || '';
+    document.getElementById('apb-pain').value   = curPersona.pain   || '';
+    document.getElementById('apb-tried').value  = curPersona.tried  || '';
+    document.getElementById('apb-belief').value = curPersona.belief || '';
+    document.getElementById('apb-mirror').value = curPersona.mirror || '';
+  }
+  document.getElementById('apbOverlay').style.display = 'flex';
+  document.body.style.overflow = 'hidden';
+}
+
+function closeAPB(){
+  document.getElementById('apbOverlay').style.display = 'none';
+  document.body.style.overflow = '';
+}
+
+function closeAPBOuter(e){
+  if (e.target === document.getElementById('apbOverlay')) closeAPB();
+}
+
+function saveAPB(){
+  const who    = document.getElementById('apb-who').value.trim();
+  const pain   = document.getElementById('apb-pain').value.trim();
+  const tried  = document.getElementById('apb-tried').value.trim();
+  const belief = document.getElementById('apb-belief').value.trim();
+  const mirror = document.getElementById('apb-mirror').value.trim();
+
+  if (!who || !pain) {
+    ['apb-who','apb-pain'].forEach(id => {
+      const el = document.getElementById(id);
+      el.style.borderColor = 'var(--red)';
+      setTimeout(() => el.style.borderColor = '', 1800);
+    });
+    return;
+  }
+
+  curPersona = { who, pain, tried, belief, mirror };
+  try { localStorage.setItem('vyrall_persona', JSON.stringify(curPersona)); } catch(e){}
+  updateAPBIndicator();
+  closeAPB();
+}
+
+function updateAPBIndicator(){
+  // Web indicator
+  const dot    = document.getElementById('apbDot');
+  const lbl    = document.getElementById('apbTriggerLbl');
+  const action = document.getElementById('apbTriggerAction');
+  const badge  = document.getElementById('apbBadge');
+
+  // Mobile indicator
+  const mDot = document.getElementById('m-apbDot');
+  const mLbl = document.getElementById('m-apbLbl');
+
+  if (curPersona && curPersona.who) {
+    const preview = curPersona.who.substring(0, 48) + (curPersona.who.length > 48 ? '…' : '');
+    if (dot)    { dot.style.background = 'var(--g)'; }
+    if (lbl)    { lbl.textContent = preview; lbl.style.color = 'var(--ink)'; }
+    if (action) { action.textContent = 'Edit →'; }
+    if (badge)  { badge.style.display = 'flex'; badge.textContent = '✦ Persona active — outputs calibrated for this audience'; }
+    if (mDot)   { mDot.style.background = 'var(--g)'; }
+    if (mLbl)   { mLbl.textContent = preview; mLbl.style.color = 'var(--ink)'; }
+  } else {
+    if (dot)    { dot.style.background = ''; }
+    if (lbl)    { lbl.textContent = 'Not set — click to define your audience'; lbl.style.color = ''; }
+    if (action) { action.textContent = 'Set up →'; }
+    if (badge)  { badge.style.display = 'none'; }
+    if (mDot)   { mDot.style.background = ''; }
+    if (mLbl)   { mLbl.textContent = 'Not set — tap to define your audience'; mLbl.style.color = ''; }
+  }
+}
+</script>
+
 </body>
 </html>

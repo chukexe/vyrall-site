@@ -174,8 +174,8 @@ vrin (0-100, how rare content on this angle would be).
 Return JSON: {"inferred_niche":"...","angles":[{"phrase":"...","why":"...","status":"hot","emotion":"...","vrin":0}]}`,
 
   // ── Virality Analysis ─────────────────────────────────────
-  analyze: ({ topic, niche, goal, tone, platform, trendAngle }) => `
-VIRALITY INTELLIGENCE ANALYSIS — apply all 10 layers including VRIN and Trend Intelligence.
+  analyze: ({ topic, niche, goal, tone, platform, trendAngle, persona }) => `
+VIRALITY INTELLIGENCE ANALYSIS — apply all 11 layers including VRIN and Trend Intelligence.
 Topic: "${topic}"
 ${niche
   ? `Niche: "${niche}"`
@@ -186,6 +186,14 @@ Goal: ${goal}
 Tone: ${tone}
 Platform: ${platform}
 ${trendAngle ? `Trend Context: This angle is "${trendAngle.status}" in the selected region. Lean into it.` : ''}
+${persona ? `
+AUDIENCE PERSONA — use this to sharpen every single decision:
+Who they are: ${persona.who}
+Primary pain point: ${persona.pain}
+What they have already tried that failed: ${persona.tried}
+What they secretly want to believe about themselves: ${persona.belief}
+The sentence that makes them say that is exactly me: ${persona.mirror}
+Write for this specific person. Not a general audience.` : ''}
 
 TASKS:
 1. Select single best storytelling format from the Format Matrix (including Attention Literacy pillar).
@@ -219,7 +227,7 @@ Return JSON:
 }`,
 
   // ── Content Generation ────────────────────────────────────
-  generate: ({ topic, niche, goal, tone, platform, format, structure, emotion, triggers, socialCurrency, offer, cta, trendAngle }) => `
+  generate: ({ topic, niche, goal, tone, platform, format, structure, emotion, triggers, socialCurrency, offer, cta, trendAngle, persona }) => `
 CONTENT GENERATION — punchiest, most optimized version. Final version, not a draft.
 
 Topic: "${topic}"
@@ -236,6 +244,14 @@ Selected triggers: ${triggers.join(', ')} — activate naturally
 Social currency: ${socialCurrency}
 ${offer ? `Offer: "${offer}" | CTA: "${cta || 'natural next step'}"` : 'No offer — pure value content.'}
 ${trendAngle ? `Trend angle: "${trendAngle.phrase}" — lean into this specific angle throughout.` : ''}
+${persona ? `
+AUDIENCE PERSONA — write for this specific person:
+Who they are: ${persona.who}
+Their pain: ${persona.pain}
+What they have tried: ${persona.tried}
+What they want to believe about themselves: ${persona.belief}
+The mirror sentence: ${persona.mirror}
+Every word, every example, every metaphor should speak directly to this person.` : ''}
 
 GENERATION RULES (all 11 layers simultaneously):
 — Hook: 1-2 sentences. "Wait…what?" in first 3 words. No greetings. Immediate tension.
@@ -326,10 +342,11 @@ Optimize for ${platform}'s mechanics and audience behaviour. Include hashtag str
 Return JSON: {"captions":[{"style":"...","text":"...","hashtag_note":"..."}]}`,
 
   // ── Remix Engine ──────────────────────────────────────────
-  remix: ({ script, niche, region, platform, emotion }) => `
+  remix: ({ script, niche, region, platform, emotion, persona }) => `
 REMIX ENGINE — Remix and Sequence methodology.
 Original script: ${script}
 Niche: ${niche} | Region: ${region} | Platform: ${platform} | Emotion: ${emotion}
+${persona ? `Audience: ${persona.who} — pain: ${persona.pain}` : ''}
 
 Generate 5 remix variations targeting different rising trend angles for ${niche} in ${region}.
 Each remix = same core insight, different entry point angle:

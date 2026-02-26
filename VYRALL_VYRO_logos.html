@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VYRALL & VYRO — Logo Suite</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@800&family=DM+Mono:wght@400&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:#08080a;color:#eeece6;font-family:'DM Mono',monospace;min-height:100vh;padding:48px 40px;}
+
+.page-title{font-size:10px;letter-spacing:.3em;text-transform:uppercase;color:#5e5c58;margin-bottom:48px;}
+
+.suite{display:flex;flex-direction:column;gap:64px;}
+
+.brand-section{display:flex;flex-direction:column;gap:24px;}
+.brand-label{font-size:9px;letter-spacing:.28em;text-transform:uppercase;color:#5e5c58;padding-bottom:12px;border-bottom:1px solid #2a2a34;}
+.brand-name{font-family:'Syne',sans-serif;font-size:11px;font-weight:800;letter-spacing:.2em;margin-bottom:4px;}
+.brand-desc{font-size:10px;color:#5e5c58;}
+
+.icon-row{display:flex;gap:24px;align-items:flex-end;flex-wrap:wrap;}
+
+.icon-wrap{display:flex;flex-direction:column;align-items:center;gap:10px;}
+.icon-size-lbl{font-size:9px;color:#5e5c58;letter-spacing:.1em;}
+
+/* ── DOWNLOAD BUTTONS ── */
+.dl-row{display:flex;gap:10px;margin-top:8px;flex-wrap:wrap;}
+.dl-btn{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.1em;padding:6px 14px;border-radius:3px;border:1px solid #2a2a34;background:transparent;color:#9e9c96;cursor:pointer;transition:all .2s;text-decoration:none;display:inline-block;}
+.dl-btn:hover{border-color:#00e5a0;color:#00e5a0;}
+.dl-btn.vyro:hover{border-color:#b06aff;color:#b06aff;}
+
+.divider{height:1px;background:#16161a;margin:8px 0;}
+
+/* colour swatches */
+.swatch-row{display:flex;gap:8px;margin-top:4px;}
+.swatch{width:20px;height:20px;border-radius:3px;}
+.swatch-lbl{font-size:9px;color:#5e5c58;margin-top:3px;text-align:center;}
+.swatch-wrap{display:flex;flex-direction:column;align-items:center;}
+</style>
+</head>
+<body>
+
+<div class="page-title">Logo Suite — Icon Format</div>
+
+<div class="suite">
+
+  <!-- ══ VYRALL ══ -->
+  <div class="brand-section">
+    <div class="brand-label">Brand 01</div>
+    <div>
+      <div class="brand-name" style="color:#00e5a0">VYRALL</div>
+      <div class="brand-desc">Content generation engine</div>
+    </div>
+
+    <div class="icon-row">
+
+      <!-- 512px -->
+      <div class="icon-wrap">
+        <svg width="120" height="120" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg" id="vyrall-512">
+          <defs>
+            <radialGradient id="vg1" cx="35%" cy="30%" r="65%">
+              <stop offset="0%" stop-color="#00ffb3" stop-opacity="0.15"/>
+              <stop offset="100%" stop-color="#00e5a0" stop-opacity="0"/>
+            </radialGradient>
+            <filter id="vglow">
+              <feGaussianBlur stdDeviation="8" result="blur"/>
+              <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+            </filter>
+            <clipPath id="vrect">
+              <rect width="512" height="512" rx="96"/>
+            </clipPath>
+          </defs>
+
+          <!-- Background -->
+          <rect width="512" height="512" rx="96" fill="#08080a"/>
+          <rect width="512" height="512" rx="96" fill="url(#vg1)"/>
+
+          <!-- Subtle grid texture -->
+          <g opacity="0.04" clip-path="url(#vrect)">
+            <line x1="0" y1="128" x2="512" y2="128" stroke="#00e5a0" stroke-width="1"/>
+            <line x1="0" y1="256" x2="512" y2="256" stroke="#00e5a0" stroke-width="1"/>
+            <line x1="0" y1="384" x2="512" y2="384" stroke="#00e5a0" stroke-width="1"/>
+            <line x1="128" y1="0" x2="128" y2="512" stroke="#00e5a0" stroke-width="1"/>
+            <line x1="256" y1="0" x2="256" y2="512" stroke="#00e5a0" stroke-width="1"/>
+            <line x1="384" y1="0" x2="384" y2="512" stroke="#00e5a0" stroke-width="1"/>
+          </g>
+
+          <!-- Border -->
+          <rect x="1.5" y="1.5" width="509" height="509" rx="95" fill="none" stroke="#00e5a0" stroke-width="1.5" opacity="0.2"/>
+
+          <!-- V mark — geometric, angular, precise -->
+          <!-- Left arm of V -->
+          <polygon points="96,140 180,140 256,340 232,340" fill="#00e5a0" filter="url(#vglow)"/>
+          <!-- Right arm of V -->
+          <polygon points="416,140 332,140 256,340 280,340" fill="#00e5a0" filter="url(#vglow)"/>
+
+          <!-- Signal dot — amber accent, bottom right of V -->
+          <circle cx="256" cy="380" r="18" fill="#ffd060"/>
+          <circle cx="256" cy="380" r="10" fill="#08080a"/>
+          <circle cx="256" cy="380" r="4" fill="#ffd060"/>
+
+          <!-- Top accent line -->
+          <line x1="96" y1="128" x2="416" y2="128" stroke="#00e5a0" stroke-width="2" opacity="0.3"/>
+        </svg>
+        <div class="icon-size-lbl">512 × 512</div>
+      </div>
+
+      <!-- 192px -->
+      <div class="icon-wrap">
+        <svg width="80" height="80" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+          <rect width="512" height="512" rx="96" fill="#08080a"/>
+          <rect x="1.5" y="1.5" width="509" height="509" rx="95" fill="none" stroke="#00e5a0" stroke-width="1.5" opacity="0.2"/>
+          <polygon points="96,140 180,140 256,340 232,340" fill="#00e5a0"/>
+          <polygon points="416,140 332,140 256,340 280,340" fill="#00e5a0"/>
+          <circle cx="256" cy="380" r="18" fill="#ffd060"/>
+          <circle cx="256" cy="380" r="10" fill="#08080a"/>
+          <circle cx="256" cy="380" r="4" fill="#ffd060"/>
+        </svg>
+        <div class="icon-size-lbl">192 × 192</div>
+      </div>
+
+      <!-- 64px favicon -->
+      <div class="icon-wrap">
+        <svg width="64" height="64" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+          <rect width="512" height="512" rx="96" fill="#08080a"/>
+          <polygon points="96,140 180,140 256,340 232,340" fill="#00e5a0"/>
+          <polygon points="416,140 332,140 256,340 280,340" fill="#00e5a0"/>
+          <circle cx="256" cy="380" r="18" fill="#ffd060"/>
+          <circle cx="256" cy="380" r="10" fill="#08080a"/>
+          <circle cx="256" cy="380" r="4" fill="#ffd060"/>
+        </svg>
+        <div class="icon-size-lbl">64 × 64</div>
+      </div>
+
+      <!-- 32px favicon -->
+      <div class="icon-wrap">
+        <svg width="32" height="32" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+          <rect width="512" height="512" rx="96" fill="#08080a"/>
+          <polygon points="96,140 180,140 256,340 232,340" fill="#00e5a0"/>
+          <polygon points="416,140 332,140 256,340 280,340" fill="#00e5a0"/>
+          <circle cx="256" cy="380" r="16" fill="#ffd060"/>
+          <circle cx="256" cy="380" r="8" fill="#08080a"/>
+          <circle cx="256" cy="380" r="3" fill="#ffd060"/>
+        </svg>
+        <div class="icon-size-lbl">32 × 32</div>
+      </div>
+
+      <!-- 16px favicon -->
+      <div class="icon-wrap">
+        <svg width="16" height="16" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+          <rect width="512" height="512" rx="96" fill="#08080a"/>
+          <polygon points="96,140 180,140 256,340 232,340" fill="#00e5a0"/>
+          <polygon points="416,140 332,140 256,340 280,340" fill="#00e5a0"/>
+          <circle cx="256" cy="380" r="20" fill="#ffd060"/>
+        </svg>
+        <div class="icon-size-lbl">16 × 16</div>
+      </div>
+
+    </div>
+
+    <!-- Colour palette -->
+    <div class="swatch-row">
+      <div class="swatch-wrap"><div class="swatch" style="background:#08080a;border:1px solid #2a2a34"></div><div class="swatch-lbl">#08080a</div></div>
+      <div class="swatch-wrap"><div class="swatch" style="background:#00e5a0"></div><div class="swatch-lbl">#00e5a0</div></div>
+      <div class="swatch-wrap"><div class="swatch" style="background:#ffd060"></div><div class="swatch-lbl">#ffd060</div></div>
+    </div>
+
+    <div class="dl-row">
+      <a class="dl-btn" onclick="downloadSVG('vyrall-512','vyrall-icon-512.svg')" href="#">↓ SVG 512px</a>
+      <a class="dl-btn" onclick="downloadPNG('vyrall-512',512,'vyrall-icon-512.png')" href="#">↓ PNG 512px</a>
+      <a class="dl-btn" onclick="downloadPNG('vyrall-512',192,'vyrall-icon-192.png')" href="#">↓ PNG 192px</a>
+      <a class="dl-btn" onclick="downloadPNG('vyrall-512',64,'vyrall-favicon-64.png')" href="#">↓ PNG 64px</a>
+      <a class="dl-btn" onclick="downloadPNG('vyrall-512',32,'vyrall-favicon-32.png')" href="#">↓ PNG 32px</a>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- ══ VYRO ══ -->
+  <div class="brand-section">
+    <div class="brand-label">Brand 02</div>
+    <div>
+      <div class="brand-name" style="color:#b06aff">VYRO</div>
+      <div class="brand-desc">Autonomous content agent</div>
+    </div>
+
+    <div class="icon-row">
+
+      <!-- 512px -->
+      <div class="icon-wrap">
+        <svg width="120" height="120" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg" id="vyro-512">
+          <defs>
+            <radialGradient id="pg1" cx="65%" cy="35%" r="70%">
+              <stop offset="0%" stop-color="#b06aff" stop-opacity="0.18"/>
+              <stop offset="100%" stop-color="#b06aff" stop-opacity="0"/>
+            </radialGradient>
+            <radialGradient id="pg2" cx="30%" cy="70%" r="50%">
+              <stop offset="0%" stop-color="#00d4d4" stop-opacity="0.1"/>
+              <stop offset="100%" stop-color="#00d4d4" stop-opacity="0"/>
+            </radialGradient>
+            <filter id="pglow">
+              <feGaussianBlur stdDeviation="10" result="blur"/>
+              <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+            </filter>
+            <filter id="pglow2">
+              <feGaussianBlur stdDeviation="6" result="blur"/>
+              <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+            </filter>
+          </defs>
+
+          <!-- Background -->
+          <rect width="512" height="512" rx="96" fill="#08080a"/>
+          <rect width="512" height="512" rx="96" fill="url(#pg1)"/>
+          <rect width="512" height="512" rx="96" fill="url(#pg2)"/>
+
+          <!-- Border — purple tint -->
+          <rect x="1.5" y="1.5" width="509" height="509" rx="95" fill="none" stroke="#b06aff" stroke-width="1.5" opacity="0.25"/>
+
+          <!-- Orbit ring — the automation circle -->
+          <circle cx="256" cy="256" r="160" fill="none" stroke="#b06aff" stroke-width="2" opacity="0.2"/>
+          <circle cx="256" cy="256" r="160" fill="none" stroke="#b06aff" stroke-width="2" opacity="0.15" stroke-dasharray="12 8"/>
+
+          <!-- Orbit ring 2 — teal inner -->
+          <circle cx="256" cy="256" r="110" fill="none" stroke="#00d4d4" stroke-width="1.5" opacity="0.15"/>
+
+          <!-- Central core — the agent nucleus -->
+          <circle cx="256" cy="256" r="52" fill="#0f0f12" stroke="#b06aff" stroke-width="2" opacity="1"/>
+          <circle cx="256" cy="256" r="40" fill="#b06aff" opacity="0.12"/>
+          <circle cx="256" cy="256" r="18" fill="#b06aff" filter="url(#pglow)"/>
+          <circle cx="256" cy="256" r="10" fill="#08080a"/>
+          <circle cx="256" cy="256" r="5" fill="#b06aff"/>
+
+          <!-- Orbit nodes — 3 satellites representing automated posts -->
+          <!-- Node 1 — top (teal) -->
+          <circle cx="256" cy="96" r="14" fill="#0f0f12" stroke="#00d4d4" stroke-width="2"/>
+          <circle cx="256" cy="96" r="7" fill="#00d4d4" filter="url(#pglow2)"/>
+
+          <!-- Node 2 — bottom right (purple) -->
+          <circle cx="395" cy="335" r="14" fill="#0f0f12" stroke="#b06aff" stroke-width="2"/>
+          <circle cx="395" cy="335" r="7" fill="#b06aff" filter="url(#pglow2)"/>
+
+          <!-- Node 3 — bottom left (amber) -->
+          <circle cx="117" cy="335" r="14" fill="#0f0f12" stroke="#ffd060" stroke-width="2"/>
+          <circle cx="117" cy="335" r="7" fill="#ffd060" filter="url(#pglow2)"/>
+
+          <!-- Connector lines from core to nodes — subtle -->
+          <line x1="256" y1="204" x2="256" y2="110" stroke="#00d4d4" stroke-width="1" opacity="0.3"/>
+          <line x1="296" y1="290" x2="383" y2="323" stroke="#b06aff" stroke-width="1" opacity="0.3"/>
+          <line x1="216" y1="290" x2="129" y2="323" stroke="#ffd060" stroke-width="1" opacity="0.3"/>
+
+          <!-- Motion arc — suggests rotation/automation -->
+          <path d="M 256 90 A 166 166 0 0 1 410 340" fill="none" stroke="#b06aff" stroke-width="2" opacity="0.4" stroke-linecap="round"/>
+        </svg>
+        <div class="icon-size-lbl">512 × 512</div>
+      </div>
+
+      <!-- 192px -->
+      <div class="icon-wrap">
+        <svg width="80" height="80" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+          <rect width="512" height="512" rx="96" fill="#08080a"/>
+          <rect x="1.5" y="1.5" width="509" height="509" rx="95" fill="none" stroke="#b06aff" stroke-width="1.5" opacity="0.25"/>
+          <circle cx="256" cy="256" r="160" fill="none" stroke="#b06aff" stroke-width="2" opacity="0.2" stroke-dasharray="12 8"/>
+          <circle cx="256" cy="256" r="110" fill="none" stroke="#00d4d4" stroke-width="1.5" opacity="0.15"/>
+          <circle cx="256" cy="256" r="52" fill="#0f0f12" stroke="#b06aff" stroke-width="2"/>
+          <circle cx="256" cy="256" r="18" fill="#b06aff"/>
+          <circle cx="256" cy="256" r="10" fill="#08080a"/>
+          <circle cx="256" cy="256" r="5" fill="#b06aff"/>
+          <circle cx="256" cy="96" r="14" fill="#0f0f12" stroke="#00d4d4" stroke-width="2"/>
+          <circle cx="256" cy="96" r="7" fill="#00d4d4"/>
+          <circle cx="395" cy="335" r="14" fill="#0f0f12" stroke="#b06aff" stroke-width="2"/>
+          <circle cx="395" cy="335" r="7" fill="#b06aff"/>
+          <circle cx="117" cy="335" r="14" fill="#0f0f12" stroke="#ffd060" stroke-width="2"/>
+          <circle cx="117" cy="335" r="7" fill="#ffd060"/>
+          <path d="M 256 90 A 166 166 0 0 1 410 340" fill="none" stroke="#b06aff" stroke-width="2" opacity="0.4" stroke-linecap="round"/>
+        </svg>
+        <div class="icon-size-lbl">192 × 192</div>
+      </div>
+
+      <!-- 64px -->
+      <div class="icon-wrap">
+        <svg width="64" height="64" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+          <rect width="512" height="512" rx="96" fill="#08080a"/>
+          <circle cx="256" cy="256" r="160" fill="none" stroke="#b06aff" stroke-width="3" opacity="0.25" stroke-dasharray="16 10"/>
+          <circle cx="256" cy="256" r="52" fill="#0f0f12" stroke="#b06aff" stroke-width="3"/>
+          <circle cx="256" cy="256" r="20" fill="#b06aff"/>
+          <circle cx="256" cy="256" r="10" fill="#08080a"/>
+          <circle cx="256" cy="96" r="16" fill="#00d4d4"/>
+          <circle cx="395" cy="335" r="16" fill="#b06aff"/>
+          <circle cx="117" cy="335" r="16" fill="#ffd060"/>
+        </svg>
+        <div class="icon-size-lbl">64 × 64</div>
+      </div>
+
+      <!-- 32px -->
+      <div class="icon-wrap">
+        <svg width="32" height="32" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+          <rect width="512" height="512" rx="96" fill="#08080a"/>
+          <circle cx="256" cy="256" r="160" fill="none" stroke="#b06aff" stroke-width="4" opacity="0.3" stroke-dasharray="20 12"/>
+          <circle cx="256" cy="256" r="55" fill="#b06aff"/>
+          <circle cx="256" cy="256" r="30" fill="#08080a"/>
+          <circle cx="256" cy="96" r="22" fill="#00d4d4"/>
+          <circle cx="395" cy="335" r="22" fill="#b06aff" opacity="0.7"/>
+          <circle cx="117" cy="335" r="22" fill="#ffd060"/>
+        </svg>
+        <div class="icon-size-lbl">32 × 32</div>
+      </div>
+
+      <!-- 16px -->
+      <div class="icon-wrap">
+        <svg width="16" height="16" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+          <rect width="512" height="512" rx="96" fill="#08080a"/>
+          <circle cx="256" cy="256" r="60" fill="#b06aff"/>
+          <circle cx="256" cy="256" r="30" fill="#08080a"/>
+          <circle cx="256" cy="96" r="28" fill="#00d4d4"/>
+          <circle cx="395" cy="335" r="28" fill="#b06aff"/>
+          <circle cx="117" cy="335" r="28" fill="#ffd060"/>
+        </svg>
+        <div class="icon-size-lbl">16 × 16</div>
+      </div>
+
+    </div>
+
+    <!-- Colour palette -->
+    <div class="swatch-row">
+      <div class="swatch-wrap"><div class="swatch" style="background:#08080a;border:1px solid #2a2a34"></div><div class="swatch-lbl">#08080a</div></div>
+      <div class="swatch-wrap"><div class="swatch" style="background:#b06aff"></div><div class="swatch-lbl">#b06aff</div></div>
+      <div class="swatch-wrap"><div class="swatch" style="background:#00d4d4"></div><div class="swatch-lbl">#00d4d4</div></div>
+      <div class="swatch-wrap"><div class="swatch" style="background:#ffd060"></div><div class="swatch-lbl">#ffd060</div></div>
+    </div>
+
+    <div class="dl-row">
+      <a class="dl-btn vyro" onclick="downloadSVG('vyro-512','vyro-icon-512.svg')" href="#">↓ SVG 512px</a>
+      <a class="dl-btn vyro" onclick="downloadPNG('vyro-512',512,'vyro-icon-512.png')" href="#">↓ PNG 512px</a>
+      <a class="dl-btn vyro" onclick="downloadPNG('vyro-512',192,'vyro-icon-192.png')" href="#">↓ PNG 192px</a>
+      <a class="dl-btn vyro" onclick="downloadPNG('vyro-512',64,'vyro-favicon-64.png')" href="#">↓ PNG 64px</a>
+      <a class="dl-btn vyro" onclick="downloadPNG('vyro-512',32,'vyro-favicon-32.png')" href="#">↓ PNG 32px</a>
+    </div>
+  </div>
+
+</div>
+
+<script>
+function downloadSVG(id, filename) {
+  event.preventDefault();
+  const svg = document.getElementById(id);
+  const serializer = new XMLSerializer();
+  let svgStr = serializer.serializeToString(svg);
+  // Fix viewBox for standalone
+  svgStr = svgStr.replace(/width="\d+" height="\d+"/, 'width="512" height="512"');
+  const blob = new Blob([svgStr], {type: 'image/svg+xml'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = filename; a.click();
+  URL.revokeObjectURL(url);
+}
+
+function downloadPNG(id, size, filename) {
+  event.preventDefault();
+  const svg = document.getElementById(id);
+  const serializer = new XMLSerializer();
+  let svgStr = serializer.serializeToString(svg);
+  svgStr = svgStr.replace(/width="\d+" height="\d+"/, `width="512" height="512"`);
+  const blob = new Blob([svgStr], {type: 'image/svg+xml'});
+  const url = URL.createObjectURL(blob);
+  const img = new Image();
+  img.onload = () => {
+    const canvas = document.createElement('canvas');
+    canvas.width = size; canvas.height = size;
+    const ctx = canvas.getContext('2d');
+    ctx.drawImage(img, 0, 0, size, size);
+    const a = document.createElement('a');
+    a.href = canvas.toDataURL('image/png');
+    a.download = filename; a.click();
+    URL.revokeObjectURL(url);
+  };
+  img.src = url;
+}
+</script>
+</body>
+</html>
