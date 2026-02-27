@@ -1,3 +1,5 @@
-[[edge_functions]]
-  function = "claude"
-  path = "/.netlify/functions/claude"
+[functions]
+  directory = "netlify/functions"
+
+[functions."claude"]
+  timeout = 30

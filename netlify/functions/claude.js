@@ -8,6 +8,14 @@ const MODEL   = 'claude-sonnet-4-20250514';
 const TOKENS  = 1800;
 const API_URL = 'https://api.anthropic.com/v1/messages';
 
+// Per-action token overrides — heavy outputs need more room
+const TOKEN_OVERRIDES = {
+  sequence: 2800,   // 30-day calendar is the largest output
+  remix:    2400,   // 5 full scripts
+  adapt:    2200,   // multiple platform rewrites
+  captions: 1400,
+};
+
 // ── VIRALITY KNOWLEDGE BASE ──────────────────────────────────
 // Prompt-engineering layer — never sent to the client
 const KB = `
@@ -131,7 +139,7 @@ function parseJSON(txt) {
 }
 
 // ── ANTHROPIC CALL ─────────────────────────────────────────────
-async function callClaude(userPrompt) {
+async function callClaude(userPrompt, maxTokens = TOKENS) {
   const res = await fetch(API_URL, {
     method: 'POST',
     headers: {
@@ -141,7 +149,7 @@ async function callClaude(userPrompt) {
     },
     body: JSON.stringify({
       model: MODEL,
-      max_tokens: TOKENS,
+      max_tokens: maxTokens,
       system: SYS,
       messages: [{ role: 'user', content: userPrompt }]
     })
@@ -443,7 +451,8 @@ exports.handler = async (event) => {
     if (!process.env.ANTHROPIC_API_KEY) throw new Error('API key not configured');
 
     const prompt = PROMPTS[action](params || {});
-    const result = await callClaude(prompt);
+    const tokenLimit = TOKEN_OVERRIDES[action] || TOKENS;
+    const result = await callClaude(prompt, tokenLimit);
 
     return {
       statusCode: 200,

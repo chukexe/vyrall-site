@@ -1200,7 +1200,11 @@ async function mGenShots() {
   } catch(e) { document.getElementById('m-shotsList').innerHTML = `<div class="err-m">${e.message}</div>`; }
 }
 
-function mShowAdapt() { document.getElementById('m-adaptCard').style.display = 'block'; }
+function mShowAdapt() {
+  const card = document.getElementById('m-adaptCard');
+  card.style.display = 'block';
+  setTimeout(() => card.scrollIntoView({ behavior: 'smooth', block: 'start' }), 50);
+}
 
 async function mRunAdapt() {
   const sel = [...document.querySelectorAll('.aplat-m.sel')].map(b => b.dataset.p);

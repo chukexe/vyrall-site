@@ -1686,7 +1686,16 @@ async function genShotList(){
 const PLAT_LABELS={tiktok:'TikTok',instagram_reels:'Instagram Reels',instagram_carousel:'IG Carousel',youtube_shorts:'YouTube Shorts',youtube_longform:'YouTube Long-Form',facebook:'Facebook',linkedin:'LinkedIn',twitter_x:'Twitter / X',newsletter:'Newsletter'};
 
 function togAdaptPlat(btn){btn.classList.toggle('sel');}
-function showAdapt(){document.getElementById('adaptCard').style.display='block';}
+function showAdapt(){
+  const card = document.getElementById('adaptCard');
+  card.style.display = 'block';
+  // Scroll smoothly into view so user knows it opened
+  setTimeout(() => card.scrollIntoView({ behavior: 'smooth', block: 'start' }), 50);
+  // Visual feedback on the button
+  const btn = document.getElementById('fb-adapt');
+  btn.classList.add('loading');
+  setTimeout(() => btn.classList.remove('loading'), 600);
+}
 
 async function runAdapt(){
   const selected=[...document.querySelectorAll('.aplat-btn.sel')].map(b=>b.dataset.p);
@@ -1710,6 +1719,8 @@ async function runAdapt(){
     document.getElementById('adaptResults').innerHTML=`<div style="padding:16px"><div class="err-msg">${e.message}</div></div>`;
   }
   btn.disabled=false;btn.textContent='Adapt for Selected Platforms';
+  const stripBtn = document.getElementById('fb-adapt');
+  if(stripBtn) stripBtn.classList.remove('loading');
 }
 
 // ════════════════════════════════════════════════════════════════
