@@ -686,6 +686,114 @@ select optgroup { font-style:normal; font-weight:500; font-size:9px; color:var(-
   font-size:10px;color:var(--g2);line-height:1.5;
 }
 
+
+/* ── TOOLTIPS ── */
+.tip {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  cursor: default;
+}
+.tip-icon {
+  width: 13px; height: 13px; border-radius: 50%;
+  background: var(--b2); color: var(--ink3);
+  font-size: 8px; display: inline-flex; align-items: center;
+  justify-content: center; cursor: help; flex-shrink: 0;
+  font-style: normal; font-family: 'DM Mono', monospace;
+  transition: all .15s; line-height: 1;
+}
+.tip:hover .tip-icon { background: var(--g3); color: var(--g2); }
+.tip-box {
+  position: absolute; bottom: calc(100% + 8px); left: 50%;
+  transform: translateX(-50%); width: 220px;
+  background: var(--s3); border: 1px solid var(--b2);
+  border-radius: 7px; padding: 10px 12px;
+  font-size: 11px; color: var(--ink2); line-height: 1.7;
+  pointer-events: none; opacity: 0; transition: opacity .15s;
+  z-index: 200; text-align: left; font-weight: 400;
+  letter-spacing: 0; text-transform: none;
+  box-shadow: 0 8px 24px rgba(0,0,0,.4);
+}
+.tip-box::after {
+  content: ''; position: absolute; top: 100%; left: 50%;
+  transform: translateX(-50%); border: 5px solid transparent;
+  border-top-color: var(--b2);
+}
+.tip:hover .tip-box { opacity: 1; }
+
+/* ── HELP BUTTON ── */
+.help-btn {
+  position: fixed; bottom: 24px; right: 24px; z-index: 400;
+  width: 40px; height: 40px; border-radius: 50%;
+  background: var(--s2); border: 1px solid var(--b2);
+  color: var(--ink2); font-size: 16px; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: all .2s; box-shadow: 0 4px 16px rgba(0,0,0,.3);
+}
+.help-btn:hover { border-color: var(--g2); color: var(--g); transform: scale(1.05); }
+
+/* ── HELP MODAL ── */
+.help-overlay {
+  position: fixed; inset: 0; z-index: 500;
+  background: rgba(8,8,10,.88); backdrop-filter: blur(6px);
+  display: none; align-items: center; justify-content: center; padding: 20px;
+}
+.help-overlay.open { display: flex; }
+.help-modal {
+  background: var(--s1); border: 1px solid var(--b1);
+  border-radius: 12px; width: 100%; max-width: 640px;
+  max-height: 88vh; overflow-y: auto; display: flex; flex-direction: column;
+}
+.help-top {
+  padding: 20px 24px 16px; border-bottom: 1px solid var(--b1);
+  display: flex; align-items: flex-start; justify-content: space-between;
+  position: sticky; top: 0; background: var(--s1); z-index: 1;
+}
+.help-title { font-family: 'Syne', sans-serif; font-size: 16px; font-weight: 700; }
+.help-sub { font-size: 11px; color: var(--ink3); margin-top: 3px; line-height: 1.5; }
+.help-close {
+  width: 28px; height: 28px; border-radius: 50%; border: 1px solid var(--b1);
+  background: transparent; color: var(--ink3); cursor: pointer; font-size: 13px;
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+  transition: all .15s;
+}
+.help-close:hover { border-color: var(--g2); color: var(--g); }
+.help-body { padding: 0 24px 32px; display: flex; flex-direction: column; }
+.help-section { padding: 20px 0; border-bottom: 1px solid var(--b1); }
+.help-section:last-child { border-bottom: none; }
+.help-section-title {
+  font-family: 'Syne', sans-serif; font-size: 12px; font-weight: 700;
+  color: var(--g); letter-spacing: .08em; margin-bottom: 12px;
+  display: flex; align-items: center; gap: 8px;
+}
+.help-section-title::before {
+  content: ''; width: 6px; height: 6px; border-radius: 50%; background: var(--g); flex-shrink: 0;
+}
+.help-item { display: flex; flex-direction: column; gap: 3px; margin-bottom: 14px; }
+.help-item:last-child { margin-bottom: 0; }
+.help-item-label {
+  font-size: 11px; font-weight: 500; color: var(--ink);
+  letter-spacing: .06em;
+}
+.help-item-desc { font-size: 11px; color: var(--ink3); line-height: 1.75; }
+.help-item-action {
+  font-size: 10px; color: var(--g2); margin-top: 2px; line-height: 1.6;
+}
+.help-step {
+  display: flex; gap: 14px; margin-bottom: 16px; align-items: flex-start;
+}
+.help-step:last-child { margin-bottom: 0; }
+.help-step-num {
+  width: 22px; height: 22px; border-radius: 50%; background: var(--g2);
+  color: var(--bg); font-family: 'Syne', sans-serif; font-size: 10px;
+  font-weight: 700; display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0; margin-top: 1px;
+}
+.help-step-body { flex: 1; }
+.help-step-title { font-size: 12px; color: var(--ink); font-weight: 500; margin-bottom: 3px; }
+.help-step-desc { font-size: 11px; color: var(--ink3); line-height: 1.75; }
+
 </style>
 </head>
 <body>
@@ -939,31 +1047,31 @@ select optgroup { font-style:normal; font-weight:500; font-size:9px; color:var(-
           <!-- Scores -->
           <div class="scores-grid">
             <div class="score-cell">
-              <div class="sc-lbl">Hook Strength</div>
+              <div class="sc-lbl tip">Hook Strength<i class="tip-icon">?</i><span class="tip-box">How hard the opening line arrests attention. Scored on zero-friction entry, immediate tension, and the "Wait — what?" trigger. Below 70 means rewrite your hook.</span></div>
               <div class="sc-bar-w"><div class="sc-bar g" id="sb-hook" style="width:0%"></div></div>
               <div class="sc-val" id="sv-hook">—</div>
               <div class="sc-src">Kane Framework</div>
             </div>
             <div class="score-cell">
-              <div class="sc-lbl">Emotion Arousal</div>
+              <div class="sc-lbl tip">Emotion Arousal<i class="tip-icon">?</i><span class="tip-box">How strongly the selected emotion is activated. High-arousal emotions (awe, anger, anxiety, surprise) drive sharing. Low-arousal emotions suppress it. The AI picks the strongest authentic fit.</span></div>
               <div class="sc-bar-w"><div class="sc-bar a" id="sb-emo" style="width:0%"></div></div>
               <div class="sc-val" id="sv-emo">—</div>
               <div class="sc-src">Berger STEPPS</div>
             </div>
             <div class="score-cell">
-              <div class="sc-lbl">Share Trigger</div>
+              <div class="sc-lbl tip">Share Trigger<i class="tip-icon">?</i><span class="tip-box">How powerfully the content motivates someone to forward it. The best content activates 2–3 triggers simultaneously — identity expression, social positioning, practical utility.</span></div>
               <div class="sc-bar-w"><div class="sc-bar b" id="sb-share" style="width:0%"></div></div>
               <div class="sc-val" id="sv-share">—</div>
               <div class="sc-src">Social Currency</div>
             </div>
             <div class="score-cell">
-              <div class="sc-lbl">Platform Fit</div>
+              <div class="sc-lbl tip">Platform Fit<i class="tip-icon">?</i><span class="tip-box">How well the format, length, structure, and hook style match the selected platform's algorithm. A LinkedIn piece scored for TikTok would score low here.</span></div>
               <div class="sc-bar-w"><div class="sc-bar p" id="sb-plat" style="width:0%"></div></div>
               <div class="sc-val" id="sv-plat">—</div>
               <div class="sc-src">Algorithm Signal</div>
             </div>
             <div class="score-cell" style="border-right:none">
-              <div class="sc-lbl">VRIN Score</div>
+              <div class="sc-lbl tip">VRIN Score<i class="tip-icon">?</i><span class="tip-box">Rarity index. Valuable + Rare + Inimitable + Non-substitutable. Below 60 means this angle is too common. Above 85 means you own territory almost nobody else is posting in.</span></div>
               <div class="sc-bar-w"><div class="sc-bar" id="sb-vrin" style="width:0%;background:var(--yellow)"></div></div>
               <div class="sc-val" id="sv-vrin" style="color:var(--yellow)">—</div>
               <div class="sc-src">Rarity Index</div>
@@ -974,28 +1082,28 @@ select optgroup { font-style:normal; font-weight:500; font-size:9px; color:var(-
           <div class="vrin-row" id="vrinRow">
             <div class="vrin-cell">
               <div class="vrin-ltr">V</div>
-              <div class="vrin-word">Valuable</div>
+              <div class="vrin-word tip">Valuable<i class="tip-icon">?</i><span class="tip-box">Does this content deliver clear, meaningful value? High score = the viewer gains something real from watching.</span></div>
               <div class="vrin-bar-w"><div class="vrin-bar" id="vb-v" style="width:0%"></div></div>
               <div class="vrin-val" id="vv-v">—</div>
               <div class="vrin-note" id="vn-v"></div>
             </div>
             <div class="vrin-cell">
               <div class="vrin-ltr">R</div>
-              <div class="vrin-word">Rare</div>
+              <div class="vrin-word tip">Rare<i class="tip-icon">?</i><span class="tip-box">How uncommon is this angle? Low score = posted constantly in your niche. High score = almost nobody has said this yet.</span></div>
               <div class="vrin-bar-w"><div class="vrin-bar" id="vb-r" style="width:0%"></div></div>
               <div class="vrin-val" id="vv-r">—</div>
               <div class="vrin-note" id="vn-r"></div>
             </div>
             <div class="vrin-cell">
               <div class="vrin-ltr">I</div>
-              <div class="vrin-word">Inimitable</div>
+              <div class="vrin-word tip">Inimitable<i class="tip-icon">?</i><span class="tip-box">How dependent is this on your specific voice, experience, or POV? High score = hard for others to replicate authentically.</span></div>
               <div class="vrin-bar-w"><div class="vrin-bar" id="vb-i" style="width:0%"></div></div>
               <div class="vrin-val" id="vv-i">—</div>
               <div class="vrin-note" id="vn-i"></div>
             </div>
             <div class="vrin-cell" style="border-right:none">
               <div class="vrin-ltr">N</div>
-              <div class="vrin-word">Non-substitutable</div>
+              <div class="vrin-word tip">Non-substitutable<i class="tip-icon">?</i><span class="tip-box">Is this the definitive take on this topic? High score = no other piece of content fills this exact role for this audience.</span></div>
               <div class="vrin-bar-w"><div class="vrin-bar" id="vb-n" style="width:0%"></div></div>
               <div class="vrin-val" id="vv-n">—</div>
               <div class="vrin-note" id="vn-n"></div>
@@ -1005,22 +1113,22 @@ select optgroup { font-style:normal; font-weight:500; font-size:9px; color:var(-
           <!-- AI Selections — transparently shown -->
           <div class="ai-sel-row" id="aiSelRow">
             <div class="ai-sel-cell">
-              <div class="as-lbl">AI Selected Emotion</div>
+              <div class="as-lbl tip">AI Selected Emotion<i class="tip-icon">?</i><span class="tip-box">The single highest-arousal emotion that authentically fits your topic. You never choose this — the AI selects autonomously from Berger's STEPPS research. This emotion shapes every word choice and sentence rhythm.</span></div>
               <div class="as-val" id="as-emo">—</div>
               <div class="as-reason" id="as-emo-why">—</div>
             </div>
             <div class="ai-sel-cell">
-              <div class="as-lbl">Hook Category</div>
+              <div class="as-lbl tip">Hook Category<i class="tip-icon">?</i><span class="tip-box">The psychological strategy behind your opening line. Six categories available — Identity Reframe, Consequence Preview, System Expose, Anticipation Gap, Near-Miss Reveal, You're Being Manipulated. The AI picks whichever hits hardest for your specific topic.</span></div>
               <div class="as-val" id="as-hook-cat" style="color:var(--teal);font-size:11px">—</div>
               <div class="as-reason" id="as-hook-cat-why" style="margin-top:4px">—</div>
             </div>
             <div class="ai-sel-cell">
-              <div class="as-lbl">Share Triggers Activated</div>
+              <div class="as-lbl tip">Share Triggers Activated<i class="tip-icon">?</i><span class="tip-box">The specific psychological mechanisms that will make someone forward this content. The AI selects 2–3 simultaneously. The first one listed is the primary trigger — the reason someone shares within the first minute of watching.</span></div>
               <div class="trigger-tags" id="as-trigs"></div>
               <div class="as-reason" id="as-trigs-why" style="margin-top:5px">—</div>
             </div>
             <div class="ai-sel-cell">
-              <div class="as-lbl">Social Currency Strategy</div>
+              <div class="as-lbl tip">Social Currency Strategy<i class="tip-icon">?</i><span class="tip-box">What the person sharing this gains socially by sharing it. People share content that makes them look good, smart, informed, or morally aware to their network. This is the sharer's invisible motivation.</span></div>
               <div class="as-reason" id="as-social">—</div>
             </div>
           </div>
@@ -2431,9 +2539,153 @@ function updateAPBIndicator(){
 }
 
 document.addEventListener('keydown', e => {
-  if (e.key === 'Escape') { closeAPB(); closeModal(); }
+  if (e.key === 'Escape') { closeAPB(); closeModal(); closeHelp(); }
 });
 
 </script>
+
+<!-- ══ HELP BUTTON ══ -->
+<button class="help-btn" onclick="openHelp()" title="How to use VYRALL">?</button>
+
+<!-- ══ HELP MODAL ══ -->
+<div class="help-overlay" id="helpOverlay" onclick="closeHelpOuter(event)">
+  <div class="help-modal">
+    <div class="help-top">
+      <div>
+        <div class="help-title">How to use VYRALL</div>
+        <div class="help-sub">What each section means and what to do with it</div>
+      </div>
+      <button class="help-close" onclick="closeHelp()">✕</button>
+    </div>
+    <div class="help-body">
+
+      <!-- THE FLOW -->
+      <div class="help-section">
+        <div class="help-section-title">The flow — start here</div>
+        <div class="help-step">
+          <div class="help-step-num">1</div>
+          <div class="help-step-body">
+            <div class="help-step-title">Discover trending angles (optional but powerful)</div>
+            <div class="help-step-desc">Enter your niche and region in the Trend Intelligence panel and hit Discover. VYRALL surfaces 6 rising angles in your space right now. Click one to pre-load it as your topic. Content aligned with rising trends gets 40%+ higher initial engagement.</div>
+          </div>
+        </div>
+        <div class="help-step">
+          <div class="help-step-num">2</div>
+          <div class="help-step-body">
+            <div class="help-step-title">Enter your topic, goal, tone, and platform</div>
+            <div class="help-step-desc">Your topic is the core idea. Niche is optional — if you leave it blank VYRALL infers it automatically. Goal tells the AI what the content is trying to achieve. Tone shapes every word choice. Platform determines the entire structure and algorithm optimisation.</div>
+          </div>
+        </div>
+        <div class="help-step">
+          <div class="help-step-num">3</div>
+          <div class="help-step-body">
+            <div class="help-step-title">Set your Audience Persona (optional)</div>
+            <div class="help-step-desc">Click the Audience Persona field to define the specific person you are writing for. Set once, applied silently to every generation. Without it VYRALL writes for your niche broadly. With it VYRALL writes for one specific person — which is what drives the highest-performing content.</div>
+          </div>
+        </div>
+        <div class="help-step">
+          <div class="help-step-num">4</div>
+          <div class="help-step-body">
+            <div class="help-step-title">Hit Generate Content</div>
+            <div class="help-step-desc">VYRALL runs two calls — first the Virality Intelligence Analysis, then the script generation. The analysis results appear first so you can see what the AI decided before the script arrives.</div>
+          </div>
+        </div>
+        <div class="help-step">
+          <div class="help-step-num">5</div>
+          <div class="help-step-body">
+            <div class="help-step-title">Use the six on-demand tools</div>
+            <div class="help-step-desc">After generation the feature strip appears. Each tool runs independently — use as many or as few as you need. None are mandatory. All are built around the script you just generated.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ANALYSIS CARD -->
+      <div class="help-section">
+        <div class="help-section-title">Virality Intelligence Report</div>
+        <div class="help-item">
+          <div class="help-item-label">The five scores (0–100)</div>
+          <div class="help-item-desc">Hook Strength, Emotion Arousal, Share Trigger, Platform Fit, and VRIN Score are pre-flight checks. Any score below 70 is a flag — hover each score label for a specific explanation of what it means and what to do about it.</div>
+          <div class="help-item-action">→ If VRIN Score is below 60, use the Remix Engine to find a rarer angle on the same topic.</div>
+        </div>
+        <div class="help-item">
+          <div class="help-item-label">VRIN Breakdown (V R I N)</div>
+          <div class="help-item-desc">Four sub-scores that make up the VRIN total. Valuable — does it deliver real value. Rare — how uncommon the angle is. Inimitable — how dependent on your specific voice. Non-substitutable — is this the definitive take.</div>
+          <div class="help-item-action">→ Low Rare score means the angle is saturated. Low Inimitable score means anyone could post this — inject more personal POV.</div>
+        </div>
+        <div class="help-item">
+          <div class="help-item-label">AI Selections — Emotion, Hook Category, Triggers</div>
+          <div class="help-item-desc">These are the strategic decisions VYRALL made autonomously — you never choose these yourself. They are shown transparently so you understand why your content is structured the way it is. Hover each label for a full explanation.</div>
+          <div class="help-item-action">→ If the emotion or hook category feels wrong for your voice, use the Emotion Shift tool or regenerate with a different tone setting.</div>
+        </div>
+        <div class="help-item">
+          <div class="help-item-label">Content Structure</div>
+          <div class="help-item-desc">The step-by-step architecture of your script — Hook → Perspective Shift → Near-Miss Bridge → Core → Self-Reflection → Payoff. Each step has a specific psychological job. The Near-Miss Bridge is the moment that compels completion.</div>
+        </div>
+      </div>
+
+      <!-- THE SCRIPT -->
+      <div class="help-section">
+        <div class="help-section-title">Your Script</div>
+        <div class="help-item">
+          <div class="help-item-label">This is the final version — not a draft</div>
+          <div class="help-item-desc">VYRALL does not produce starting points. The script is publish-ready. Read it aloud before filming — adjust any words that don't feel natural in your voice. The structure stays. The exact phrasing is yours to own.</div>
+        </div>
+        <div class="help-item">
+          <div class="help-item-label">For video platforms (TikTok, Reels, YouTube Shorts)</div>
+          <div class="help-item-desc">This is your teleprompter script. Deliver it to camera. Do not read it verbatim — learn it well enough to make it feel natural. The line breaks are pacing marks, not paragraph breaks.</div>
+          <div class="help-item-action">→ Use the Shot List tool to know exactly how to film each section.</div>
+        </div>
+        <div class="help-item">
+          <div class="help-item-label">For LinkedIn and text platforms</div>
+          <div class="help-item-desc">Paste the script directly as your post. The line breaks are intentional — they create the white space LinkedIn's algorithm and readers reward. Do not consolidate into solid paragraphs.</div>
+          <div class="help-item-action">→ Choose one of the five Caption Variants as your opening two lines — the text visible before "see more" cuts off.</div>
+        </div>
+        <div class="help-item">
+          <div class="help-item-label">Three quick actions beneath the script</div>
+          <div class="help-item-desc">Rewrite Hook generates a new opening line without touching the body. Full Regenerate produces a completely different angle on the same topic. Shift Emotion rewrites the script through a different emotional lens.</div>
+        </div>
+      </div>
+
+      <!-- ON-DEMAND TOOLS -->
+      <div class="help-section">
+        <div class="help-section-title">The Six On-Demand Tools</div>
+        <div class="help-item">
+          <div class="help-item-label">Thumbnail Concepts</div>
+          <div class="help-item-desc">Three distinct click-driving visual concepts for your cover image or YouTube thumbnail. Each uses a different psychological trigger. Pick one and recreate it using Canva or any design tool. The headline text goes directly on the image.</div>
+        </div>
+        <div class="help-item">
+          <div class="help-item-label">Shot List</div>
+          <div class="help-item-desc">A scene-by-scene filming guide built for a solo creator with a smartphone. Talking head shots tell you how to frame yourself. B-roll shots tell you what footage to capture. Pacing tells your editor how long to hold each cut.</div>
+        </div>
+        <div class="help-item">
+          <div class="help-item-label">Platform Adaptation</div>
+          <div class="help-item-desc">Click it — the panel opens below. Select which platforms to adapt to, then hit the Adapt button. VYRALL rewrites your script natively for each — not just resized, but restructured for that platform's specific algorithm and audience behaviour.</div>
+          <div class="help-item-action">→ The panel scrolls into view automatically. If you don't see it, scroll down after clicking.</div>
+        </div>
+        <div class="help-item">
+          <div class="help-item-label">Caption Variants</div>
+          <div class="help-item-desc">Five opening lines for your post description — each using a different hook strategy. Curiosity Gap for maximum reach. Bold Statement for authority. Question for comments. Stat for professional audiences. Story Opener for saves. Pick one per post.</div>
+        </div>
+        <div class="help-item">
+          <div class="help-item-label">Remix Engine</div>
+          <div class="help-item-desc">Five completely different versions of the same core idea — each targeting a different audience segment, emotional register, or trend angle. These are not rewrites. They are separate pieces of content. Space them across your posting calendar — the 30-Day Sequence tells you exactly when.</div>
+        </div>
+        <div class="help-item">
+          <div class="help-item-label">30-Day Sequence Builder</div>
+          <div class="help-item-desc">A full month of content mapped from one topic. Week 1 plants awareness. Week 2 delivers tactics. Week 3 handles objections. Week 4 drives conversion. Copy this into a spreadsheet or scheduling tool — it is a complete content strategy, not just a list of ideas.</div>
+          <div class="help-item-action">→ The CTA column matters. Follow, Save, Comment, Share, DM, and Link each serve a different algorithmic and business purpose. Do not default to the same CTA every post.</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script>
+function openHelp(){ document.getElementById('helpOverlay').classList.add('open'); document.body.style.overflow='hidden'; }
+function closeHelp(){ document.getElementById('helpOverlay').classList.remove('open'); document.body.style.overflow=''; }
+function closeHelpOuter(e){ if(e.target===document.getElementById('helpOverlay')) closeHelp(); }
+</script>
+
 </body>
 </html>
