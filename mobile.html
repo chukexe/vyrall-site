@@ -401,6 +401,24 @@ select optgroup{font-style:normal;color:var(--ink3);font-size:10px;}
 .m-help-step-title { font-size: 12px; color: var(--ink); font-weight: 500; margin-bottom: 3px; }
 .m-help-step-desc { font-size: 11px; color: var(--ink3); line-height: 1.75; }
 
+
+/* ── MOBILE NICHE LOCK ── */
+.m-niche-row { display: flex; gap: 6px; align-items: center; }
+.m-niche-row input { flex: 1; min-width: 0; }
+.m-lock-btn {
+  width: 38px; height: 38px; border-radius: 6px; flex-shrink: 0;
+  border: 1px solid var(--b1); background: transparent;
+  color: var(--ink3); font-size: 15px; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: all .15s;
+}
+.m-lock-btn.locked { background: var(--g3); border-color: var(--g2); }
+.m-niche-badge {
+  font-size: 9px; color: var(--g2); margin-top: 4px;
+  display: none; letter-spacing: .07em;
+}
+.m-niche-badge.on { display: block; }
+
 </style>
 </head>
 <body>
@@ -451,7 +469,11 @@ select optgroup{font-style:normal;color:var(--ink3);font-size:10px;}
       <div style="padding:14px;display:flex;flex-direction:column;gap:10px;">
         <div class="form-group">
           <label class="form-label">Your Niche <span style="color:var(--ink3);font-size:9px">(optional — topic works too)</span></label>
-          <input type="text" id="m-niche" placeholder="e.g. personal finance, fitness, AI tools…"/>
+          <div class="m-niche-row">
+            <input type="text" id="m-niche" placeholder="e.g. personal finance, fitness, AI tools…"/>
+            <button class="m-lock-btn" id="mNicheLockBtn" onclick="mToggleNicheLock()">🔓</button>
+          </div>
+          <div class="m-niche-badge" id="mNicheBadge">⬤ Niche locked</div>
         </div>
         <div class="form-group">
           <label class="form-label">Audience Persona <span style="color:var(--ink3);font-size:9px">(sharpens every output)</span></label>
@@ -1371,15 +1393,16 @@ async function mGenRemix() {
 
 async function mGenSeq() {
   const card = document.getElementById('m-seqCard'); card.style.display = 'block';
+  setTimeout(()=>card.scrollIntoView({behavior:'smooth',block:'start'}),50);
   document.getElementById('m-seqBody').innerHTML = mSkel();
   const typeColors = {awareness:'var(--g)',tactical:'var(--blue)',objection:'var(--purple)',conversion:'var(--amber)',rest:'var(--ink3)'};
+  const params = {script:mScript, platform:document.getElementById('m-plat').selectedOptions[0].text, niche:mNiche||'general', emotion:mEmo};
   try {
-    const d = await vyrallCall('sequence', {
-      script: mScript,
-      platform: document.getElementById('m-plat').selectedOptions[0].text,
-      niche: mNiche||'general', emotion: mEmo
-    });
-    const weeks = d.weeks || []; let copyAll = '30-DAY SEQUENCE\n\n';
+    const [d1,d2] = await Promise.all([
+      vyrallCall('sequence',{...params,half:1}),
+      vyrallCall('sequence',{...params,half:2})
+    ]);
+    const weeks = [...(d1.weeks||[]),...(d2.weeks||[])]; let copyAll = '30-DAY SEQUENCE\n\n';
     document.getElementById('m-seqBody').innerHTML = weeks.map(w => {
       copyAll += `WEEK ${w.week} — ${w.theme}\n\n`;
       return `<div class="seq-week-lbl-m">Week ${w.week} — ${w.theme}</div>
@@ -1727,6 +1750,57 @@ function updateAPBIndicator(){
 </div>
 
 <script>
+// ── MOBILE NICHE LOCK ──
+let mNicheLocked = false;
+
+(function mLoadNiche(){
+  try {
+    const saved = localStorage.getItem('vyrall_niche');
+    if (saved) {
+      document.getElementById('m-niche').value = saved;
+      mNicheLocked = true;
+      mUpdateNicheLock();
+    }
+  } catch(e){}
+})();
+
+function mToggleNicheLock(){
+  const input = document.getElementById('m-niche');
+  const val = input.value.trim();
+  if (!mNicheLocked) {
+    if (!val) {
+      input.style.borderColor = 'var(--red)';
+      setTimeout(() => input.style.borderColor = '', 2000);
+      return;
+    }
+    mNicheLocked = true;
+    try { localStorage.setItem('vyrall_niche', val); } catch(e){}
+  } else {
+    mNicheLocked = false;
+    try { localStorage.removeItem('vyrall_niche'); } catch(e){}
+  }
+  mUpdateNicheLock();
+}
+
+function mUpdateNicheLock(){
+  const btn   = document.getElementById('mNicheLockBtn');
+  const badge = document.getElementById('mNicheBadge');
+  const input = document.getElementById('m-niche');
+  if (mNicheLocked) {
+    btn.textContent = '🔒';
+    btn.classList.add('locked');
+    badge.classList.add('on');
+    input.readOnly = true;
+    input.style.color = 'var(--g2)';
+  } else {
+    btn.textContent = '🔓';
+    btn.classList.remove('locked');
+    badge.classList.remove('on');
+    input.readOnly = false;
+    input.style.color = '';
+  }
+}
+
 // ── MOBILE TOOLTIP TOGGLE ──
 function mTogTip(id) {
   const box = document.getElementById(id);

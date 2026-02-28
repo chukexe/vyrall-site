@@ -687,51 +687,53 @@ select optgroup { font-style:normal; font-weight:500; font-size:9px; color:var(-
 }
 
 
-/* ── TOOLTIPS ── */
+/* ── TOOLTIPS — fixed position via JS to escape overflow:hidden parents ── */
 .tip {
-  position: relative;
   display: inline-flex;
   align-items: center;
   gap: 4px;
   cursor: default;
 }
 .tip-icon {
-  width: 13px; height: 13px; border-radius: 50%;
+  width: 14px; height: 14px; border-radius: 50%;
   background: var(--b2); color: var(--ink3);
   font-size: 8px; display: inline-flex; align-items: center;
   justify-content: center; cursor: help; flex-shrink: 0;
   font-style: normal; font-family: 'DM Mono', monospace;
-  transition: all .15s; line-height: 1;
+  transition: all .15s; line-height: 1; border: 1px solid var(--b1);
 }
-.tip:hover .tip-icon { background: var(--g3); color: var(--g2); }
-.tip-box {
-  position: absolute; bottom: calc(100% + 8px); left: 50%;
-  transform: translateX(-50%); width: 220px;
+.tip-icon:hover { background: var(--g3); color: var(--g); border-color: var(--g2); }
+
+/* Global floating tooltip box — one shared instance */
+#globalTip {
+  position: fixed;
+  width: 230px;
   background: var(--s3); border: 1px solid var(--b2);
-  border-radius: 7px; padding: 10px 12px;
-  font-size: 11px; color: var(--ink2); line-height: 1.7;
+  border-radius: 8px; padding: 11px 13px;
+  font-size: 11px; color: var(--ink2); line-height: 1.75;
   pointer-events: none; opacity: 0; transition: opacity .15s;
-  z-index: 200; text-align: left; font-weight: 400;
+  z-index: 9999; text-align: left; font-weight: 400;
   letter-spacing: 0; text-transform: none;
-  box-shadow: 0 8px 24px rgba(0,0,0,.4);
+  box-shadow: 0 8px 32px rgba(0,0,0,.5);
+  font-family: 'DM Mono', monospace;
 }
-.tip-box::after {
-  content: ''; position: absolute; top: 100%; left: 50%;
-  transform: translateX(-50%); border: 5px solid transparent;
-  border-top-color: var(--b2);
+#globalTip.show { opacity: 1; }
+#globalTip::after {
+  content: ''; position: absolute; top: 100%; left: 20px;
+  border: 5px solid transparent; border-top-color: var(--b2);
 }
-.tip:hover .tip-box { opacity: 1; }
 
 /* ── HELP BUTTON ── */
 .help-btn {
-  position: fixed; bottom: 24px; right: 24px; z-index: 400;
-  width: 40px; height: 40px; border-radius: 50%;
-  background: var(--s2); border: 1px solid var(--b2);
-  color: var(--ink2); font-size: 16px; cursor: pointer;
-  display: flex; align-items: center; justify-content: center;
-  transition: all .2s; box-shadow: 0 4px 16px rgba(0,0,0,.3);
+  position: fixed; bottom: 28px; right: 28px; z-index: 800;
+  width: 42px; height: 42px; border-radius: 50%;
+  background: var(--s1); border: 1px solid var(--g2);
+  color: var(--g); font-size: 17px; font-weight: 700;
+  cursor: pointer; display: flex; align-items: center; justify-content: center;
+  transition: all .2s; box-shadow: 0 4px 20px rgba(0,0,0,.5), 0 0 0 1px var(--g3);
+  font-family: 'Syne', sans-serif;
 }
-.help-btn:hover { border-color: var(--g2); color: var(--g); transform: scale(1.05); }
+.help-btn:hover { background: var(--g2); color: var(--bg); transform: scale(1.08); box-shadow: 0 6px 24px rgba(0,0,0,.5); }
 
 /* ── HELP MODAL ── */
 .help-overlay {
@@ -794,6 +796,27 @@ select optgroup { font-style:normal; font-weight:500; font-size:9px; color:var(-
 .help-step-title { font-size: 12px; color: var(--ink); font-weight: 500; margin-bottom: 3px; }
 .help-step-desc { font-size: 11px; color: var(--ink3); line-height: 1.75; }
 
+
+/* ── NICHE LOCK ── */
+.niche-row { display: flex; gap: 6px; align-items: center; }
+.niche-row input { flex: 1; }
+.niche-lock-btn {
+  width: 34px; height: 34px; border-radius: 6px; flex-shrink: 0;
+  border: 1px solid var(--b1); background: transparent;
+  color: var(--ink3); font-size: 14px; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: all .15s;
+}
+.niche-lock-btn:hover { border-color: var(--g2); color: var(--g); }
+.niche-lock-btn.locked {
+  background: var(--g3); border-color: var(--g2); color: var(--g);
+}
+.niche-locked-badge {
+  font-size: 9px; color: var(--g2); margin-top: 3px;
+  display: none; align-items: center; gap: 5px; letter-spacing: .08em;
+}
+.niche-locked-badge.on { display: flex; }
+
 </style>
 </head>
 <body>
@@ -847,8 +870,12 @@ select optgroup { font-style:normal; font-weight:500; font-size:9px; color:var(-
         <input type="text" id="topicInput" placeholder="e.g. why most people never save money"/>
       </div>
       <div class="field">
-        <label class="fl">Niche <span style="color:var(--ink3);font-size:9px">(optional)</span></label>
-        <input type="text" id="nicheInput" placeholder="finance, fitness, real estate…"/>
+        <label class="fl">Niche <span style="color:var(--ink3);font-size:9px">(optional — lock to save typing)</span></label>
+        <div class="niche-row">
+          <input type="text" id="nicheInput" placeholder="finance, fitness, real estate…"/>
+          <button class="niche-lock-btn" id="nicheLockBtn" onclick="toggleNicheLock()" title="Lock niche">🔓</button>
+        </div>
+        <div class="niche-locked-badge" id="nicheLockBadge">⬤ Niche locked — pre-filled on every generation</div>
       </div>
       <div class="field">
         <label class="fl">Audience Persona <span style="color:var(--ink3);font-size:9px">(optional — sharpens every output)</span></label>
@@ -1047,31 +1074,31 @@ select optgroup { font-style:normal; font-weight:500; font-size:9px; color:var(-
           <!-- Scores -->
           <div class="scores-grid">
             <div class="score-cell">
-              <div class="sc-lbl tip">Hook Strength<i class="tip-icon">?</i><span class="tip-box">How hard the opening line arrests attention. Scored on zero-friction entry, immediate tension, and the "Wait — what?" trigger. Below 70 means rewrite your hook.</span></div>
+              <div class="sc-lbl tip">Hook Strength<i class="tip-icon" data-tip="How hard the opening line arrests attention. Scored on zero-friction entry, immediate tension, and the &quot;Wait — what?&quot; trigger. Below 70 means rewrite your hook.">?</i></div>
               <div class="sc-bar-w"><div class="sc-bar g" id="sb-hook" style="width:0%"></div></div>
               <div class="sc-val" id="sv-hook">—</div>
               <div class="sc-src">Kane Framework</div>
             </div>
             <div class="score-cell">
-              <div class="sc-lbl tip">Emotion Arousal<i class="tip-icon">?</i><span class="tip-box">How strongly the selected emotion is activated. High-arousal emotions (awe, anger, anxiety, surprise) drive sharing. Low-arousal emotions suppress it. The AI picks the strongest authentic fit.</span></div>
+              <div class="sc-lbl tip">Emotion Arousal<i class="tip-icon" data-tip="How strongly the selected emotion is activated. High-arousal emotions (awe, anger, anxiety, surprise) drive sharing. Low-arousal emotions suppress it. The AI picks the strongest authentic fit.">?</i></div>
               <div class="sc-bar-w"><div class="sc-bar a" id="sb-emo" style="width:0%"></div></div>
               <div class="sc-val" id="sv-emo">—</div>
               <div class="sc-src">Berger STEPPS</div>
             </div>
             <div class="score-cell">
-              <div class="sc-lbl tip">Share Trigger<i class="tip-icon">?</i><span class="tip-box">How powerfully the content motivates someone to forward it. The best content activates 2–3 triggers simultaneously — identity expression, social positioning, practical utility.</span></div>
+              <div class="sc-lbl tip">Share Trigger<i class="tip-icon" data-tip="How powerfully the content motivates someone to forward it. The best content activates 2–3 triggers simultaneously — identity expression, social positioning, practical utility.">?</i></div>
               <div class="sc-bar-w"><div class="sc-bar b" id="sb-share" style="width:0%"></div></div>
               <div class="sc-val" id="sv-share">—</div>
               <div class="sc-src">Social Currency</div>
             </div>
             <div class="score-cell">
-              <div class="sc-lbl tip">Platform Fit<i class="tip-icon">?</i><span class="tip-box">How well the format, length, structure, and hook style match the selected platform's algorithm. A LinkedIn piece scored for TikTok would score low here.</span></div>
+              <div class="sc-lbl tip">Platform Fit<i class="tip-icon" data-tip="How well the format, length, structure, and hook style match the selected platform's algorithm. A LinkedIn piece scored for TikTok would score low here.">?</i></div>
               <div class="sc-bar-w"><div class="sc-bar p" id="sb-plat" style="width:0%"></div></div>
               <div class="sc-val" id="sv-plat">—</div>
               <div class="sc-src">Algorithm Signal</div>
             </div>
             <div class="score-cell" style="border-right:none">
-              <div class="sc-lbl tip">VRIN Score<i class="tip-icon">?</i><span class="tip-box">Rarity index. Valuable + Rare + Inimitable + Non-substitutable. Below 60 means this angle is too common. Above 85 means you own territory almost nobody else is posting in.</span></div>
+              <div class="sc-lbl tip">VRIN Score<i class="tip-icon" data-tip="Rarity index. Valuable + Rare + Inimitable + Non-substitutable. Below 60 means this angle is too common. Above 85 means you own territory almost nobody else is posting in.">?</i></div>
               <div class="sc-bar-w"><div class="sc-bar" id="sb-vrin" style="width:0%;background:var(--yellow)"></div></div>
               <div class="sc-val" id="sv-vrin" style="color:var(--yellow)">—</div>
               <div class="sc-src">Rarity Index</div>
@@ -1082,28 +1109,28 @@ select optgroup { font-style:normal; font-weight:500; font-size:9px; color:var(-
           <div class="vrin-row" id="vrinRow">
             <div class="vrin-cell">
               <div class="vrin-ltr">V</div>
-              <div class="vrin-word tip">Valuable<i class="tip-icon">?</i><span class="tip-box">Does this content deliver clear, meaningful value? High score = the viewer gains something real from watching.</span></div>
+              <div class="vrin-word tip">Valuable<i class="tip-icon" data-tip="Does this content deliver clear, meaningful value? High score = the viewer gains something real from watching.">?</i></div>
               <div class="vrin-bar-w"><div class="vrin-bar" id="vb-v" style="width:0%"></div></div>
               <div class="vrin-val" id="vv-v">—</div>
               <div class="vrin-note" id="vn-v"></div>
             </div>
             <div class="vrin-cell">
               <div class="vrin-ltr">R</div>
-              <div class="vrin-word tip">Rare<i class="tip-icon">?</i><span class="tip-box">How uncommon is this angle? Low score = posted constantly in your niche. High score = almost nobody has said this yet.</span></div>
+              <div class="vrin-word tip">Rare<i class="tip-icon" data-tip="How uncommon is this angle? Low score = posted constantly in your niche. High score = almost nobody has said this yet.">?</i></div>
               <div class="vrin-bar-w"><div class="vrin-bar" id="vb-r" style="width:0%"></div></div>
               <div class="vrin-val" id="vv-r">—</div>
               <div class="vrin-note" id="vn-r"></div>
             </div>
             <div class="vrin-cell">
               <div class="vrin-ltr">I</div>
-              <div class="vrin-word tip">Inimitable<i class="tip-icon">?</i><span class="tip-box">How dependent is this on your specific voice, experience, or POV? High score = hard for others to replicate authentically.</span></div>
+              <div class="vrin-word tip">Inimitable<i class="tip-icon" data-tip="How dependent is this on your specific voice, experience, or POV? High score = hard for others to replicate authentically.">?</i></div>
               <div class="vrin-bar-w"><div class="vrin-bar" id="vb-i" style="width:0%"></div></div>
               <div class="vrin-val" id="vv-i">—</div>
               <div class="vrin-note" id="vn-i"></div>
             </div>
             <div class="vrin-cell" style="border-right:none">
               <div class="vrin-ltr">N</div>
-              <div class="vrin-word tip">Non-substitutable<i class="tip-icon">?</i><span class="tip-box">Is this the definitive take on this topic? High score = no other piece of content fills this exact role for this audience.</span></div>
+              <div class="vrin-word tip">Non-substitutable<i class="tip-icon" data-tip="Is this the definitive take on this topic? High score = no other piece of content fills this exact role for this audience.">?</i></div>
               <div class="vrin-bar-w"><div class="vrin-bar" id="vb-n" style="width:0%"></div></div>
               <div class="vrin-val" id="vv-n">—</div>
               <div class="vrin-note" id="vn-n"></div>
@@ -1113,22 +1140,22 @@ select optgroup { font-style:normal; font-weight:500; font-size:9px; color:var(-
           <!-- AI Selections — transparently shown -->
           <div class="ai-sel-row" id="aiSelRow">
             <div class="ai-sel-cell">
-              <div class="as-lbl tip">AI Selected Emotion<i class="tip-icon">?</i><span class="tip-box">The single highest-arousal emotion that authentically fits your topic. You never choose this — the AI selects autonomously from Berger's STEPPS research. This emotion shapes every word choice and sentence rhythm.</span></div>
+              <div class="as-lbl tip">AI Selected Emotion<i class="tip-icon" data-tip="The single highest-arousal emotion that authentically fits your topic. You never choose this — the AI selects autonomously from Berger's STEPPS research. This emotion shapes every word choice and sentence rhythm.">?</i></div>
               <div class="as-val" id="as-emo">—</div>
               <div class="as-reason" id="as-emo-why">—</div>
             </div>
             <div class="ai-sel-cell">
-              <div class="as-lbl tip">Hook Category<i class="tip-icon">?</i><span class="tip-box">The psychological strategy behind your opening line. Six categories available — Identity Reframe, Consequence Preview, System Expose, Anticipation Gap, Near-Miss Reveal, You're Being Manipulated. The AI picks whichever hits hardest for your specific topic.</span></div>
+              <div class="as-lbl tip">Hook Category<i class="tip-icon" data-tip="The psychological strategy behind your opening line. Six categories available — Identity Reframe, Consequence Preview, System Expose, Anticipation Gap, Near-Miss Reveal, You're Being Manipulated. The AI picks whichever hits hardest for your specific topic.">?</i></div>
               <div class="as-val" id="as-hook-cat" style="color:var(--teal);font-size:11px">—</div>
               <div class="as-reason" id="as-hook-cat-why" style="margin-top:4px">—</div>
             </div>
             <div class="ai-sel-cell">
-              <div class="as-lbl tip">Share Triggers Activated<i class="tip-icon">?</i><span class="tip-box">The specific psychological mechanisms that will make someone forward this content. The AI selects 2–3 simultaneously. The first one listed is the primary trigger — the reason someone shares within the first minute of watching.</span></div>
+              <div class="as-lbl tip">Share Triggers Activated<i class="tip-icon" data-tip="The specific psychological mechanisms that will make someone forward this content. The AI selects 2–3 simultaneously. The first one listed is the primary trigger — the reason someone shares within the first minute of watching.">?</i></div>
               <div class="trigger-tags" id="as-trigs"></div>
               <div class="as-reason" id="as-trigs-why" style="margin-top:5px">—</div>
             </div>
             <div class="ai-sel-cell">
-              <div class="as-lbl tip">Social Currency Strategy<i class="tip-icon">?</i><span class="tip-box">What the person sharing this gains socially by sharing it. People share content that makes them look good, smart, informed, or morally aware to their network. This is the sharer's invisible motivation.</span></div>
+              <div class="as-lbl tip">Social Currency Strategy<i class="tip-icon" data-tip="What the person sharing this gains socially by sharing it. People share content that makes them look good, smart, informed, or morally aware to their network. This is the sharer's invisible motivation.">?</i></div>
               <div class="as-reason" id="as-social">—</div>
             </div>
           </div>
@@ -1905,13 +1932,18 @@ async function genSequence(){
   const btn=document.getElementById('fb-seq');
   btn.classList.add('loading');btn.disabled=true;
   document.getElementById('seqCard').style.display='block';
+  setTimeout(()=>document.getElementById('seqCard').scrollIntoView({behavior:'smooth',block:'start'}),50);
   document.getElementById('seqBody').innerHTML=`<div style="padding:20px"><div class="skel-wrap">${['70%','85%','60%','90%','50%','80%','65%','75%'].map(w=>`<div class="sk" style="width:${w}"></div>`).join('')}</div></div>`;
   const plat=document.getElementById('platSel').selectedOptions[0].text;
   const niche=curNiche||document.getElementById('trendNiche').value||'general';
+  const params={script:curScript,platform:plat,niche,emotion:curEmo};
   try{
-    const d=await vyrallCall('sequence', {
-      script: curScript, platform: plat, niche, emotion: curEmo
-    });const weeks=d.weeks||[];
+    // Split into two calls — weeks 1+2 then weeks 3+4 — each fast enough to beat timeout
+    const [d1,d2]=await Promise.all([
+      vyrallCall('sequence',{...params,half:1}),
+      vyrallCall('sequence',{...params,half:2})
+    ]);
+    const weeks=[...(d1.weeks||[]),...(d2.weeks||[])];
     const typeColors={awareness:'var(--g)',tactical:'var(--blue)',objection:'var(--purple)',conversion:'var(--amber)',rest:'var(--ink3)'};
     const typeEmoji={awareness:'◎',tactical:'◈',objection:'◉',conversion:'▶',rest:'—'};
     let copyAll='30-DAY CONTENT SEQUENCE\n\n';
@@ -2455,6 +2487,45 @@ document.addEventListener('keydown',e=>{ if(e.key==='Escape') closeModal(); });
 </div>
 
 <script>
+
+// ══ GLOBAL TOOLTIP SYSTEM ══
+(function() {
+  // Create one shared floating tooltip element
+  const tip = document.createElement('div');
+  tip.id = 'globalTip';
+  document.body.appendChild(tip);
+
+  function showTip(icon) {
+    const txt = icon.dataset.tip;
+    if (!txt) return;
+    tip.textContent = txt;
+    tip.classList.add('show');
+    positionTip(icon);
+  }
+  function hideTip() {
+    tip.classList.remove('show');
+  }
+  function positionTip(icon) {
+    const r = icon.getBoundingClientRect();
+    let left = r.left + r.width / 2 - 115;
+    let top  = r.top - 8;
+    // clamp to viewport
+    if (left < 8) left = 8;
+    if (left + 230 > window.innerWidth - 8) left = window.innerWidth - 238;
+    if (top - tip.offsetHeight < 8) top = r.bottom + 8; // flip below if no room
+    else top = top - tip.offsetHeight;
+    tip.style.left = left + 'px';
+    tip.style.top  = top  + 'px';
+  }
+
+  document.addEventListener('mouseover', e => {
+    if (e.target.classList.contains('tip-icon')) showTip(e.target);
+  });
+  document.addEventListener('mouseout', e => {
+    if (e.target.classList.contains('tip-icon')) hideTip();
+  });
+  document.addEventListener('scroll', hideTip, true);
+})();
 
 // ══ AUDIENCE PERSONA BUILDER ══
 let curPersona = null;

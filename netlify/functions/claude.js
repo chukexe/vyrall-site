@@ -10,10 +10,11 @@ const API_URL = 'https://api.anthropic.com/v1/messages';
 
 // Per-action token overrides — heavy outputs need more room
 const TOKEN_OVERRIDES = {
-  sequence: 2800,   // 30-day calendar is the largest output
-  remix:    2400,   // 5 full scripts
-  adapt:    2200,   // multiple platform rewrites
-  captions: 1400,
+  sequence: 3500,   // 30-day calendar — needs headroom for full JSON
+  remix:    3000,   // 5 full scripts
+  adapt:    2400,   // multiple platform rewrites
+  captions: 1600,
+  generate: 2200,
 };
 
 // ── VIRALITY KNOWLEDGE BASE ──────────────────────────────────
@@ -132,10 +133,28 @@ const SYS = `${KB}\nYou are VYRALL's proprietary AI engine. Apply ALL 11 viralit
 // ── JSON PARSER ───────────────────────────────────────────────
 function parseJSON(txt) {
   if (typeof txt === 'object') return txt;
-  const c = txt.replace(/```json|```/g, '').trim();
-  const start = c.indexOf('{'), end = c.lastIndexOf('}');
+  // Strip markdown fences
+  let c = txt.replace(/```json\s*/gi, '').replace(/```/g, '').trim();
+  // Extract outermost JSON object
+  const start = c.indexOf('{');
+  const end   = c.lastIndexOf('}');
   if (start === -1 || end === -1) throw new Error('No JSON object found in response');
-  return JSON.parse(c.substring(start, end + 1));
+  c = c.substring(start, end + 1);
+  // First attempt — direct parse
+  try { return JSON.parse(c); } catch(e1) {}
+  // Second attempt — sanitize control characters
+  try {
+    const s = c.replace(/[\x00-\x1F\x7F]/g, m =>
+      m === '\n' ? '\\n' : m === '\t' ? '\\t' : m === '\r' ? '' : ''
+    );
+    return JSON.parse(s);
+  } catch(e2) {}
+  // Third attempt — extract just the array we need
+  const arrMatch = c.match(/"(weeks|remixes|captions|adaptations|shots|thumbnails|angles)"\s*:\s*(\[[\s\S]*?\])/);
+  if (arrMatch) {
+    try { return JSON.parse('{"' + arrMatch[1] + '":' + arrMatch[2] + '}'); } catch(e3) {}
+  }
+  throw new Error('Could not parse AI response as JSON. The response may have been too long — try again.');
 }
 
 // ── ANTHROPIC CALL ─────────────────────────────────────────────
@@ -334,56 +353,66 @@ Return JSON: {"adaptations":[{"platform":"...","script":"..."}]}`,
   // ── Caption Variants ──────────────────────────────────────
   captions: ({ script, platform, emotion }) => `
 CAPTION VARIANT GENERATOR.
-Script: ${script}
-Platform: ${platform}
-Emotion: ${emotion}
+Topic summary (first 200 chars of script): ${(script||'').substring(0,200)}
+Platform: ${platform} | Emotion: ${emotion}
 
-5 caption variants, each using a completely different hook style:
+Generate 5 caption variants, each a different hook style. Each caption = 1-3 short sentences max.
 1. CURIOSITY GAP — withhold to force the read
 2. BOLD STATEMENT — declarative, strong position
 3. QUESTION — makes reader self-reflect
-4. STAT / NUMBER — surprising figure opens
+4. STAT or NUMBER — surprising figure opens
 5. STORY OPENER — pulls from the narrative
 
-Optimize for ${platform}'s mechanics and audience behaviour. Include hashtag strategy note for each.
-
-Return JSON: {"captions":[{"style":"...","text":"...","hashtag_note":"..."}]}`,
+RULES: Keep each caption under 40 words. Hashtag note = 3 words max.
+Return ONLY this JSON, no other text:
+{"captions":[{"style":"Curiosity Gap","text":"caption here","hashtag_note":"3 hashtags max"},{"style":"Bold Statement","text":"...","hashtag_note":"..."},{"style":"Question","text":"...","hashtag_note":"..."},{"style":"Stat","text":"...","hashtag_note":"..."},{"style":"Story Opener","text":"...","hashtag_note":"..."}]}`,
 
   // ── Remix Engine ──────────────────────────────────────────
   remix: ({ script, niche, region, platform, emotion, persona }) => `
-REMIX ENGINE — Remix and Sequence methodology.
-Original script: ${script}
+REMIX ENGINE.
+Core topic (first 250 chars): ${(script||'').substring(0,250)}
 Niche: ${niche} | Region: ${region} | Platform: ${platform} | Emotion: ${emotion}
-${persona ? `Audience: ${persona.who} — pain: ${persona.pain}` : ''}
+${persona ? `Audience: ${persona.who}` : ''}
 
-Generate 5 remix variations targeting different rising trend angles for ${niche} in ${region}.
-Each remix = same core insight, different entry point angle:
-- By audience (students, parents, professionals, specific roles)
-- By geography (city-level, diaspora angle, regional costs/institutions)
-- By urgency (warning vs opportunity version)
-- By format trigger (myth-busting vs storytime vs listicle)
-- By cultural context (${region}-specific references)
+Generate exactly 5 remix variations. Each targets a different angle:
+Remix 1 — different audience segment
+Remix 2 — geography or cultural angle specific to ${region}
+Remix 3 — urgency flip (warning vs opportunity)
+Remix 4 — different format (myth-bust, storytime, or listicle)
+Remix 5 — contrarian or surprising take
 
-Each must feel completely fresh. Preserve perspective shift and payoff.
+STRICT RULES:
+— Each script: 60-90 words MAXIMUM. No exceptions.
+— Each hook: under 12 words.
+— No apostrophes or special quotes in any field — use plain text only.
+— Return ONLY the JSON below, nothing before or after it.
 
-Return JSON: {"remixes":[{"angle":"...","hook":"opening sentence","script":"full 30-40s script","why":"one sentence what makes this angle different"}]}`,
+{"remixes":[{"angle":"angle name","hook":"hook under 12 words","script":"60-90 word script plain text","why":"one sentence plain text"},{"angle":"...","hook":"...","script":"...","why":"..."},{"angle":"...","hook":"...","script":"...","why":"..."},{"angle":"...","hook":"...","script":"...","why":"..."},{"angle":"...","hook":"...","script":"...","why":"..."}]}`,
 
   // ── 30-Day Sequence ───────────────────────────────────────
-  sequence: ({ script, platform, niche, emotion }) => `
-30-DAY CONTENT SEQUENCE BUILDER.
-Core script: ${script}
+  sequence: ({ script, platform, niche, emotion, half }) => `
+30-DAY CONTENT SEQUENCE — ${half === 2 ? 'WEEKS 3 AND 4' : 'WEEKS 1 AND 2'}.
 Platform: ${platform} | Niche: ${niche} | Emotion: ${emotion}
+Topic: ${(script||'').substring(0,200)}
 
-Build 30-day posting sequence using Remix and Sequence methodology:
-WEEK 1 (Days 1-7): Big picture / awareness — hook new viewers, establish authority
-WEEK 2 (Days 8-14): Tactical / how-to — deliver value to new followers
-WEEK 3 (Days 15-21): Objection killers + social proof — handle skeptics, build trust
-WEEK 4 (Days 22-30): Conversion push — drive action
+${half === 2 ? `
+Build WEEK 3 and WEEK 4 only:
+WEEK 3 (Days 15,16,17,19,20 — rest Days 18,21): Objection — handle skeptics, build trust
+WEEK 4 (Days 22,23,24,26,27,28,29 — rest Days 25,30): Conversion — drive action
+` : `
+Build WEEK 1 and WEEK 2 only:
+WEEK 1 (Days 1,2,3,5,6 — rest Days 4,7): Awareness — hook new viewers, establish authority
+WEEK 2 (Days 8,9,10,12,13 — rest Days 11,14): Tactical — deliver value to new followers
+`}
 
-Rules: group similar into mini-series of 3-4. Space similar angles 3+ days apart.
-Include 2-3 rest days. CTA types: follow|comment|save|share|DM|link
+STRICT RULES:
+— Hooks: max 10 words. Notes: max 6 words.
+— No apostrophes or special quotes — plain text only.
+— CTA must be exactly one of: follow|comment|save|share|DM|link
+— Rest days: type="rest", hook="Rest day", cta="none", note="no post today"
+— Return ONLY the JSON. Nothing before or after.
 
-Return JSON: {"weeks":[{"week":1,"theme":"...","days":[{"day":1,"type":"awareness|tactical|objection|conversion|rest","hook":"...","cta":"follow|comment|save|share|DM|link","note":"..."}]}]}`,
+{"weeks":[{"week":${half === 2 ? 3 : 1},"theme":"theme here","days":[{"day":${half === 2 ? 15 : 1},"type":"awareness","hook":"hook max 10 words","cta":"follow","note":"brief note"}]}]}`,
 
   // ── Hook Rewrite ──────────────────────────────────────────
   regenHook: ({ script, emotion }) => `
