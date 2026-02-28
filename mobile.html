@@ -1020,7 +1020,7 @@ select optgroup{font-style:normal;color:var(--ink3);font-size:10px;}
 // API — All prompt assembly server-side via Netlify function.
 // Client sends action + clean params only. Key never in browser.
 // ═══════════════════════════════════════════════════════════════
-async function vyrallCall(action, params) {
+async function _vyrallBase(action, params) {
   const r = await fetch('/.netlify/functions/claude', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -2092,11 +2092,10 @@ function mSetGateMsg(id, txt, type) {
 }
 
 // ── Wire beta code into mobile vyrallCall ──
-const _mOrigVyrallCall = vyrallCall;
 async function vyrallCall(action, params) {
   const withCode = mBetaCode ? { ...params, code: mBetaCode } : params;
   try {
-    const result = await _mOrigVyrallCall(action, withCode);
+    const result = await _vyrallBase(action, withCode);
     if (action === 'generate' || action === 'analyze') {
       try {
         const res = await mBetaCall('betaVerify', { code: mBetaCode });

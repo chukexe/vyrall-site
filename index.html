@@ -1774,7 +1774,7 @@ function setBadge(s,t){
 // function. The client sends an action name + clean params only.
 // Key never touches the browser. KB above stays visible (it sells).
 // ════════════════════════════════════════════════════════════════
-async function vyrallCall(action, params) {
+async function _vyrallBase(action, params) {
   const r = await fetch('/.netlify/functions/claude', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -3090,12 +3090,11 @@ function setGateMsgEl(id, txt, type) {
 }
 
 // ── Wire beta code into every vyrallCall ──
-const _origVyrallCall = vyrallCall;
 async function vyrallCall(action, params) {
   // Inject beta code into all generation calls
   const withCode = betaCode ? { ...params, code: betaCode } : params;
   try {
-    const result = await _origVyrallCall(action, withCode);
+    const result = await _vyrallBase(action, withCode);
     // After a generate/analyze call, refresh remaining count
     if (action === 'generate' || action === 'analyze') {
       try {
