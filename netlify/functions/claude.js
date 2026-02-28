@@ -4,9 +4,12 @@
 // API key stays server-side. KB lives here too — not in browser.
 // ============================================================
 
-const MODEL   = 'claude-sonnet-4-20250514';
-const TOKENS  = 1800;
-const API_URL = 'https://api.anthropic.com/v1/messages';
+const MODEL        = 'claude-sonnet-4-20250514';
+const TOKENS       = 1800;
+const API_URL      = 'https://api.anthropic.com/v1/messages';
+const RESEND_URL   = 'https://api.resend.com/emails';
+const SENDER_EMAIL = 'noreply@contact.vyrall.app';
+const SENDER_NAME  = 'VYRALL';
 
 // Per-action token overrides — heavy outputs need more room
 const TOKEN_OVERRIDES = {
@@ -456,6 +459,66 @@ Return JSON: {"aligned_script":"...","cta":"${cta || ''}"}`
 
 };
 
+// ── SUPABASE HELPER ──────────────────────────────────────────
+async function sb(path, method = 'GET', body = null) {
+  const opts = {
+    method,
+    headers: {
+      'Content-Type':  'application/json',
+      'apikey':        process.env.SUPABASE_ANON_KEY,
+      'Authorization': 'Bearer ' + process.env.SUPABASE_ANON_KEY,
+      'Prefer':        method === 'POST' ? 'return=representation' : '',
+    },
+  };
+  if (body) opts.body = JSON.stringify(body);
+  const res = await fetch(process.env.SUPABASE_URL + '/rest/v1/' + path, opts);
+  const text = await res.text();
+  try { return JSON.parse(text); } catch(e) { return text; }
+}
+
+// ── CODE GENERATOR ────────────────────────────────────────────
+function generateCode() {
+  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  const seg = () => Array.from({length:4}, () =>
+    chars[Math.floor(Math.random() * chars.length)]).join('');
+  return `VY-${seg()}-${seg()}`;
+}
+
+// ── RESEND EMAIL ──────────────────────────────────────────────
+async function sendCodeEmail(name, email, code) {
+  const html = `
+    <div style="font-family:sans-serif;max-width:480px;margin:0 auto;background:#08080a;color:#e8e8e8;padding:40px 32px;border-radius:12px">
+      <div style="margin-bottom:28px">
+        <span style="font-size:22px;font-weight:800;letter-spacing:.12em;color:#e8e8e8">VYR<span style="color:#00e5a0">ALL</span></span>
+      </div>
+      <p style="font-size:15px;color:#b0b0b0;line-height:1.7;margin-bottom:24px">Hey ${name},</p>
+      <p style="font-size:15px;color:#b0b0b0;line-height:1.7;margin-bottom:24px">Your VYRALL beta access code is ready.</p>
+      <div style="background:#111114;border:1px solid #00e5a0;border-radius:8px;padding:20px 24px;margin-bottom:28px;text-align:center">
+        <div style="font-size:11px;letter-spacing:.2em;color:#00e5a0;margin-bottom:8px;text-transform:uppercase">Your Access Code</div>
+        <div style="font-size:26px;font-weight:800;letter-spacing:.18em;color:#ffffff;font-family:monospace">${code}</div>
+      </div>
+      <p style="font-size:14px;color:#b0b0b0;line-height:1.7;margin-bottom:8px">Go here and enter your code to get started:</p>
+      <a href="https://vyrall.app" style="display:inline-block;background:#00e5a0;color:#08080a;font-weight:700;font-size:13px;letter-spacing:.1em;padding:12px 24px;border-radius:6px;text-decoration:none;margin-bottom:28px">Open VYRALL →</a>
+      <p style="font-size:13px;color:#666;line-height:1.7">You have <strong style="color:#e8e8e8">3 generations</strong> included in the beta. Use them on topics that matter to you.</p>
+      <p style="font-size:13px;color:#666;line-height:1.7;margin-top:16px">Your honest feedback after using it is the most valuable thing you can give.</p>
+      <div style="margin-top:32px;padding-top:20px;border-top:1px solid #1e1e22;font-size:11px;color:#444">VYRALL — Content built to spread</div>
+    </div>
+  `;
+  await fetch(RESEND_URL, {
+    method: 'POST',
+    headers: {
+      'Content-Type':  'application/json',
+      'Authorization': 'Bearer ' + process.env.RESEND_API_KEY,
+    },
+    body: JSON.stringify({
+      from:    `${SENDER_NAME} <${SENDER_EMAIL}>`,
+      to:      [email],
+      subject: 'Your VYRALL beta access code',
+      html,
+    }),
+  });
+}
+
 // ── HANDLER ───────────────────────────────────────────────────
 exports.handler = async (event) => {
   const CORS = {
@@ -476,8 +539,124 @@ exports.handler = async (event) => {
     const { action, params } = JSON.parse(event.body || '{}');
 
     if (!action) throw new Error('No action specified');
+
+    // ── BETA: Check spots available ──────────────────────────
+    if (action === 'betaSpots') {
+      const cfg = await sb('beta_config?id=eq.1');
+      const c = cfg[0] || {};
+      return { statusCode:200, headers:CORS, body:JSON.stringify({
+        open:        c.beta_open,
+        remaining:   (c.max_spots || 50) - (c.spots_taken || 0),
+        max:         c.max_spots || 50,
+      })};
+    }
+
+    // ── BETA: Request access ─────────────────────────────────
+    if (action === 'betaRequest') {
+      const { name, email } = params || {};
+      if (!name || !email) throw new Error('Name and email required');
+
+      // Check beta is still open
+      const cfg = await sb('beta_config?id=eq.1');
+      const c = cfg[0] || {};
+      if (!c.beta_open || (c.spots_taken >= c.max_spots)) {
+        // Add to waitlist
+        await sb('waitlist', 'POST', { email }).catch(()=>{});
+        return { statusCode:200, headers:CORS, body:JSON.stringify({ status:'full' })};
+      }
+
+      // Check if email already registered
+      const existing = await sb(`beta_users?email=eq.${encodeURIComponent(email)}`);
+      if (existing && existing.length > 0) {
+        return { statusCode:200, headers:CORS, body:JSON.stringify({ status:'exists', code: existing[0].code })};
+      }
+
+      // Generate unique code
+      let code, attempts = 0;
+      do {
+        code = generateCode();
+        const check = await sb(`beta_users?code=eq.${code}`);
+        if (!check || check.length === 0) break;
+        attempts++;
+      } while (attempts < 10);
+
+      // Save user
+      await sb('beta_users', 'POST', { name, email, code, usage_count:0, usage_max:3, active:true });
+
+      // Increment spots taken
+      await sb(`beta_config?id=eq.1`, 'PATCH', { spots_taken: (c.spots_taken || 0) + 1 });
+
+      // Send email
+      await sendCodeEmail(name, email, code);
+
+      return { statusCode:200, headers:CORS, body:JSON.stringify({ status:'ok' })};
+    }
+
+    // ── BETA: Verify code ────────────────────────────────────
+    if (action === 'betaVerify') {
+      const { code } = params || {};
+      if (!code) throw new Error('Code required');
+      const clean = (code || '').trim().toUpperCase();
+      const users = await sb(`beta_users?code=eq.${encodeURIComponent(clean)}&active=eq.true`);
+      if (!users || users.length === 0) {
+        return { statusCode:200, headers:CORS, body:JSON.stringify({ valid:false })};
+      }
+      const user = users[0];
+      return { statusCode:200, headers:CORS, body:JSON.stringify({
+        valid:       true,
+        name:        user.name,
+        usage_count: user.usage_count,
+        usage_max:   user.usage_max,
+        remaining:   user.usage_max - user.usage_count,
+      })};
+    }
+
+    // ── BETA: Log usage ──────────────────────────────────────
+    if (action === 'betaLog') {
+      const { code, name, actionName, platform, niche } = params || {};
+      await sb('usage_logs', 'POST', {
+        code, name, action: actionName, platform, niche
+      }).catch(()=>{}); // silent — never block generation
+      return { statusCode:200, headers:CORS, body:JSON.stringify({ ok:true })};
+    }
+
+    // ── BETA: Waitlist ───────────────────────────────────────
+    if (action === 'betaWaitlist') {
+      const { email } = params || {};
+      if (!email) throw new Error('Email required');
+      await sb('waitlist', 'POST', { email }).catch(()=>{});
+      return { statusCode:200, headers:CORS, body:JSON.stringify({ ok:true })};
+    }
+
+    // ── CONTENT GENERATION ───────────────────────────────────
     if (!PROMPTS[action]) throw new Error(`Unknown action: ${action}`);
     if (!process.env.ANTHROPIC_API_KEY) throw new Error('API key not configured');
+
+    // Verify code and check usage before every generation
+    const { code: userCode } = params || {};
+    if (userCode) {
+      const clean = (userCode || '').trim().toUpperCase();
+      const users = await sb(`beta_users?code=eq.${encodeURIComponent(clean)}&active=eq.true`);
+      if (!users || users.length === 0) {
+        return { statusCode:403, headers:CORS, body:JSON.stringify({ error:'Invalid access code' })};
+      }
+      const user = users[0];
+      // Only count core generate actions against usage
+      if (action === 'analyze' || action === 'generate') {
+        if (user.usage_count >= user.usage_max) {
+          return { statusCode:403, headers:CORS, body:JSON.stringify({ error:'beta_limit', name: user.name })};
+        }
+        // Increment usage
+        await sb(`beta_users?code=eq.${encodeURIComponent(clean)}`, 'PATCH', {
+          usage_count: user.usage_count + 1
+        });
+        // Log it
+        await sb('usage_logs', 'POST', {
+          code: clean, name: user.name,
+          action, platform: params.platform, niche: params.niche
+        }).catch(()=>{});
+      }
+    }
 
     const prompt = PROMPTS[action](params || {});
     const tokenLimit = TOKEN_OVERRIDES[action] || TOKENS;
