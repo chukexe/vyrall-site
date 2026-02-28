@@ -422,9 +422,140 @@ select optgroup{font-style:normal;color:var(--ink3);font-size:10px;}
 }
 .m-niche-badge.on { display: block; }
 
+
+/* ══ MOBILE BETA GATE ══ */
+#mBetaGate {
+  position: fixed; inset: 0; z-index: 2000;
+  background: var(--bg);
+  display: flex; align-items: center; justify-content: center;
+  padding: 20px; overflow-y: auto;
+}
+.m-gate-box {
+  width: 100%; max-width: 380px;
+  display: flex; flex-direction: column; align-items: center;
+}
+.m-gate-logo {
+  display: flex; align-items: center; gap: 9px; margin-bottom: 28px;
+}
+.m-gate-logo-txt {
+  font-family: 'Syne', sans-serif; font-weight: 800;
+  font-size: 22px; letter-spacing: .14em; color: var(--ink);
+}
+.m-gate-logo-txt em { color: var(--g); font-style: normal; }
+.m-gate-card {
+  width: 100%; background: var(--s1);
+  border: 1px solid var(--b1); border-radius: 12px;
+  padding: 26px 22px; display: flex; flex-direction: column; gap: 16px;
+}
+.m-gate-title {
+  font-family: 'Syne', sans-serif; font-size: 16px;
+  font-weight: 700; color: var(--ink); text-align: center;
+}
+.m-gate-sub {
+  font-size: 11px; color: var(--ink3); text-align: center;
+  line-height: 1.75; margin-top: -8px;
+}
+.m-gate-spots {
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  padding: 10px 14px; background: var(--g3); border: 1px solid var(--g2);
+  border-radius: 6px; font-size: 11px; color: var(--g);
+  letter-spacing: .07em; font-weight: 600;
+}
+.m-gate-spots-num {
+  font-size: 14px; font-weight: 800; font-family: 'Syne', sans-serif;
+}
+.m-gate-input {
+  width: 100%; padding: 13px 14px; border-radius: 6px;
+  border: 1px solid var(--b1); background: var(--s2);
+  color: var(--ink); font-size: 14px; outline: none;
+  box-sizing: border-box; transition: border .15s;
+  font-family: 'DM Mono', monospace; -webkit-appearance: none;
+}
+.m-gate-input:focus { border-color: var(--g2); }
+.m-gate-btn {
+  width: 100%; padding: 14px; border-radius: 6px;
+  background: var(--g); border: none; color: var(--bg);
+  font-family: 'Syne', sans-serif; font-size: 12px;
+  font-weight: 700; letter-spacing: .12em; text-transform: uppercase;
+  cursor: pointer; -webkit-appearance: none;
+}
+.m-gate-btn.outline {
+  background: transparent; border: 1px solid var(--b1); color: var(--ink2);
+}
+.m-gate-divider {
+  display: flex; align-items: center; gap: 10px;
+  font-size: 10px; color: var(--ink3); letter-spacing: .1em;
+}
+.m-gate-divider::before, .m-gate-divider::after {
+  content: ''; flex: 1; height: 1px; background: var(--b1);
+}
+.m-gate-msg {
+  font-size: 11px; text-align: center; line-height: 1.7; min-height: 16px;
+}
+.m-gate-msg.ok  { color: var(--g); }
+.m-gate-msg.err { color: #ff4444; }
+
 </style>
 </head>
 <body>
+
+<!-- ══ MOBILE BETA GATE ══ -->
+<div id="mBetaGate" style="display:none">
+  <div class="m-gate-box">
+
+    <div class="m-gate-logo">
+      <svg width="32" height="32" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg" style="flex-shrink:0">
+  <rect width="512" height="512" rx="96" fill="#08080a"/>
+  <polygon points="96,140 180,140 256,340 232,340" fill="#00e5a0"/>
+  <polygon points="416,140 332,140 256,340 280,340" fill="#00e5a0"/>
+  <circle cx="256" cy="380" r="18" fill="#ffd060"/>
+  <circle cx="256" cy="380" r="10" fill="#08080a"/>
+  <circle cx="256" cy="380" r="4" fill="#ffd060"/>
+</svg>
+      <div class="m-gate-logo-txt">VYR<em>ALL</em></div>
+    </div>
+
+    <!-- Request card -->
+    <div class="m-gate-card" id="mGateRequest">
+      <div class="m-gate-title">Early Access Beta</div>
+      <div class="m-gate-sub">Content built to spread — 11 layers of virality science in one tool.</div>
+      <div class="m-gate-spots">
+        <span class="m-gate-spots-num" id="mGateSpotsNum">—</span>
+        <span>beta spots remaining</span>
+      </div>
+      <input class="m-gate-input" id="mGateName" placeholder="Your name" autocomplete="name"/>
+      <input class="m-gate-input" id="mGateEmail" placeholder="Your email" type="email" autocomplete="email"/>
+      <button class="m-gate-btn" onclick="mGateRequestAccess()">Request Access</button>
+      <div class="m-gate-divider">already have a code</div>
+      <input class="m-gate-input" id="mGateCodeInput" placeholder="VY-XXXX-XXXX" style="text-transform:uppercase;letter-spacing:.1em" autocomplete="off"/>
+      <button class="m-gate-btn outline" onclick="mGateVerifyCode()">Enter Code</button>
+      <div class="m-gate-msg" id="mGateMsg"></div>
+    </div>
+
+    <!-- Beta full card -->
+    <div class="m-gate-card" id="mGateFull" style="display:none">
+      <div class="m-gate-title">Beta is Full</div>
+      <div class="m-gate-sub">All 50 spots have been claimed. Leave your email and you will be first to know when VYRALL opens publicly.</div>
+      <input class="m-gate-input" id="mGateWaitEmail" placeholder="Your email" type="email"/>
+      <button class="m-gate-btn" onclick="mGateJoinWaitlist()">Join Waitlist</button>
+      <div class="m-gate-msg" id="mGateWaitMsg"></div>
+    </div>
+
+    <!-- Code sent card -->
+    <div class="m-gate-card" id="mGateCodeSent" style="display:none">
+      <div style="text-align:center;display:flex;flex-direction:column;gap:14px">
+        <div style="font-size:28px">✉️</div>
+        <div class="m-gate-title">Check your email</div>
+        <div class="m-gate-sub" id="mGateCodeSentSub">Your access code is on its way.</div>
+        <input class="m-gate-input" id="mGateCodeInput2" placeholder="VY-XXXX-XXXX" style="text-transform:uppercase;letter-spacing:.1em" autocomplete="off"/>
+        <button class="m-gate-btn" onclick="mGateVerifyCode2()">Enter Code</button>
+        <div class="m-gate-msg" id="mGateMsg2"></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
 
 <!-- TOP BAR -->
 <div class="topbar">
@@ -1838,6 +1969,158 @@ function closeMHelpOuter(e) {
   if (e.target === document.getElementById('mHelpOverlay')) closeMHelp();
 }
 </script>
+
+
+// ══════════════════════════════════════════════════════════════
+// MOBILE BETA GATE
+// ══════════════════════════════════════════════════════════════
+let mBetaCode = null;
+let mBetaUser = null;
+
+async function mBetaCall(action, params) {
+  const r = await fetch('/.netlify/functions/claude', {
+    method:  'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body:    JSON.stringify({ action, params }),
+  });
+  return r.json();
+}
+
+async function mGateInit() {
+  const saved = localStorage.getItem('vyrall_beta_code');
+  if (saved) {
+    const res = await mBetaCall('betaVerify', { code: saved });
+    if (res.valid && res.remaining > 0) {
+      mBetaCode = saved;
+      mBetaUser = res;
+      mUnlockTool();
+      return;
+    } else {
+      localStorage.removeItem('vyrall_beta_code');
+    }
+  }
+  try {
+    const s = await mBetaCall('betaSpots', {});
+    if (!s.open || s.remaining <= 0) {
+      mShowGateCard('mGateFull');
+    } else {
+      document.getElementById('mGateSpotsNum').textContent = s.remaining;
+    }
+  } catch(e) {}
+  document.getElementById('mBetaGate').style.display = 'flex';
+}
+
+function mShowGateCard(id) {
+  ['mGateRequest','mGateFull','mGateCodeSent'].forEach(c => {
+    const el = document.getElementById(c);
+    if (el) el.style.display = c === id ? 'flex' : 'none';
+  });
+}
+
+async function mGateRequestAccess() {
+  const name  = document.getElementById('mGateName').value.trim();
+  const email = document.getElementById('mGateEmail').value.trim();
+  if (!name)  { mSetGateMsg('mGateMsg','Enter your name','err'); return; }
+  if (!email || !email.includes('@')) { mSetGateMsg('mGateMsg','Enter a valid email','err'); return; }
+  mSetGateMsg('mGateMsg','Sending…','');
+  try {
+    const res = await mBetaCall('betaRequest', { name, email });
+    if (res.status === 'full') {
+      mShowGateCard('mGateFull');
+    } else {
+      document.getElementById('mGateCodeSentSub').textContent =
+        res.status === 'exists'
+          ? 'You already requested access. Check your email for your code.'
+          : `Your code is on its way to ${email}.`;
+      mShowGateCard('mGateCodeSent');
+    }
+  } catch(e) { mSetGateMsg('mGateMsg','Something went wrong — try again','err'); }
+}
+
+async function mGateVerifyCode() {
+  const code = document.getElementById('mGateCodeInput').value.trim().toUpperCase();
+  await mVerifyAndUnlock(code, 'mGateMsg');
+}
+
+async function mGateVerifyCode2() {
+  const code = document.getElementById('mGateCodeInput2').value.trim().toUpperCase();
+  await mVerifyAndUnlock(code, 'mGateMsg2');
+}
+
+async function mVerifyAndUnlock(code, msgId) {
+  if (!code) { mSetGateMsg(msgId,'Enter your code','err'); return; }
+  mSetGateMsg(msgId,'Verifying…','');
+  try {
+    const res = await mBetaCall('betaVerify', { code });
+    if (!res.valid) { mSetGateMsg(msgId,'Code not recognised — check and try again','err'); return; }
+    if (res.remaining <= 0) { mSetGateMsg(msgId,'Your 3 beta generations have been used. Thank you for testing VYRALL.','err'); return; }
+    mBetaCode = code;
+    mBetaUser = res;
+    localStorage.setItem('vyrall_beta_code', code);
+    mUnlockTool();
+  } catch(e) { mSetGateMsg(msgId,'Something went wrong — try again','err'); }
+}
+
+async function mGateJoinWaitlist() {
+  const email = document.getElementById('mGateWaitEmail').value.trim();
+  if (!email || !email.includes('@')) { mSetGateMsg('mGateWaitMsg','Enter a valid email','err'); return; }
+  await mBetaCall('betaWaitlist', { email });
+  mSetGateMsg('mGateWaitMsg','You are on the list. We will email you when VYRALL opens.','ok');
+}
+
+function mUnlockTool() {
+  const gate = document.getElementById('mBetaGate');
+  gate.style.opacity = '0';
+  gate.style.transition = 'opacity .4s';
+  setTimeout(() => { gate.style.display = 'none'; }, 400);
+  // Show remaining badge in topbar
+  if (mBetaUser) {
+    const rem = mBetaUser.usage_max - mBetaUser.usage_count;
+    const badge = document.createElement('div');
+    badge.style.cssText = 'font-size:9px;color:var(--g2);letter-spacing:.07em;padding:3px 8px;border:1px solid var(--g3);border-radius:4px;';
+    badge.textContent = `${rem} gen${rem !== 1 ? 's' : ''} left`;
+    const topbar = document.querySelector('.topbar-right');
+    if (topbar) topbar.prepend(badge);
+  }
+}
+
+function mSetGateMsg(id, txt, type) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.textContent = txt;
+  el.className = 'm-gate-msg' + (type ? ' ' + type : '');
+}
+
+// ── Wire beta code into mobile vyrallCall ──
+const _mOrigVyrallCall = vyrallCall;
+async function vyrallCall(action, params) {
+  const withCode = mBetaCode ? { ...params, code: mBetaCode } : params;
+  try {
+    const result = await _mOrigVyrallCall(action, withCode);
+    if (action === 'generate' || action === 'analyze') {
+      try {
+        const res = await mBetaCall('betaVerify', { code: mBetaCode });
+        if (res.valid) {
+          mBetaUser = res;
+          const badge = document.querySelector('.topbar-right div');
+          if (badge) {
+            const rem = res.usage_max - res.usage_count;
+            badge.textContent = `${rem} gen${rem !== 1 ? 's' : ''} left`;
+          }
+        }
+      } catch(e) {}
+    }
+    return result;
+  } catch(e) {
+    if (e.message && e.message.includes('beta_limit')) {
+      alert('You have used all 3 of your beta generations. Thank you for testing VYRALL.');
+      throw e;
+    }
+    throw e;
+  }
+}
+
+window.addEventListener('DOMContentLoaded', mGateInit);
 
 </body>
 </html>

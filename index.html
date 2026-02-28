@@ -820,9 +820,168 @@ select optgroup { font-style:normal; font-weight:500; font-size:9px; color:var(-
 }
 .niche-locked-badge.on { display: flex; }
 
+
+/* ══ BETA GATE ══════════════════════════════════════════ */
+#betaGate {
+  position: fixed; inset: 0; z-index: 2000;
+  background: var(--bg);
+  display: flex; align-items: center; justify-content: center;
+  padding: 24px;
+}
+.gate-box {
+  width: 100%; max-width: 420px;
+  display: flex; flex-direction: column; align-items: center;
+  gap: 0;
+}
+.gate-logo {
+  display: flex; align-items: center; gap: 10px; margin-bottom: 36px;
+}
+.gate-logo-txt {
+  font-family: 'Syne', sans-serif; font-weight: 800;
+  font-size: 26px; letter-spacing: .14em; color: var(--ink);
+}
+.gate-logo-txt em { color: var(--g); font-style: normal; }
+.gate-card {
+  width: 100%; background: var(--s1);
+  border: 1px solid var(--b1); border-radius: 12px;
+  padding: 32px 28px; display: flex; flex-direction: column; gap: 20px;
+}
+.gate-title {
+  font-family: 'Syne', sans-serif; font-size: 18px;
+  font-weight: 700; color: var(--ink); text-align: center;
+}
+.gate-sub {
+  font-size: 12px; color: var(--ink3); text-align: center;
+  line-height: 1.7; margin-top: -12px;
+}
+.gate-spots {
+  display: flex; align-items: center; justify-content: center;
+  gap: 8px; padding: 10px 16px;
+  background: var(--g3); border: 1px solid var(--g2);
+  border-radius: 6px; font-size: 11px; color: var(--g);
+  letter-spacing: .08em; font-weight: 600;
+}
+.gate-spots-num { font-size: 15px; font-weight: 800; font-family: 'Syne', sans-serif; }
+.gate-input {
+  width: 100%; padding: 12px 14px; border-radius: 6px;
+  border: 1px solid var(--b1); background: var(--s2);
+  color: var(--ink); font-size: 13px; font-family: 'DM Mono', monospace;
+  outline: none; box-sizing: border-box; transition: border .15s;
+}
+.gate-input:focus { border-color: var(--g2); }
+.gate-input.err { border-color: #ff4444; }
+.gate-btn {
+  width: 100%; padding: 13px; border-radius: 6px;
+  background: var(--g); border: none; color: var(--bg);
+  font-family: 'Syne', sans-serif; font-size: 12px;
+  font-weight: 700; letter-spacing: .12em; text-transform: uppercase;
+  cursor: pointer; transition: all .2s;
+}
+.gate-btn:hover { background: var(--g2); }
+.gate-btn:disabled { background: var(--b1); color: var(--ink3); cursor: not-allowed; }
+.gate-divider {
+  display: flex; align-items: center; gap: 12px;
+  font-size: 10px; color: var(--ink3); letter-spacing: .1em;
+}
+.gate-divider::before, .gate-divider::after {
+  content: ''; flex: 1; height: 1px; background: var(--b1);
+}
+.gate-msg {
+  font-size: 11px; text-align: center; line-height: 1.7;
+  min-height: 16px; transition: all .2s;
+}
+.gate-msg.ok  { color: var(--g); }
+.gate-msg.err { color: #ff4444; }
+.gate-welcome {
+  text-align: center; padding: 8px 0;
+}
+.gate-welcome-name {
+  font-family: 'Syne', sans-serif; font-size: 16px;
+  font-weight: 700; color: var(--ink); margin-bottom: 6px;
+}
+.gate-welcome-sub {
+  font-size: 11px; color: var(--ink3); line-height: 1.7;
+}
+.gate-usage-bar {
+  width: 100%; height: 4px; background: var(--b1);
+  border-radius: 2px; overflow: hidden; margin-top: 4px;
+}
+.gate-usage-fill {
+  height: 100%; background: var(--g);
+  border-radius: 2px; transition: width .4s;
+}
+.gate-full-box { text-align: center; display: flex; flex-direction: column; gap: 16px; }
+.gate-full-title {
+  font-family: 'Syne', sans-serif; font-size: 16px;
+  font-weight: 700; color: var(--ink);
+}
+.gate-full-sub { font-size: 12px; color: var(--ink3); line-height: 1.7; }
+
 </style>
 </head>
 <body>
+
+<!-- ══ BETA GATE ══ -->
+<div id="betaGate">
+  <div class="gate-box">
+
+    <!-- Logo -->
+    <div class="gate-logo">
+      <svg width="36" height="36" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg" style="flex-shrink:0">
+  <rect width="512" height="512" rx="96" fill="#08080a"/>
+  <polygon points="96,140 180,140 256,340 232,340" fill="#00e5a0"/>
+  <polygon points="416,140 332,140 256,340 280,340" fill="#00e5a0"/>
+  <circle cx="256" cy="380" r="18" fill="#ffd060"/>
+  <circle cx="256" cy="380" r="10" fill="#08080a"/>
+  <circle cx="256" cy="380" r="4" fill="#ffd060"/>
+</svg>
+      <div class="gate-logo-txt">VYR<em>ALL</em></div>
+    </div>
+
+    <!-- Request access card -->
+    <div class="gate-card" id="gateRequest">
+      <div class="gate-title">Early Access Beta</div>
+      <div class="gate-sub">Content built to spread — 11 layers of virality science in one tool.</div>
+      <div class="gate-spots" id="gateSpots">
+        <span class="gate-spots-num" id="gateSpotsNum">—</span>
+        <span>beta spots remaining</span>
+      </div>
+      <input class="gate-input" id="gateName" placeholder="Your name" autocomplete="name"/>
+      <input class="gate-input" id="gateEmail" placeholder="Your email" type="email" autocomplete="email"/>
+      <button class="gate-btn" id="gateReqBtn" onclick="gateRequestAccess()">Request Access</button>
+      <div class="gate-divider">already have a code</div>
+      <input class="gate-input" id="gateCodeInput" placeholder="Enter your code — VY-XXXX-XXXX" style="text-transform:uppercase;letter-spacing:.1em" autocomplete="off"/>
+      <button class="gate-btn" id="gateVerifyBtn" onclick="gateVerifyCode()" style="background:transparent;border:1px solid var(--b1);color:var(--ink2)">Enter Code</button>
+      <div class="gate-msg" id="gateMsg"></div>
+    </div>
+
+    <!-- Beta full card -->
+    <div class="gate-card" id="gateFull" style="display:none">
+      <div class="gate-full-box">
+        <div class="gate-full-title">Beta is Full</div>
+        <div class="gate-full-sub">All 50 spots have been claimed. Leave your email and you will be first to know when VYRALL opens publicly.</div>
+        <input class="gate-input" id="gateWaitEmail" placeholder="Your email" type="email"/>
+        <button class="gate-btn" onclick="gateJoinWaitlist()">Join Waitlist</button>
+        <div class="gate-msg" id="gateWaitMsg"></div>
+      </div>
+    </div>
+
+    <!-- Code sent confirmation -->
+    <div class="gate-card" id="gateCodeSent" style="display:none">
+      <div style="text-align:center;display:flex;flex-direction:column;gap:14px">
+        <div style="font-size:28px">✉️</div>
+        <div class="gate-title">Check your email</div>
+        <div class="gate-sub" id="gateCodeSentSub">Your access code is on its way. Enter it below when it arrives.</div>
+        <input class="gate-input" id="gateCodeInput2" placeholder="VY-XXXX-XXXX" style="text-transform:uppercase;letter-spacing:.1em" autocomplete="off"/>
+        <button class="gate-btn" onclick="gateVerifyCode2()">Enter Code</button>
+        <div class="gate-msg" id="gateMsg2"></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+
 
 <header>
   <div style="display:flex;align-items:center;gap:10px">
@@ -2770,6 +2929,192 @@ function openHelp(){ document.getElementById('helpOverlay').classList.add('open'
 function closeHelp(){ document.getElementById('helpOverlay').classList.remove('open'); document.body.style.overflow=''; }
 function closeHelpOuter(e){ if(e.target===document.getElementById('helpOverlay')) closeHelp(); }
 </script>
+
+
+// ══════════════════════════════════════════════════════════════
+// BETA GATE
+// ══════════════════════════════════════════════════════════════
+let betaCode   = null;
+let betaUser   = null;
+let betaRemain = 0;
+
+async function gateInit() {
+  // Check if code already stored in browser
+  const saved = localStorage.getItem('vyrall_beta_code');
+  if (saved) {
+    const res = await betaCall('betaVerify', { code: saved });
+    if (res.valid) {
+      betaCode   = saved;
+      betaUser   = res;
+      betaRemain = res.remaining;
+      unlockTool();
+      return;
+    } else {
+      localStorage.removeItem('vyrall_beta_code');
+    }
+  }
+  // Load spot count
+  try {
+    const s = await betaCall('betaSpots', {});
+    if (!s.open || s.remaining <= 0) {
+      showGateCard('gateFull');
+    } else {
+      document.getElementById('gateSpotsNum').textContent = s.remaining;
+    }
+  } catch(e) {}
+  document.getElementById('betaGate').style.display = 'flex';
+}
+
+async function betaCall(action, params) {
+  const r = await fetch('/.netlify/functions/claude', {
+    method:  'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body:    JSON.stringify({ action, params }),
+  });
+  return r.json();
+}
+
+function showGateCard(id) {
+  ['gateRequest','gateFull','gateCodeSent'].forEach(c => {
+    const el = document.getElementById(c);
+    if (el) el.style.display = c === id ? 'flex' : 'none';
+  });
+  // gateRequest uses flex column
+  const req = document.getElementById('gateRequest');
+  if (req && id === 'gateRequest') req.style.display = 'flex';
+}
+
+async function gateRequestAccess() {
+  const name  = document.getElementById('gateName').value.trim();
+  const email = document.getElementById('gateEmail').value.trim();
+  const msg   = document.getElementById('gateMsg');
+  const btn   = document.getElementById('gateReqBtn');
+
+  if (!name)  { setGateMsg('Enter your name', 'err'); return; }
+  if (!email || !email.includes('@')) { setGateMsg('Enter a valid email', 'err'); return; }
+
+  btn.disabled = true; btn.textContent = 'Sending…';
+  setGateMsg('', '');
+
+  try {
+    const res = await betaCall('betaRequest', { name, email });
+    if (res.status === 'full') {
+      showGateCard('gateFull');
+    } else if (res.status === 'exists') {
+      document.getElementById('gateCodeSentSub').textContent =
+        'You already requested access. Check your email for your code, or enter it below.';
+      showGateCard('gateCodeSent');
+    } else {
+      document.getElementById('gateCodeSentSub').textContent =
+        `Your code is on its way to ${email}. Enter it below when it arrives.`;
+      showGateCard('gateCodeSent');
+    }
+  } catch(e) {
+    setGateMsg('Something went wrong — try again', 'err');
+    btn.disabled = false; btn.textContent = 'Request Access';
+  }
+}
+
+async function gateVerifyCode() {
+  const raw  = document.getElementById('gateCodeInput').value.trim().toUpperCase();
+  await verifyAndUnlock(raw, 'gateMsg');
+}
+
+async function gateVerifyCode2() {
+  const raw  = document.getElementById('gateCodeInput2').value.trim().toUpperCase();
+  await verifyAndUnlock(raw, 'gateMsg2');
+}
+
+async function verifyAndUnlock(code, msgId) {
+  if (!code) { setGateMsgEl(msgId, 'Enter your code', 'err'); return; }
+  setGateMsgEl(msgId, 'Verifying…', '');
+  try {
+    const res = await betaCall('betaVerify', { code });
+    if (!res.valid) {
+      setGateMsgEl(msgId, 'Code not recognised — check and try again', 'err');
+      return;
+    }
+    if (res.remaining <= 0) {
+      setGateMsgEl(msgId, 'Your 3 beta generations have been used. Thank you for testing VYRALL.', 'err');
+      return;
+    }
+    betaCode   = code;
+    betaUser   = res;
+    betaRemain = res.remaining;
+    localStorage.setItem('vyrall_beta_code', code);
+    unlockTool();
+  } catch(e) {
+    setGateMsgEl(msgId, 'Something went wrong — try again', 'err');
+  }
+}
+
+async function gateJoinWaitlist() {
+  const email = document.getElementById('gateWaitEmail').value.trim();
+  if (!email || !email.includes('@')) {
+    setGateMsgEl('gateWaitMsg', 'Enter a valid email', 'err'); return;
+  }
+  await betaCall('betaWaitlist', { email });
+  setGateMsgEl('gateWaitMsg', 'You are on the list. We will email you when VYRALL opens.', 'ok');
+}
+
+function unlockTool() {
+  const gate = document.getElementById('betaGate');
+  gate.style.opacity = '0';
+  gate.style.transition = 'opacity .4s';
+  setTimeout(() => { gate.style.display = 'none'; }, 400);
+  updateBetaBadge();
+}
+
+function updateBetaBadge() {
+  // Show remaining generations in header
+  if (!betaUser) return;
+  const rem = betaUser.usage_max - betaUser.usage_count;
+  const existing = document.getElementById('betaBadge');
+  if (existing) { existing.textContent = `${rem} gen${rem !== 1 ? 's' : ''} left`; return; }
+  const badge = document.createElement('div');
+  badge.id = 'betaBadge';
+  badge.style.cssText = 'font-size:10px;color:var(--g2);letter-spacing:.08em;padding:4px 10px;border:1px solid var(--g3);border-radius:4px;';
+  badge.textContent = `${rem} gen${rem !== 1 ? 's' : ''} left`;
+  const hdr = document.querySelector('header .hdr-nav');
+  if (hdr) hdr.prepend(badge);
+}
+
+function setGateMsg(txt, type) {
+  setGateMsgEl('gateMsg', txt, type);
+}
+function setGateMsgEl(id, txt, type) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.textContent = txt;
+  el.className = 'gate-msg' + (type ? ' ' + type : '');
+}
+
+// ── Wire beta code into every vyrallCall ──
+const _origVyrallCall = vyrallCall;
+async function vyrallCall(action, params) {
+  // Inject beta code into all generation calls
+  const withCode = betaCode ? { ...params, code: betaCode } : params;
+  try {
+    const result = await _origVyrallCall(action, withCode);
+    // After a generate/analyze call, refresh remaining count
+    if (action === 'generate' || action === 'analyze') {
+      try {
+        const res = await betaCall('betaVerify', { code: betaCode });
+        if (res.valid) { betaUser = res; betaRemain = res.remaining; updateBetaBadge(); }
+      } catch(e) {}
+    }
+    return result;
+  } catch(e) {
+    if (e.message && e.message.includes('beta_limit')) {
+      alert('You have used all 3 of your beta generations. Thank you for testing VYRALL — your feedback means everything.');
+      throw e;
+    }
+    throw e;
+  }
+}
+
+// Initialise gate on load
+window.addEventListener('DOMContentLoaded', gateInit);
 
 </body>
 </html>
