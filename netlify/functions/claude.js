@@ -8,7 +8,7 @@ const MODEL        = 'claude-sonnet-4-20250514';
 const TOKENS       = 1800;
 const API_URL      = 'https://api.anthropic.com/v1/messages';
 const RESEND_URL   = 'https://api.resend.com/emails';
-const SENDER_EMAIL = 'noreply@contact.vyrall.app';
+const SENDER_EMAIL = 'onboarding@resend.dev';
 const SENDER_NAME  = 'VYRALL';
 
 // Per-action token overrides — heavy outputs need more room
