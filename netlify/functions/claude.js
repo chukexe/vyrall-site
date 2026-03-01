@@ -647,7 +647,7 @@ exports.handler = async (event) => {
       }
       betaUser = users[0];
       // Only count core generate actions against usage
-      if (action === 'analyze' || action === 'generate') {
+      if (action === 'generate') {
         if (betaUser.usage_count >= betaUser.usage_max) {
           return { statusCode:403, headers:CORS, body:JSON.stringify({ error:'beta_limit', name: betaUser.name })};
         }
@@ -660,7 +660,7 @@ exports.handler = async (event) => {
     const result = await callClaude(prompt, tokenLimit);
 
     // ── Only increment AFTER successful generation ──
-    if (betaUser && betaClean && (action === 'analyze' || action === 'generate')) {
+    if (betaUser && betaClean && action === 'generate') {
       await sb(`beta_users?code=eq.${encodeURIComponent(betaClean)}`, 'PATCH', {
         usage_count: betaUser.usage_count + 1
       }).catch(()=>{});
