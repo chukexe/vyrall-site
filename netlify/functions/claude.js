@@ -258,8 +258,33 @@ Return JSON:
 }`,
 
   // ── Content Generation ────────────────────────────────────
-  generate: ({ topic, niche, goal, tone, platform, format, structure, emotion, triggers, socialCurrency, offer, cta, trendAngle, persona }) => `
+  generate: ({ topic, niche, goal, tone, platform, format, structure, emotion, triggers, socialCurrency, offer, cta, trendAngle, persona }) => {
+  // Randomizer — picks a different stylistic approach each call
+  const styles = [
+    'Open with a single stark sentence. No warm-up. Drop the reader into the middle of the story.',
+    'Open with a question that makes the reader doubt something they were certain about.',
+    'Open with a specific number or data point that feels wrong at first glance.',
+    'Open mid-scene — as if something has already happened and the reader just walked in.',
+    'Open with the payoff line first, then work backwards to explain why it is true.',
+    'Open with a short provocative statement. Then immediately contradict conventional wisdom.',
+    'Open by addressing the reader directly — second person, present tense, immediate tension.',
+    'Open with dialogue or a quote — real or imagined — that creates instant intrigue.',
+  ];
+  const structures = [
+    'Use short punchy sentences throughout. Maximum 12 words per sentence.',
+    'Alternate between short punchy sentences and one longer flowing sentence for rhythm.',
+    'Use a list format for the core body — numbered or dashed — with a strong opener and closer.',
+    'Build in threes — three observations, three reveals, three consequences.',
+    'Use the before-after-bridge structure — where they are, where they could be, what bridges the gap.',
+  ];
+  const randomStyle = styles[Math.floor(Math.random() * styles.length)];
+  const randomStructure = structures[Math.floor(Math.random() * structures.length)];
+
+  return `
 CONTENT GENERATION — punchiest, most optimized version. Final version, not a draft.
+STYLE DIRECTIVE (follow this precisely — it makes the output feel fresh and non-generic):
+Opening: ${randomStyle}
+Rhythm: ${randomStructure}
 
 Topic: "${topic}"
 ${niche
@@ -313,7 +338,8 @@ Return ONLY this JSON, nothing before or after:
   "aligned_script":"full final script including hook — plain text only",
   "cta":"${offer ? 'standalone CTA sentence' : ''}",
   "share_explanation":"one sentence plain text"
-}`,
+}`;
+},
 
   // ── Thumbnail Concepts ────────────────────────────────────
   thumbnails: ({ script, format, platform, emotion }) => `
