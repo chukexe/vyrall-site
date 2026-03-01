@@ -8,7 +8,7 @@ const MODEL        = 'claude-sonnet-4-20250514';
 const TOKENS       = 1800;
 const API_URL      = 'https://api.anthropic.com/v1/messages';
 const RESEND_URL   = 'https://api.resend.com/emails';
-const SENDER_EMAIL = 'onboarding@resend.dev';
+const SENDER_EMAIL = 'payearned@gmail.com';
 const SENDER_NAME  = 'VYRALL';
 
 // Per-action token overrides — heavy outputs need more room
@@ -17,7 +17,8 @@ const TOKEN_OVERRIDES = {
   remix:    3000,   // 5 full scripts
   adapt:    2400,   // multiple platform rewrites
   captions: 1600,
-  generate: 2200,
+  generate: 2800,   // increased — complex scripts need headroom
+  analyze:  2000,   // increased — VRIN + insights can run long
 };
 
 // ── VIRALITY KNOWLEDGE BASE ──────────────────────────────────
@@ -304,12 +305,14 @@ ${offer
   ? '— CTA (Antidote framing): Position the offer as the relief to the problem just exposed — not as a pitch. "If you want to take back control of [X]..." not "DM me to join..."'
   : '— End with thought-provoking question that makes viewer reflect AND share.'}
 — Social currency: The sharer gains social benefit. Design for the sharer.
+— LENGTH: Script must be 150-250 words maximum. Tight and punchy — never padded.
 
-Return JSON:
+CRITICAL JSON RULES: Use plain straight quotes only. No curly quotes, no apostrophes in text — use contractions sparingly. No unescaped special characters.
+Return ONLY this JSON, nothing before or after:
 {
-  "aligned_script":"full final script including hook",
+  "aligned_script":"full final script including hook — plain text only",
   "cta":"${offer ? 'standalone CTA sentence' : ''}",
-  "share_explanation":"one sentence: which trigger fires first and exact psychological reason they forward this"
+  "share_explanation":"one sentence plain text"
 }`,
 
   // ── Thumbnail Concepts ────────────────────────────────────
@@ -634,33 +637,38 @@ exports.handler = async (event) => {
 
     // Verify code and check usage before every generation
     const { code: userCode } = params || {};
+    let betaUser = null;
+    let betaClean = null;
     if (userCode) {
-      const clean = (userCode || '').trim().toUpperCase();
-      const users = await sb(`beta_users?code=eq.${encodeURIComponent(clean)}&active=eq.true`);
+      betaClean = (userCode || '').trim().toUpperCase();
+      const users = await sb(`beta_users?code=eq.${encodeURIComponent(betaClean)}&active=eq.true`);
       if (!users || users.length === 0) {
         return { statusCode:403, headers:CORS, body:JSON.stringify({ error:'Invalid access code' })};
       }
-      const user = users[0];
+      betaUser = users[0];
       // Only count core generate actions against usage
       if (action === 'analyze' || action === 'generate') {
-        if (user.usage_count >= user.usage_max) {
-          return { statusCode:403, headers:CORS, body:JSON.stringify({ error:'beta_limit', name: user.name })};
+        if (betaUser.usage_count >= betaUser.usage_max) {
+          return { statusCode:403, headers:CORS, body:JSON.stringify({ error:'beta_limit', name: betaUser.name })};
         }
-        // Increment usage
-        await sb(`beta_users?code=eq.${encodeURIComponent(clean)}`, 'PATCH', {
-          usage_count: user.usage_count + 1
-        });
-        // Log it
-        await sb('usage_logs', 'POST', {
-          code: clean, name: user.name,
-          action, platform: params.platform, niche: params.niche
-        }).catch(()=>{});
       }
     }
 
+    // ── Run the actual Claude call ──
     const prompt = PROMPTS[action](params || {});
     const tokenLimit = TOKEN_OVERRIDES[action] || TOKENS;
     const result = await callClaude(prompt, tokenLimit);
+
+    // ── Only increment AFTER successful generation ──
+    if (betaUser && betaClean && (action === 'analyze' || action === 'generate')) {
+      await sb(`beta_users?code=eq.${encodeURIComponent(betaClean)}`, 'PATCH', {
+        usage_count: betaUser.usage_count + 1
+      }).catch(()=>{});
+      await sb('usage_logs', 'POST', {
+        code: betaClean, name: betaUser.name,
+        action, platform: params.platform, niche: params.niche
+      }).catch(()=>{});
+    }
 
     return {
       statusCode: 200,
