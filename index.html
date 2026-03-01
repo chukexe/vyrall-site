@@ -917,6 +917,44 @@ select optgroup { font-style:normal; font-weight:500; font-size:9px; color:var(-
 }
 .gate-full-sub { font-size: 12px; color: var(--ink3); line-height: 1.7; }
 
+
+/* ══ FEEDBACK REMINDER CARD ══ */
+#feedbackReminder {
+  display: none;
+  margin: 20px 0;
+  padding: 20px 24px;
+  background: linear-gradient(135deg, var(--s1) 0%, var(--g3) 100%);
+  border: 1px solid var(--g2);
+  border-radius: 10px;
+  animation: fadeSlideIn .4s ease;
+}
+@keyframes fadeSlideIn {
+  from { opacity:0; transform:translateY(10px); }
+  to   { opacity:1; transform:translateY(0); }
+}
+.fb-reminder-top {
+  display: flex; align-items: center; gap: 12px; margin-bottom: 12px;
+}
+.fb-reminder-icon {
+  font-size: 22px; flex-shrink: 0;
+}
+.fb-reminder-title {
+  font-family: 'Syne', sans-serif; font-size: 14px;
+  font-weight: 700; color: var(--ink);
+}
+.fb-reminder-sub {
+  font-size: 11px; color: var(--ink3); line-height: 1.7; margin-bottom: 16px;
+}
+.fb-reminder-btn {
+  display: inline-block; padding: 10px 20px;
+  background: var(--g); color: var(--bg);
+  font-family: 'Syne', sans-serif; font-size: 11px;
+  font-weight: 700; letter-spacing: .1em; text-transform: uppercase;
+  border-radius: 6px; text-decoration: none; border: none; cursor: pointer;
+  transition: background .2s;
+}
+.fb-reminder-btn:hover { background: var(--g2); }
+
 </style>
 </head>
 <body>
@@ -1672,6 +1710,9 @@ const PLAT_TIPS={
 function togAcc(b,c){document.getElementById(b).classList.toggle('open');document.getElementById(c).classList.toggle('open');}
 
 let offerOn=false, curScript='', curCta='', curFmtData=null, curEmo='', curTrendAngle=null, curNiche='', curRegion='United Kingdom';
+
+// ── Beta feedback survey URL — replace with your Google Form link ──
+const SURVEY_URL = 'YOUR_GOOGLE_FORM_URL_HERE';
 
 // ════════════════════════════════════════════════════════════════
 // TREND INTELLIGENCE — New in v4
@@ -3065,6 +3106,21 @@ function unlockTool() {
   updateBetaBadge();
 }
 
+
+function showFeedbackReminder() {
+  const card = document.getElementById('feedbackReminder');
+  const link = document.getElementById('feedbackLink');
+  if (!card) return;
+  if (link && SURVEY_URL && SURVEY_URL !== 'YOUR_GOOGLE_FORM_URL_HERE') {
+    link.href = SURVEY_URL;
+  } else if (link) {
+    // No survey URL set yet — button opens mailto as fallback
+    link.href = 'mailto:payearned@gmail.com?subject=VYRALL Beta Feedback';
+  }
+  card.style.display = 'block';
+  setTimeout(() => card.scrollIntoView({ behavior: 'smooth', block: 'center' }), 100);
+}
+
 function updateBetaBadge() {
   // Show remaining generations in header
   if (!betaUser) return;
@@ -3099,7 +3155,15 @@ async function vyrallCall(action, params) {
     if (action === 'generate' || action === 'analyze') {
       try {
         const res = await betaCall('betaVerify', { code: betaCode });
-        if (res.valid) { betaUser = res; betaRemain = res.remaining; updateBetaBadge(); }
+        if (res.valid) {
+          betaUser = res;
+          betaRemain = res.remaining;
+          updateBetaBadge();
+          // Show feedback reminder after final generation
+          if (action === 'generate' && res.remaining === 0) {
+            showFeedbackReminder();
+          }
+        }
       } catch(e) {}
     }
     return result;

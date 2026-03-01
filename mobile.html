@@ -495,6 +495,38 @@ select optgroup{font-style:normal;color:var(--ink3);font-size:10px;}
 .m-gate-msg.ok  { color: var(--g); }
 .m-gate-msg.err { color: #ff4444; }
 
+
+/* ══ MOBILE FEEDBACK REMINDER ══ */
+#mFeedbackReminder {
+  display: none;
+  margin: 16px 0;
+  padding: 18px 20px;
+  background: linear-gradient(135deg, var(--s1) 0%, var(--g3) 100%);
+  border: 1px solid var(--g2);
+  border-radius: 10px;
+  animation: mFadeIn .4s ease;
+}
+@keyframes mFadeIn {
+  from { opacity:0; transform:translateY(8px); }
+  to   { opacity:1; transform:translateY(0); }
+}
+.m-fb-icon { font-size: 20px; margin-bottom: 8px; }
+.m-fb-title {
+  font-family: 'Syne', sans-serif; font-size: 13px;
+  font-weight: 700; color: var(--ink); margin-bottom: 8px;
+}
+.m-fb-sub {
+  font-size: 11px; color: var(--ink3); line-height: 1.75; margin-bottom: 14px;
+}
+.m-fb-btn {
+  display: inline-block; padding: 10px 20px;
+  background: var(--g); color: var(--bg);
+  font-family: 'Syne', sans-serif; font-size: 11px;
+  font-weight: 700; letter-spacing: .1em; text-transform: uppercase;
+  border-radius: 6px; text-decoration: none; border: none; cursor: pointer;
+  width: 100%; text-align: center; box-sizing: border-box;
+}
+
 </style>
 </head>
 <body>
@@ -890,7 +922,16 @@ select optgroup{font-style:normal;color:var(--ink3);font-size:10px;}
       <div id="m-remixCopy" style="display:none"></div>
     </div>
 
-    <div id="m-seqCard" style="display:none" class="card">
+    
+<!-- ══ MOBILE FEEDBACK REMINDER ══ -->
+<div id="mFeedbackReminder">
+  <div class="m-fb-icon">🎉</div>
+  <div class="m-fb-title">You have used your 3 beta generations</div>
+  <div class="m-fb-sub">Thank you for testing VYRALL. Your honest feedback right now — while the experience is fresh — is the most valuable thing you can give. Takes 4 minutes.</div>
+  <a class="m-fb-btn" id="mFeedbackLink" href="#" target="_blank">Give Feedback →</a>
+</div>
+
+<div id="m-seqCard" style="display:none" class="card">
       <div class="card-hdr"><div><div class="card-eye" style="color:var(--amber)">30-Day Sequence</div><div class="card-title">Content Calendar</div></div><button class="abtn-m" onclick="mCopy(document.getElementById('m-seqCopy').textContent,this)">Copy</button></div>
       <div id="m-seqBody"></div>
       <div id="m-seqCopy" style="display:none"></div>
@@ -1044,6 +1085,9 @@ function pj(txt) {
 // ═══════════════════════════════════════════════════════════════
 let mOfferOn=false, mScript='', mCta='', mFmtData=null, mEmo='',
     mTrendAngle=null, mNiche='', mCurTopic='';
+
+// ── Beta feedback survey URL ──
+const SURVEY_URL = 'YOUR_GOOGLE_FORM_URL_HERE';
 
 const PLAT_TIPS={
   tiktok:['Completion + rewatch rate = primary signals','First 0-3s determines algorithmic seeding'],
@@ -2068,6 +2112,20 @@ async function mGateJoinWaitlist() {
   mSetGateMsg('mGateWaitMsg','You are on the list. We will email you when VYRALL opens.','ok');
 }
 
+
+function mShowFeedbackReminder() {
+  const card = document.getElementById('mFeedbackReminder');
+  const link = document.getElementById('mFeedbackLink');
+  if (!card) return;
+  if (link && typeof SURVEY_URL !== 'undefined' && SURVEY_URL !== 'YOUR_GOOGLE_FORM_URL_HERE') {
+    link.href = SURVEY_URL;
+  } else if (link) {
+    link.href = 'mailto:payearned@gmail.com?subject=VYRALL Beta Feedback';
+  }
+  card.style.display = 'block';
+  setTimeout(() => card.scrollIntoView({ behavior: 'smooth', block: 'center' }), 100);
+}
+
 function mUnlockTool() {
   const gate = document.getElementById('mBetaGate');
   gate.style.opacity = '0';
@@ -2105,6 +2163,10 @@ async function vyrallCall(action, params) {
           if (badge) {
             const rem = res.usage_max - res.usage_count;
             badge.textContent = `${rem} gen${rem !== 1 ? 's' : ''} left`;
+          }
+          // Show feedback reminder after final generation
+          if (action === 'generate' && res.remaining === 0) {
+            mShowFeedbackReminder();
           }
         }
       } catch(e) {}
