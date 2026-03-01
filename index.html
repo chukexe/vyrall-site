@@ -3114,6 +3114,71 @@ async function vyrallCall(action, params) {
 
 // Initialise gate on load
 window.addEventListener('DOMContentLoaded', gateInit);
+
+// ══════════════════════════════════════════════════════════════
+// NICHE LOCK
+// ══════════════════════════════════════════════════════════════
+function toggleNicheLock() {
+  const input  = document.getElementById('nicheInput');
+  const btn    = document.getElementById('nicheLockBtn');
+  const badge  = document.getElementById('nicheLockBadge');
+  const isLocked = btn.classList.contains('locked');
+
+  if (isLocked) {
+    // Unlock
+    input.readOnly = false;
+    input.style.background = '';
+    input.style.borderColor = '';
+    btn.classList.remove('locked');
+    btn.textContent = '🔓';
+    badge.classList.remove('on');
+    localStorage.removeItem('vyrall_niche');
+    curNiche = '';
+  } else {
+    // Lock
+    const val = input.value.trim();
+    if (!val) {
+      input.style.borderColor = '#ff4444';
+      input.placeholder = 'Enter a niche to lock';
+      setTimeout(() => {
+        input.style.borderColor = '';
+        input.placeholder = 'finance, fitness, real estate…';
+      }, 2000);
+      return;
+    }
+    input.readOnly = true;
+    input.style.background = 'var(--g3)';
+    input.style.borderColor = 'var(--g2)';
+    btn.classList.add('locked');
+    btn.textContent = '🔒';
+    badge.classList.add('on');
+    localStorage.setItem('vyrall_niche', val);
+    curNiche = val;
+  }
+}
+
+function initNicheLock() {
+  const saved = localStorage.getItem('vyrall_niche');
+  if (!saved) return;
+  const input = document.getElementById('nicheInput');
+  const btn   = document.getElementById('nicheLockBtn');
+  const badge = document.getElementById('nicheLockBadge');
+  if (!input) return;
+  input.value    = saved;
+  input.readOnly = true;
+  input.style.background  = 'var(--g3)';
+  input.style.borderColor = 'var(--g2)';
+  btn.classList.add('locked');
+  btn.textContent = '🔒';
+  badge.classList.add('on');
+  curNiche = saved;
+}
+
+// Init niche lock on load — after gate check
+document.addEventListener('DOMContentLoaded', () => {
+  setTimeout(initNicheLock, 500);
+});
+
 </script>
 
 </body>
