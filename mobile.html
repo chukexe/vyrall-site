@@ -2212,19 +2212,25 @@ async function vyrallCall(action, params) {
   const withCode = mBetaCode ? { ...params, code: mBetaCode } : params;
   try {
     const result = await _vyrallBase(action, withCode);
-    if (action === 'generate' || action === 'analyze') {
+    if (action === 'generate') {
+      // Optimistically decrement locally first
+      if (mBetaUser) {
+        mBetaUser.usage_count = (mBetaUser.usage_count || 0) + 1;
+        mBetaUser.remaining   = mBetaUser.usage_max - mBetaUser.usage_count;
+        const rem = mBetaUser.remaining;
+        const badge = document.querySelector('.topbar-right div');
+        if (badge) badge.textContent = `${rem} gen${rem !== 1 ? 's' : ''} left`;
+        if (rem === 1 || rem === 0) mShowFeedbackReminder(rem);
+      }
+      // Sync with server in background
       try {
         const res = await mBetaCall('betaVerify', { code: mBetaCode });
         if (res.valid) {
           mBetaUser = res;
           const badge = document.querySelector('.topbar-right div');
           if (badge) {
-            const rem = res.usage_max - res.usage_count;
-            badge.textContent = `${rem} gen${rem !== 1 ? 's' : ''} left`;
-          }
-          // Show feedback reminder after final generation
-          if (action === 'generate' && (res.remaining === 0 || res.remaining === 1)) {
-            mShowFeedbackReminder(res.remaining);
+            const r = res.usage_max - res.usage_count;
+            badge.textContent = `${r} gen${r !== 1 ? 's' : ''} left`;
           }
         }
       } catch(e) {}

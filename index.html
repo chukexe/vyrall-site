@@ -3291,20 +3291,23 @@ async function vyrallCall(action, params) {
   const withCode = betaCode ? { ...params, code: betaCode } : params;
   try {
     const result = await _vyrallBase(action, withCode);
-    // After a generate/analyze call, refresh remaining count
-    if (action === 'generate' || action === 'analyze') {
+    // After generation — update count locally then verify from server
+    if (action === 'generate') {
+      // Optimistically decrement locally first — avoids race condition
+      if (betaUser) {
+        betaUser.usage_count = (betaUser.usage_count || 0) + 1;
+        betaUser.remaining   = betaUser.usage_max - betaUser.usage_count;
+        betaRemain = betaUser.remaining;
+        updateBetaBadge();
+        // Show feedback at 1 left (after gen 2) and 0 left (after gen 3)
+        if (betaUser.remaining === 1 || betaUser.remaining === 0) {
+          showFeedbackReminder(betaUser.remaining);
+        }
+      }
+      // Sync with server in background to keep count accurate
       try {
         const res = await betaCall('betaVerify', { code: betaCode });
-        if (res.valid) {
-          betaUser = res;
-          betaRemain = res.remaining;
-          updateBetaBadge();
-          // Show feedback reminder after final generation
-          // Show feedback after gen 2 (1 left) and gen 3 (0 left)
-          if (action === 'generate' && (res.remaining === 0 || res.remaining === 1)) {
-            showFeedbackReminder(res.remaining);
-          }
-        }
+        if (res.valid) { betaUser = res; betaRemain = res.remaining; updateBetaBadge(); }
       } catch(e) {}
     }
     return result;
