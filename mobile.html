@@ -550,6 +550,34 @@ select optgroup{font-style:normal;color:var(--ink3);font-size:10px;}
   font-size: 9px; color: var(--g); letter-spacing: .1em; text-transform: uppercase;
 }
 
+
+/* ══ MOBILE NICHE AUTOCOMPLETE ══ */
+.m-niche-combo { position: relative; flex: 1; }
+.m-niche-combo input { width: 100%; box-sizing: border-box; }
+.m-niche-dd {
+  position: absolute; top: calc(100% + 4px); left: 0; right: 0;
+  background: var(--s1); border: 1px solid var(--g2);
+  border-radius: 8px; z-index: 999; max-height: 200px;
+  overflow-y: auto; display: none;
+  box-shadow: 0 8px 24px rgba(0,0,0,.5);
+}
+.m-niche-dd.open { display: block; }
+.m-niche-dd-group {
+  padding: 6px 12px 2px;
+  font-size: 8px; letter-spacing: .14em; text-transform: uppercase;
+  color: var(--g2); font-weight: 700; border-top: 1px solid var(--b1);
+}
+.m-niche-dd-group:first-child { border-top: none; }
+.m-niche-dd-opt {
+  padding: 10px 14px; font-size: 13px; color: var(--ink2);
+  cursor: pointer; -webkit-tap-highlight-color: transparent;
+}
+.m-niche-dd-opt:active { background: var(--g3); color: var(--ink); }
+.m-niche-dd-opt mark {
+  background: transparent; color: var(--g);
+  font-weight: 700; text-decoration: underline;
+}
+
 </style>
 <script>
 if ('serviceWorker' in navigator) {
@@ -674,7 +702,12 @@ if ('serviceWorker' in navigator) {
         <div class="form-group">
           <label class="form-label">Your Niche <span style="color:var(--ink3);font-size:9px">(optional — topic works too)</span></label>
           <div class="m-niche-row">
-            <input type="text" id="m-niche" placeholder="e.g. personal finance, fitness, AI tools…"/>
+            <div class="m-niche-combo" id="mNicheCombo">
+              <input type="text" id="m-niche" placeholder="Search or type your niche…" autocomplete="off"
+                oninput="mNicheSearch(this.value)"
+                onfocus="mNicheSearch(this.value)"/>
+              <div class="m-niche-dd" id="mNicheDd"></div>
+            </div>
             <button class="m-lock-btn" id="mNicheLockBtn" onclick="mToggleNicheLock()">🔓</button>
           </div>
           <div class="m-niche-badge" id="mNicheBadge">⬤ Niche locked</div>
@@ -2262,6 +2295,50 @@ function clearMAPBField(id) {
   const el = document.getElementById(id);
   if (el) { el.value = ''; el.focus(); }
 }
+
+
+// ══ MOBILE NICHE AUTOCOMPLETE ══
+function mNicheSearch(val) {
+  const dd = document.getElementById('mNicheDd');
+  const q  = val.trim().toLowerCase();
+  const filtered = q.length === 0
+    ? NICHE_LIST
+    : NICHE_LIST.filter(n => n.label.toLowerCase().includes(q) || n.group.toLowerCase().includes(q));
+
+  if (filtered.length === 0) {
+    dd.innerHTML = '<div class="m-niche-dd-opt" style="color:var(--ink3)">No match — your custom niche will be used</div>';
+    dd.classList.add('open');
+    return;
+  }
+
+  let html = ''; let lastGroup = '';
+  filtered.forEach(n => {
+    if (n.group !== lastGroup) {
+      html += `<div class="m-niche-dd-group">${n.group}</div>`;
+      lastGroup = n.group;
+    }
+    const hl = q ? n.label.replace(new RegExp(`(${q})`, 'gi'), '<mark>$1</mark>') : n.label;
+    html += `<div class="m-niche-dd-opt" data-val="${n.label.replace(/"/g, '&quot;')}" onmousedown="mNicheSelectEl(this)" ontouchend="mNicheSelectEl(this)">${hl}</div>`;
+  });
+  dd.innerHTML = html;
+  dd.classList.add('open');
+}
+
+function mNicheSelectEl(el) {
+  const val   = el.dataset.val;
+  const input = document.getElementById('m-niche');
+  const dd    = document.getElementById('mNicheDd');
+  input.value = val;
+  mNiche      = val;
+  dd.classList.remove('open');
+}
+
+document.addEventListener('click', e => {
+  if (!e.target.closest('#mNicheCombo')) {
+    const dd = document.getElementById('mNicheDd');
+    if (dd) dd.classList.remove('open');
+  }
+});
 
 window.addEventListener('DOMContentLoaded', mGateInit);
 
