@@ -237,6 +237,7 @@ TASKS:
 7. VRIN breakdown — score Valuable/Rare/Inimitable/Non-substitutable (0-100) with one-sentence note each.
 8. Generate 4 strategic insights (mix: 2 good, 1 info, 1 warn).
 9. Generate 5 format requirements with <strong>bold term</strong> — explanation format.
+10. Platform depth note — one specific insight about what makes content succeed on ${platform} right now that most creators miss. This should be non-obvious and directly actionable.
 
 Return JSON:
 {
@@ -308,10 +309,10 @@ Return JSON:
       humanity: 'Speak to the viewer identity — who they want to be, not just what they want to know.',
     },
     'LinkedIn': {
-      length: '180-280 words. Long enough to develop the idea, short enough to read in one sitting.',
-      structure: 'Hook line → Perspective shift → Supporting argument (3 points) → Payoff → Question.',
-      voice: 'Professional but human. Thoughtful, not corporate. First person, specific experiences.',
-      humanity: 'The most shared LinkedIn content is honest self-reflection. Write as a real professional thinking out loud, not a brand publishing content.',
+      length: '180-320 words. Hook line must stand alone — it is the only thing visible before "see more". White space is a weapon — use line breaks aggressively. Each line should be able to stand alone.',
+      structure: 'Single hook line (the whole argument in one sentence) → one line break → Develop the tension → The turn — where conventional wisdom is wrong → The real insight — specific and earned, not generic → End with a question that forces self-assessment, not agreement.',
+      voice: 'Professional but uncomfortably honest. Sounds like someone saying the thing everyone in the room is thinking but nobody is saying. No corporate language. No "I am excited to share". No "Let that sink in." Write like a real person who has earned the right to this opinion.',
+      humanity: 'LinkedIn rewards specificity over abstraction. Name a real situation. Name a real tension. The more specific and honest the detail — the more universal the resonance. One specific real moment beats three generic insights every time.',
     },
     'Twitter / X': {
       length: '180-260 characters for the hook tweet. Thread format: 8-12 tweets of 200-260 characters each.',
@@ -320,10 +321,16 @@ Return JSON:
       humanity: 'One tweet in the thread should feel vulnerable or surprisingly honest.',
     },
     'Podcast': {
-      length: '1500-2000 words. 10-14 minutes of natural spoken content.',
-      structure: 'Cold open → Context → Three developed ideas with stories → Synthesis → Takeaway.',
-      voice: 'Conversational, exploratory, warm. Sounds like thinking out loud, not presenting slides.',
-      humanity: 'Stories are the engine. Every point needs a human moment attached to it.',
+      length: '1800-2400 words of spoken content. 12-16 minutes delivered naturally. This is NOT a script to be read — it is a conversation architecture to be inhabited.',
+      structure: 'Cold open (a scene or moment — not a topic announcement) → The question this episode is really about → First unexpected angle → Personal or reported story that complicates the easy answer → The turn — where the conventional wisdom breaks → The real insight → What this means for the listener right now → One clear takeaway they can use today. NO headers, NO bullet points, NO list structures — pure flowing spoken thought.',
+      voice: 'Sounds like the host is working something out in real time — not presenting a finished argument. Use false starts occasionally. Use questions directed at the listener. Use silence signals — write [pause] where a real speaker would breathe. Write in spoken fragments not written sentences. Nobody says "Furthermore" or "In conclusion" out loud.',
+      humanity: 'The episode must contain at minimum: one moment of genuine uncertainty from the host, one specific named person or real situation (not "someone I know" but a real story with texture), one admission of something the host got wrong or did not expect. These are not optional — they are what separates a podcast from a lecture.',
+    },
+    'Newsletter': {
+      length: '500-900 words. Long enough to develop one idea fully. Short enough to read in 4 minutes.',
+      structure: 'Subject-line-worthy opening line → The observation or premise → Why this matters right now → The unexpected angle → Practical implication → One clear takeaway or question.',
+      voice: 'Written to one person — use "you" throughout. Intelligent but never academic. The best newsletters sound like a smart friend writing you a long email about something they cannot stop thinking about.',
+      humanity: 'Include one personal observation, one specific detail from real life, one moment of honest uncertainty. Newsletters that perform are newsletters that feel personal — not published.',
     },
   };
 
@@ -339,6 +346,14 @@ Return JSON:
 
   return `
 CONTENT GENERATION — fully developed, human, platform-optimised. Final version, not a draft.
+
+VYRALL MANDATE — what makes this output different from every other AI tool:
+1. It sounds like a specific human being with a specific point of view — not generic AI content.
+2. It contains at least one moment of genuine surprise — something the reader did not see coming and could not have predicted.
+3. The viral mechanics are invisible. The structure serves the story. If the structure is visible, the content has failed.
+4. It is calibrated for the specific platform, the specific audience age and life stage, and the specific emotional state you are trying to activate.
+5. It would be impossible to produce this exact piece without knowing the specific topic, niche, tone, platform and persona. Generic = failure.
+VYRALL QUALITY TEST: Read the output. If it could have been written about any topic, rewrite it. If it sounds like every other piece on this subject, rewrite it. If the structure is more visible than the voice, rewrite it.
 STYLE DIRECTIVE (follow this precisely — it makes the output feel fresh and non-generic):
 Opening: ${randomStyle}
 Rhythm: ${randomStructure}
