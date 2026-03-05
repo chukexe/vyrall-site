@@ -13,12 +13,12 @@ const SENDER_NAME  = 'VYRALL';
 
 // Per-action token overrides — heavy outputs need more room
 const TOKEN_OVERRIDES = {
-  sequence: 3500,   // 30-day calendar — needs headroom for full JSON
+  sequence: 3500,   // 30-day calendar
   remix:    3000,   // 5 full scripts
   adapt:    2400,   // multiple platform rewrites
   captions: 1600,
-  generate: 2800,   // increased — complex scripts need headroom
-  analyze:  2000,   // increased — VRIN + insights can run long
+  generate: 4000,   // YouTube Long Form needs 2000+ words — needs headroom
+  analyze:  2000,
 };
 
 // ── VIRALITY KNOWLEDGE BASE ──────────────────────────────────
@@ -280,8 +280,65 @@ Return JSON:
   const randomStyle = styles[Math.floor(Math.random() * styles.length)];
   const randomStructure = structures[Math.floor(Math.random() * structures.length)];
 
+  
+  // ── Platform specifications ──────────────────────────────────
+  const PLATFORM_SPECS = {
+    'YouTube Long Form': {
+      length: '1800-2500 words. This is a full video script — not a short piece. It should take 12-18 minutes to deliver naturally.',
+      structure: 'Cold open (hook + stakes) → Context and credibility → First insight → Near-miss bridge → Deep dive (3 main points with stories and examples) → Turning point → Payoff → Call to action. Each section fully developed with stories, specific examples, real details.',
+      voice: 'Conversational, unhurried, authoritative. Spoken word — write as if talking to one person across a table. Use natural spoken rhythm, incomplete sentences where a real speaker would use them, pauses built into the text.',
+      humanity: 'Include at least one personal story or specific real-world scenario that grounds the argument. Vulnerability is a retention signal on YouTube — audiences stay for people, not points.',
+    },
+    'YouTube Shorts': {
+      length: '60-90 words maximum. 45-60 seconds spoken.',
+      structure: 'Hook → One insight → Payoff. Nothing else.',
+      voice: 'Fast, punchy, immediate. Every word earns its place.',
+      humanity: 'One specific human moment — a scene, a feeling, a recognition.',
+    },
+    'TikTok': {
+      length: '80-120 words. 60-90 seconds.',
+      structure: 'Pattern interrupt hook → Tension → Reveal → Share-worthy ending.',
+      voice: 'Casual, direct, energetic. Sounds like a real person talking, not a script being read.',
+      humanity: 'Personal, relatable, specific. The viewer should feel you are talking about them.',
+    },
+    'Instagram Reels': {
+      length: '60-100 words. Under 60 seconds.',
+      structure: 'Visual hook → Core insight → Identity payoff.',
+      voice: 'Aspirational but grounded. Polished but human.',
+      humanity: 'Speak to the viewer identity — who they want to be, not just what they want to know.',
+    },
+    'LinkedIn': {
+      length: '180-280 words. Long enough to develop the idea, short enough to read in one sitting.',
+      structure: 'Hook line → Perspective shift → Supporting argument (3 points) → Payoff → Question.',
+      voice: 'Professional but human. Thoughtful, not corporate. First person, specific experiences.',
+      humanity: 'The most shared LinkedIn content is honest self-reflection. Write as a real professional thinking out loud, not a brand publishing content.',
+    },
+    'Twitter / X': {
+      length: '180-260 characters for the hook tweet. Thread format: 8-12 tweets of 200-260 characters each.',
+      structure: 'Hook tweet → build → insight → counterintuitive turn → payoff tweet.',
+      voice: 'Sharp, confident, slightly provocative. Every tweet must stand alone.',
+      humanity: 'One tweet in the thread should feel vulnerable or surprisingly honest.',
+    },
+    'Podcast': {
+      length: '1500-2000 words. 10-14 minutes of natural spoken content.',
+      structure: 'Cold open → Context → Three developed ideas with stories → Synthesis → Takeaway.',
+      voice: 'Conversational, exploratory, warm. Sounds like thinking out loud, not presenting slides.',
+      humanity: 'Stories are the engine. Every point needs a human moment attached to it.',
+    },
+  };
+
+  const platformKey = Object.keys(PLATFORM_SPECS).find(k =>
+    platform && platform.toLowerCase().includes(k.toLowerCase().split(' ')[0].toLowerCase())
+  );
+  const spec = PLATFORM_SPECS[platformKey] || {
+    length: '200-350 words.',
+    structure: 'Hook → Core → Payoff.',
+    voice: 'Match the platform tone.',
+    humanity: 'Write for a real human, not a content algorithm.',
+  };
+
   return `
-CONTENT GENERATION — punchiest, most optimized version. Final version, not a draft.
+CONTENT GENERATION — fully developed, human, platform-optimised. Final version, not a draft.
 STYLE DIRECTIVE (follow this precisely — it makes the output feel fresh and non-generic):
 Opening: ${randomStyle}
 Rhythm: ${randomStructure}
@@ -309,28 +366,41 @@ What they want to believe about themselves: ${persona.belief}
 The mirror sentence: ${persona.mirror}
 Every word, every example, every metaphor should speak directly to this person.` : ''}
 
+PLATFORM REQUIREMENTS — NON-NEGOTIABLE:
+Length: ${spec.length}
+Structure: ${spec.structure}
+Voice: ${spec.voice}
+Humanity requirement: ${spec.humanity}
+
+AUDIENCE LIFE STAGE — CRITICAL:
+${persona ? `This content is for: ${persona.who}` : 'Audience is adults in active career and life-building phase — 18 to 40 years old.'}
+Every example, every scene, every reference must be rooted in adult working life — NOT school, NOT student experience, NOT theoretical futures.
+If the hook uses a scene, it must be a scene from the working world, relationships, money, health, business, or personal growth — not a classroom.
+AGE TEST: Before writing the hook — ask: does this problem exist for a 28-year-old professional right now, today? If not, reframe it until it does.
+
 GENERATION RULES (all 11 layers simultaneously):
-— Hook: 1-2 sentences. "Wait…what?" in first 3 words. No greetings. Immediate tension.
-  ZERO-FRICTION TEST: requires zero prior context. Mid-scroll viewer with 1.5s must feel tension instantly.
+— Hook: Opens with immediate tension relevant to the audience's actual life. No greetings. No school scenes for adult audiences.
+  ZERO-FRICTION TEST: A person mid-scroll with 1.5 seconds must feel the tension in their own life instantly.
   Choose from hook categories: "You're Being Manipulated" / Anticipation Gap / Near-Miss Reveal /
-  System Expose / Identity Reframe / Consequence Preview — whichever hits hardest for this topic.
+  System Expose / Identity Reframe / Consequence Preview — whichever hits hardest for this topic AND this audience.
 — Perspective Shift: Most surprising, counterintuitive angle. NOT what they expect.
-— Core: Tight, compressed. Every sentence adds new value. Nothing redundant.
+— HUMANITY FIRST: The viral structure serves the human story — not the other way around.
+  The structure should be invisible. The person should be visible.
+  Write with a real voice — a specific point of view, a specific way of seeing.
+  If the script sounds like it was engineered, rewrite it until it sounds like it was lived.
+— Core: Fully developed for the platform length. Every section earns its word count with specificity, stories, and real examples.
 — NEAR-MISS STRUCTURE: At the midpoint, the payoff must feel imminent but not yet delivered.
-  Use a bridge like "I'll tell you exactly what this means in a second — but first you need to see why..."
-  This compels completion. Do not skip this.
+  This compels completion. Build it naturally into the narrative — not as a visible technique.
 — VARIABLE REWARD PACING: Drop an unexpected insight early. Then withhold. Then drop another.
-  Slow down briefly. Then deliver the payoff faster than expected. Uneven spacing = higher dopamine response.
+  Uneven spacing = higher dopamine response. But pace naturally — do not let the mechanism show.
 — Self-Reflection: Viewer evaluates their own life situation specifically.
-— Payoff: Clear, satisfying, memorable aha moment. Arrives faster than expected.
-— Micro-hooks: Every 3-7 seconds of spoken content — a new tension or surprise.
-— Emotion ${emotion}: Activated through word choice and rhythm — never stated.
-— Platform ${platform}: Optimize for this platform's specific algorithm mechanics.
+— Payoff: Clear, satisfying, memorable. Arrives faster than expected. Feels earned, not delivered.
+— Emotion ${emotion}: Activated through word choice, story, and rhythm — never stated explicitly.
+— Platform ${platform}: Every structural and length decision optimised for this platform's specific mechanics.
 ${offer
-  ? '— CTA (Antidote framing): Position the offer as the relief to the problem just exposed — not as a pitch. "If you want to take back control of [X]..." not "DM me to join..."'
-  : '— End with thought-provoking question that makes viewer reflect AND share.'}
-— Social currency: The sharer gains social benefit. Design for the sharer.
-— LENGTH: Script must be 150-250 words maximum. Tight and punchy — never padded.
+  ? '— CTA (Antidote framing): Position the offer as the relief to the problem just exposed — not as a pitch.'
+  : '— End with a thought-provoking question that makes the viewer reflect AND share.'}
+— Social currency: The sharer gains something by sharing this. Design for the sharer's identity.
 
 CRITICAL JSON RULES: Use plain straight quotes only. No curly quotes, no apostrophes in text — use contractions sparingly. No unescaped special characters.
 Return ONLY this JSON, nothing before or after:
