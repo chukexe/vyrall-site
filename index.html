@@ -3102,12 +3102,18 @@ async function gateInit() {
 }
 
 async function betaCall(action, params) {
-  const r = await fetch('/.netlify/functions/claude', {
+  const r    = await fetch('/.netlify/functions/claude', {
     method:  'POST',
     headers: { 'Content-Type': 'application/json' },
     body:    JSON.stringify({ action, params }),
   });
-  return r.json();
+  const text = await r.text();
+  let data;
+  try { data = JSON.parse(text); }
+  catch(e) { throw new Error('Server error: ' + text.substring(0, 300)); }
+  if (data.error) throw new Error(data.error);
+  if (!r.ok)      throw new Error('HTTP ' + r.status);
+  return data;
 }
 
 function showGateCard(id) {
@@ -3146,7 +3152,10 @@ async function gateRequestAccess() {
       showGateCard('gateCodeSent');
     }
   } catch(e) {
-    setGateMsg('Something went wrong — try again', 'err');
+    // Show actual error for diagnosis — helps identify Supabase/env issues
+    const msg = e.message || 'Unknown error';
+    setGateMsg('Error: ' + msg, 'err');
+    console.error('gateRequestAccess error:', msg);
     btn.disabled = false; btn.textContent = 'Request Access';
   }
 }

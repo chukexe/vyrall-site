@@ -575,6 +575,9 @@ Return JSON: {"aligned_script":"...","cta":"${cta || ''}"}`
 
 // ── SUPABASE HELPER ──────────────────────────────────────────
 async function sb(path, method = 'GET', body = null) {
+  if (!process.env.SUPABASE_URL)      throw new Error('SUPABASE_URL env var missing');
+  if (!process.env.SUPABASE_ANON_KEY) throw new Error('SUPABASE_ANON_KEY env var missing');
+
   const opts = {
     method,
     headers: {
@@ -585,8 +588,15 @@ async function sb(path, method = 'GET', body = null) {
     },
   };
   if (body) opts.body = JSON.stringify(body);
-  const res = await fetch(process.env.SUPABASE_URL + '/rest/v1/' + path, opts);
+
+  const url = process.env.SUPABASE_URL + '/rest/v1/' + path;
+  const res  = await fetch(url, opts);
   const text = await res.text();
+
+  if (!res.ok) {
+    throw new Error(`Supabase ${method} ${path} failed [${res.status}]: ${text}`);
+  }
+
   try { return JSON.parse(text); } catch(e) { return text; }
 }
 
@@ -618,7 +628,9 @@ async function sendCodeEmail(name, email, code) {
       <div style="margin-top:32px;padding-top:20px;border-top:1px solid #1e1e22;font-size:11px;color:#444">VYRALL — Content built to spread</div>
     </div>
   `;
-  await fetch(RESEND_URL, {
+  if (!process.env.RESEND_API_KEY) throw new Error('RESEND_API_KEY env var missing');
+
+  const emailRes = await fetch(RESEND_URL, {
     method: 'POST',
     headers: {
       'Content-Type':  'application/json',
@@ -631,6 +643,11 @@ async function sendCodeEmail(name, email, code) {
       html,
     }),
   });
+
+  const emailText = await emailRes.text();
+  if (!emailRes.ok) {
+    throw new Error(`Resend failed [${emailRes.status}]: ${emailText}`);
+  }
 }
 
 // ── HANDLER ───────────────────────────────────────────────────
@@ -656,7 +673,7 @@ exports.handler = async (event) => {
 
     // ── BETA: Check spots available ──────────────────────────
     if (action === 'betaSpots') {
-      const cfg = await sb('beta_config?id=eq.1');
+      const cfg = await sb('beta_config?id=eq.1&select=*');
       const c = cfg[0] || {};
       return { statusCode:200, headers:CORS, body:JSON.stringify({
         open:        c.beta_open,
@@ -671,7 +688,7 @@ exports.handler = async (event) => {
       if (!name || !email) throw new Error('Name and email required');
 
       // Check beta is still open
-      const cfg = await sb('beta_config?id=eq.1');
+      const cfg = await sb('beta_config?id=eq.1&select=*');
       const c = cfg[0] || {};
       if (!c.beta_open || (c.spots_taken >= c.max_spots)) {
         // Add to waitlist
