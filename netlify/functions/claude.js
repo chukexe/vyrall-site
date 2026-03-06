@@ -238,6 +238,13 @@ TASKS:
 8. Generate 4 strategic insights (mix: 2 good, 1 info, 1 warn).
 9. Generate 5 format requirements with <strong>bold term</strong> — explanation format.
 10. Platform depth note — one specific insight about what makes content succeed on ${platform} right now that most creators miss. This should be non-obvious and directly actionable.
+11. SPREAD score — rate this content plan on all 6 dimensions (0-10 each):
+    S — Socially useful: does sharing this make the sharer look smart, informed, or caring?
+    P — Provocative: does it challenge assumptions or spark genuine debate?
+    R — Replicable: can the format or idea be easily remixed or imitated by others?
+    E — Emotional: does it trigger high-arousal emotion (awe, anger, amusement, inspiration) not mild interest?
+    A — Ambiguous: does it leave enough open to prompt discussion rather than closing the story completely?
+    D — Distributive: is it built to travel — short, platform-native, safe and rewarding to share across contexts?
 
 Return JSON:
 {
@@ -255,7 +262,8 @@ Return JSON:
   "social_currency_strategy":"one sentence",
   "scores":{"hook_strength":0,"emotion_arousal":0,"share_trigger":0,"platform_fit":0,"vrin_score":0},
   "vrin":{"valuable":0,"valuable_note":"...","rare":0,"rare_note":"...","inimitable":0,"inimitable_note":"...","non_substitutable":0,"non_substitutable_note":"..."},
-  "insights":[{"type":"good","text":"..."},{"type":"good","text":"..."},{"type":"info","text":"..."},{"type":"warn","text":"..."}]
+  "insights":[{"type":"good","text":"..."},{"type":"good","text":"..."},{"type":"info","text":"..."},{"type":"warn","text":"..."}],
+  "spread_score":{"S":0,"S_label":"Socially useful","P":0,"P_label":"Provocative","R":0,"R_label":"Replicable","E":0,"E_label":"Emotional","A":0,"A_label":"Ambiguous","D":0,"D_label":"Distributive","total":0,"verdict":"one sentence on strongest and weakest dimension"}
 }`,
 
   // ── Content Generation ────────────────────────────────────
@@ -416,6 +424,12 @@ ${offer
   ? '— CTA (Antidote framing): Position the offer as the relief to the problem just exposed — not as a pitch.'
   : '— End with a thought-provoking question that makes the viewer reflect AND share.'}
 — Social currency: The sharer gains something by sharing this. Design for the sharer's identity.
+— AMBIGUITY LAYER: Do not close the story completely. Leave one thread open — an unanswered question, a tension unresolved, a statement that invites the reader to add their own meaning. Closed stories get nodded at. Open stories get argued about, quoted, and shared.
+— POSITIVE TILT: Holding emotional intensity constant, lean toward the positive or hopeful end. Content that makes people feel capable, seen, or inspired travels further than content that only makes them feel afraid or angry. Anger activates — hope converts.
+— EASE OF PROCESSING: The central idea must be graspable in 3 seconds by someone mid-scroll. If it requires prior knowledge, reframe it. If the hook is ambiguous in the wrong way (confusing, not intriguing), rewrite it. Clarity and intrigue must coexist.
+— REPLICABILITY SIGNAL: Where natural, end with a structure, question, or frame that invites others to make their own version. "What's yours?" / "Try this with your niche." / A format so clean others want to remix it. Virality multiplies when the idea propagates beyond the original asset.
+— CULTURAL TIMING: Root the content in what is happening now — a tension, conversation, or shift that makes this feel urgent today rather than evergreen-generic. "This speaks to what's happening right now" is a share trigger. Content that could have been posted two years ago rarely goes viral today.
+— LOW FRICTION TO SHARE: Write so the content is safe and rewarding to share in multiple social contexts — with colleagues, friends, and public audiences. Avoid anything that makes the sharer look extreme, uninformed, or socially risky. The sharer's reputation is always on the line. Make sharing feel like a gift, not a risk.
 
 CRITICAL JSON RULES: Use plain straight quotes only. No curly quotes, no apostrophes in text — use contractions sparingly. No unescaped special characters.
 Return ONLY this JSON, nothing before or after:

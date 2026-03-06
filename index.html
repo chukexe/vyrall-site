@@ -1403,6 +1403,48 @@ if ('serviceWorker' in navigator) {
             </div>
           </div>
 
+
+          <!-- SPREAD Score — HBR 2025 Framework -->
+          <div class="spread-row" id="spreadRow" style="display:none">
+            <div class="spread-cell">
+              <div class="spread-ltr">S</div>
+              <div class="spread-word">Socially useful</div>
+              <div class="spread-bar-w"><div class="spread-bar" id="spb-s"></div></div>
+              <div class="spread-val" id="spv-s">—</div>
+            </div>
+            <div class="spread-cell">
+              <div class="spread-ltr">P</div>
+              <div class="spread-word">Provocative</div>
+              <div class="spread-bar-w"><div class="spread-bar" id="spb-p"></div></div>
+              <div class="spread-val" id="spv-p">—</div>
+            </div>
+            <div class="spread-cell">
+              <div class="spread-ltr">R</div>
+              <div class="spread-word">Replicable</div>
+              <div class="spread-bar-w"><div class="spread-bar" id="spb-r"></div></div>
+              <div class="spread-val" id="spv-r">—</div>
+            </div>
+            <div class="spread-cell">
+              <div class="spread-ltr">E</div>
+              <div class="spread-word">Emotional</div>
+              <div class="spread-bar-w"><div class="spread-bar" id="spb-e"></div></div>
+              <div class="spread-val" id="spv-e">—</div>
+            </div>
+            <div class="spread-cell">
+              <div class="spread-ltr">A</div>
+              <div class="spread-word">Ambiguous</div>
+              <div class="spread-bar-w"><div class="spread-bar" id="spb-a"></div></div>
+              <div class="spread-val" id="spv-a">—</div>
+            </div>
+            <div class="spread-cell">
+              <div class="spread-ltr">D</div>
+              <div class="spread-word">Distributive</div>
+              <div class="spread-bar-w"><div class="spread-bar" id="spb-d"></div></div>
+              <div class="spread-val" id="spv-d">—</div>
+            </div>
+          </div>
+          <div class="spread-verdict" id="spreadVerdict" style="display:none"></div>
+
           <!-- AI Selections — transparently shown -->
           <div class="ai-sel-row" id="aiSelRow">
             <div class="ai-sel-cell">
@@ -1922,6 +1964,24 @@ function renderAnalysis(data){
     const note=document.getElementById(`vn-${k}`);
     if(note)note.textContent=vrin[`${key}_note`]||'';
   });
+
+  // SPREAD Score — HBR 2025
+  const sp = data.spread_score;
+  if (sp) {
+    const spreadRow    = document.getElementById('spreadRow');
+    const spreadVerdict = document.getElementById('spreadVerdict');
+    if (spreadRow) spreadRow.style.display = 'grid';
+    if (spreadVerdict) { spreadVerdict.style.display = 'block'; spreadVerdict.innerHTML = '<strong>SPREAD:</strong> ' + (sp.verdict || ''); }
+    [['s','S'],['p','P'],['r','R'],['e','E'],['a','A'],['d','D']].forEach(([el,key]) => {
+      const val = Math.round((sp[key] || 0) * 10); // convert 0-10 to 0-100%
+      setTimeout(() => {
+        const bar = document.getElementById(`spb-${el}`);
+        const valEl = document.getElementById(`spv-${el}`);
+        if (bar) bar.style.width = val + '%';
+        if (valEl) valEl.textContent = sp[key] + '/10';
+      }, 300);
+    });
+  }
 
   // AI Selections — shown transparently
   const emo=data.selected_emotion||'';
