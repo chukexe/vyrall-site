@@ -8,7 +8,7 @@ const MODEL        = 'claude-sonnet-4-20250514';
 const TOKENS       = 1800;
 const API_URL      = 'https://api.anthropic.com/v1/messages';
 const RESEND_URL   = 'https://api.resend.com/emails';
-const SENDER_EMAIL = 'payearned@gmail.com';
+const SENDER_EMAIL = 'onboarding@resend.dev';
 const SENDER_NAME  = 'VYRALL';
 
 // Per-action token overrides — heavy outputs need more room
@@ -717,8 +717,15 @@ exports.handler = async (event) => {
       // Increment spots taken
       await sb(`beta_config?id=eq.1`, 'PATCH', { spots_taken: (c.spots_taken || 0) + 1 });
 
-      // Send email
-      await sendCodeEmail(name, email, code);
+      // Send email — log failure clearly so we can diagnose
+      try {
+        await sendCodeEmail(name, email, code);
+      } catch(emailErr) {
+        console.error('EMAIL SEND FAILED:', emailErr.message);
+        // User is saved — return code in response so they can still access
+        // Do not block signup because of email failure
+        return { statusCode:200, headers:CORS, body:JSON.stringify({ status:'ok', code, emailError: emailErr.message })};
+      }
 
       return { statusCode:200, headers:CORS, body:JSON.stringify({ status:'ok' })};
     }

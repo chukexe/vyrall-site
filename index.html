@@ -3146,9 +3146,16 @@ async function gateRequestAccess() {
       document.getElementById('gateCodeSentSub').textContent =
         'You already requested access. Check your email for your code, or enter it below.';
       showGateCard('gateCodeSent');
+    } else if (res.emailError) {
+      // Email failed but user was saved — show code directly on screen
+      document.getElementById('gateCodeSentSub').innerHTML =
+        `There was a problem sending your email. Your code is:<br><br>
+        <strong style="font-size:22px;letter-spacing:.15em;color:#00e5a0;font-family:monospace">${res.code}</strong><br><br>
+        Copy it now and enter it below.`;
+      showGateCard('gateCodeSent');
     } else {
       document.getElementById('gateCodeSentSub').textContent =
-        `Your code is on its way to ${email}. Enter it below when it arrives.`;
+        \`Your code is on its way to \${email}. Enter it below when it arrives.\`;
       showGateCard('gateCodeSent');
     }
   } catch(e) {
@@ -3364,107 +3371,107 @@ function copyCode(code) {
 // ══════════════════════════════════════════════════════════════
 const NICHE_LIST = [
   // ── Lifestyle & Daily Life
-  { group: 'Lifestyle & Daily Life', label: 'Morning routines & productivity' },
-  { group: 'Lifestyle & Daily Life', label: 'Life hacks & minimalism' },
-  { group: 'Lifestyle & Daily Life', label: 'Daily vlog & personal life' },
+  { group: "Lifestyle & Daily Life", label: "Morning routines & productivity" },
+  { group: "Lifestyle & Daily Life", label: "Life hacks & minimalism" },
+  { group: "Lifestyle & Daily Life", label: "Daily vlog & personal life" },
   // ── Health & Wellness
-  { group: 'Health & Wellness', label: 'Fitness & workout' },
-  { group: 'Health & Wellness', label: 'Nutrition & diet' },
-  { group: 'Health & Wellness', label: 'Mental health & self-care' },
-  { group: 'Health & Wellness', label: 'Weight loss journey' },
-  { group: 'Health & Wellness', label: 'Women's hormonal health' },
+  { group: "Health & Wellness", label: "Fitness & workout" },
+  { group: "Health & Wellness", label: "Nutrition & diet" },
+  { group: "Health & Wellness", label: "Mental health & self-care" },
+  { group: "Health & Wellness", label: "Weight loss journey" },
+  { group: "Health & Wellness", label: "Women"s hormonal health' },
   // ── Beauty & Fashion
-  { group: 'Beauty & Fashion', label: 'Makeup tutorials' },
-  { group: 'Beauty & Fashion', label: 'Outfit ideas & styling' },
-  { group: 'Beauty & Fashion', label: 'Product reviews & hauls' },
-  { group: 'Beauty & Fashion', label: 'Second-hand & thrift fashion' },
-  { group: 'Beauty & Fashion', label: 'Skincare routines' },
+  { group: "Beauty & Fashion", label: "Makeup tutorials" },
+  { group: "Beauty & Fashion", label: "Outfit ideas & styling" },
+  { group: "Beauty & Fashion", label: "Product reviews & hauls" },
+  { group: "Beauty & Fashion", label: "Second-hand & thrift fashion" },
+  { group: "Beauty & Fashion", label: "Skincare routines" },
   // ── Personal Finance & Investing
-  { group: 'Personal Finance & Investing', label: 'Budgeting & saving' },
-  { group: 'Personal Finance & Investing', label: 'Side hustles & income streams' },
-  { group: 'Personal Finance & Investing', label: 'Crypto & stocks explained' },
-  { group: 'Personal Finance & Investing', label: 'Wealth building & FIRE' },
-  { group: 'Personal Finance & Investing', label: 'UK first-time buyer mortgages' },
-  { group: 'Personal Finance & Investing', label: 'Personal finance for beginners' },
+  { group: "Personal Finance & Investing", label: "Budgeting & saving" },
+  { group: "Personal Finance & Investing", label: "Side hustles & income streams" },
+  { group: "Personal Finance & Investing", label: "Crypto & stocks explained" },
+  { group: "Personal Finance & Investing", label: "Wealth building & FIRE" },
+  { group: "Personal Finance & Investing", label: "UK first-time buyer mortgages" },
+  { group: "Personal Finance & Investing", label: "Personal finance for beginners" },
   // ── Entrepreneurship & Business
-  { group: 'Entrepreneurship & Business', label: 'Startup advice & scaling' },
-  { group: 'Entrepreneurship & Business', label: 'Leadership & management' },
-  { group: 'Entrepreneurship & Business', label: 'Freelancing & solopreneurship' },
-  { group: 'Entrepreneurship & Business', label: 'E-commerce & dropshipping' },
-  { group: 'Entrepreneurship & Business', label: 'Personal branding' },
+  { group: "Entrepreneurship & Business", label: "Startup advice & scaling" },
+  { group: "Entrepreneurship & Business", label: "Leadership & management" },
+  { group: "Entrepreneurship & Business", label: "Freelancing & solopreneurship" },
+  { group: "Entrepreneurship & Business", label: "E-commerce & dropshipping" },
+  { group: "Entrepreneurship & Business", label: "Personal branding" },
   // ── Tech & AI
-  { group: 'Tech & AI', label: 'AI tutorials & insights' },
-  { group: 'Tech & AI', label: 'Tech reviews & gadgets' },
-  { group: 'Tech & AI', label: 'Automation & productivity tools' },
-  { group: 'Tech & AI', label: 'Software development' },
-  { group: 'Tech & AI', label: 'Cybersecurity & privacy' },
+  { group: "Tech & AI", label: "AI tutorials & insights" },
+  { group: "Tech & AI", label: "Tech reviews & gadgets" },
+  { group: "Tech & AI", label: "Automation & productivity tools" },
+  { group: "Tech & AI", label: "Software development" },
+  { group: "Tech & AI", label: "Cybersecurity & privacy" },
   // ── Gaming
-  { group: 'Gaming', label: 'Let's plays & game walkthroughs' },
-  { group: 'Gaming', label: 'Game reviews & rankings' },
-  { group: 'Gaming', label: 'Esports & competitive gaming' },
-  { group: 'Gaming', label: 'Retro gaming' },
+  { group: "Gaming", label: "Let"s plays & game walkthroughs' },
+  { group: "Gaming", label: "Game reviews & rankings" },
+  { group: "Gaming", label: "Esports & competitive gaming" },
+  { group: "Gaming", label: "Retro gaming" },
   // ── Food & Cooking
-  { group: 'Food & Cooking', label: 'Recipes & meal prep' },
-  { group: 'Food & Cooking', label: 'Diet-based cooking (keto, vegan, etc)' },
-  { group: 'Food & Cooking', label: 'Restaurant reviews & food vlogs' },
-  { group: 'Food & Cooking', label: 'Baking & desserts' },
+  { group: "Food & Cooking", label: "Recipes & meal prep" },
+  { group: "Food & Cooking", label: "Diet-based cooking (keto, vegan, etc)" },
+  { group: "Food & Cooking", label: "Restaurant reviews & food vlogs" },
+  { group: "Food & Cooking", label: "Baking & desserts" },
   // ── Travel & Adventure
-  { group: 'Travel & Adventure', label: 'Travel vlogs & destination guides' },
-  { group: 'Travel & Adventure', label: 'Budget travel & backpacking' },
-  { group: 'Travel & Adventure', label: 'Van life & slow travel' },
-  { group: 'Travel & Adventure', label: 'Hidden gems & local culture' },
+  { group: "Travel & Adventure", label: "Travel vlogs & destination guides" },
+  { group: "Travel & Adventure", label: "Budget travel & backpacking" },
+  { group: "Travel & Adventure", label: "Van life & slow travel" },
+  { group: "Travel & Adventure", label: "Hidden gems & local culture" },
   // ── Parenting & Family
-  { group: 'Parenting & Family', label: 'Parenting tips & activities' },
-  { group: 'Parenting & Family', label: 'Mindful parenting' },
-  { group: 'Parenting & Family', label: 'Family challenges & vlogs' },
-  { group: 'Parenting & Family', label: 'Newborn & baby care' },
+  { group: "Parenting & Family", label: "Parenting tips & activities" },
+  { group: "Parenting & Family", label: "Mindful parenting" },
+  { group: "Parenting & Family", label: "Family challenges & vlogs" },
+  { group: "Parenting & Family", label: "Newborn & baby care" },
   // ── Education & Learning
-  { group: 'Education & Learning', label: 'Quick lessons & explainers' },
-  { group: 'Education & Learning', label: 'Study tips & academic hacks' },
-  { group: 'Education & Learning', label: 'Language learning' },
-  { group: 'Education & Learning', label: 'Career growth & skills' },
+  { group: "Education & Learning", label: "Quick lessons & explainers" },
+  { group: "Education & Learning", label: "Study tips & academic hacks" },
+  { group: "Education & Learning", label: "Language learning" },
+  { group: "Education & Learning", label: "Career growth & skills" },
   // ── Comedy & Entertainment
-  { group: 'Comedy & Entertainment', label: 'Skits & short comedy' },
-  { group: 'Comedy & Entertainment', label: 'Reactions & commentary' },
-  { group: 'Comedy & Entertainment', label: 'Niche humor & memes' },
-  { group: 'Comedy & Entertainment', label: 'Workplace & relatable humor' },
+  { group: "Comedy & Entertainment", label: "Skits & short comedy" },
+  { group: "Comedy & Entertainment", label: "Reactions & commentary" },
+  { group: "Comedy & Entertainment", label: "Niche humor & memes" },
+  { group: "Comedy & Entertainment", label: "Workplace & relatable humor" },
   // ── Home & DIY
-  { group: 'Home Decor & DIY', label: 'Room makeovers & interior design' },
-  { group: 'Home Decor & DIY', label: 'Budget home hacks' },
-  { group: 'Home Decor & DIY', label: 'Craft projects & DIY builds' },
-  { group: 'Home Decor & DIY', label: 'Tiny homes & micro-living' },
+  { group: "Home Decor & DIY", label: "Room makeovers & interior design" },
+  { group: "Home Decor & DIY", label: "Budget home hacks" },
+  { group: "Home Decor & DIY", label: "Craft projects & DIY builds" },
+  { group: "Home Decor & DIY", label: "Tiny homes & micro-living" },
   // ── Pets & Animals
-  { group: 'Pets & Animals', label: 'Dog training & care' },
-  { group: 'Pets & Animals', label: 'Cat content & humor' },
-  { group: 'Pets & Animals', label: 'Exotic pets & wildlife' },
+  { group: "Pets & Animals", label: "Dog training & care" },
+  { group: "Pets & Animals", label: "Cat content & humor" },
+  { group: "Pets & Animals", label: "Exotic pets & wildlife" },
   // ── Motivation & Self-Improvement
-  { group: 'Motivation & Self-Improvement', label: 'Mindset & goal setting' },
-  { group: 'Motivation & Self-Improvement', label: 'Daily affirmations & habits' },
-  { group: 'Motivation & Self-Improvement', label: 'Minimalist productivity' },
-  { group: 'Motivation & Self-Improvement', label: 'Stoicism & philosophy' },
+  { group: "Motivation & Self-Improvement", label: "Mindset & goal setting" },
+  { group: "Motivation & Self-Improvement", label: "Daily affirmations & habits" },
+  { group: "Motivation & Self-Improvement", label: "Minimalist productivity" },
+  { group: "Motivation & Self-Improvement", label: "Stoicism & philosophy" },
   // ── Art & Creativity
-  { group: 'Art & Creativity', label: 'Digital art & illustration' },
-  { group: 'Art & Creativity', label: 'Music covers & production' },
-  { group: 'Art & Creativity', label: 'Photography & videography' },
-  { group: 'Art & Creativity', label: 'Poetry & spoken word' },
+  { group: "Art & Creativity", label: "Digital art & illustration" },
+  { group: "Art & Creativity", label: "Music covers & production" },
+  { group: "Art & Creativity", label: "Photography & videography" },
+  { group: "Art & Creativity", label: "Poetry & spoken word" },
   // ── Sustainable Living
-  { group: 'Sustainable Living & Eco', label: 'Zero waste lifestyle' },
-  { group: 'Sustainable Living & Eco', label: 'Eco-friendly products & swaps' },
-  { group: 'Sustainable Living & Eco', label: 'Sustainable fashion' },
+  { group: "Sustainable Living & Eco", label: "Zero waste lifestyle" },
+  { group: "Sustainable Living & Eco", label: "Eco-friendly products & swaps" },
+  { group: "Sustainable Living & Eco", label: "Sustainable fashion" },
   // ── Career & Work
-  { group: 'Career & Work', label: 'Remote work & WFH lifestyle' },
-  { group: 'Career & Work', label: 'Job hunting & interview tips' },
-  { group: 'Career & Work', label: 'Corporate life & office humor' },
-  { group: 'Career & Work', label: 'Leadership & personal development' },
+  { group: "Career & Work", label: "Remote work & WFH lifestyle" },
+  { group: "Career & Work", label: "Job hunting & interview tips" },
+  { group: "Career & Work", label: "Corporate life & office humor" },
+  { group: "Career & Work", label: "Leadership & personal development" },
   // ── Relationships
-  { group: 'Relationships & Dating', label: 'Dating advice & relationships' },
-  { group: 'Relationships & Dating', label: 'Marriage & couples content' },
-  { group: 'Relationships & Dating', label: 'Breakups & healing' },
-  { group: 'Relationships & Dating', label: 'Social skills & confidence' },
+  { group: "Relationships & Dating", label: "Dating advice & relationships" },
+  { group: "Relationships & Dating", label: "Marriage & couples content" },
+  { group: "Relationships & Dating", label: "Breakups & healing" },
+  { group: "Relationships & Dating", label: "Social skills & confidence" },
   // ── Spirituality & Faith
-  { group: 'Spirituality & Faith', label: 'Faith & Christianity' },
-  { group: 'Spirituality & Faith', label: 'Mindfulness & meditation' },
-  { group: 'Spirituality & Faith', label: 'Astrology & spirituality' },
+  { group: "Spirituality & Faith", label: "Faith & Christianity" },
+  { group: "Spirituality & Faith", label: "Mindfulness & meditation" },
+  { group: "Spirituality & Faith", label: "Astrology & spirituality" },
 ];
 
 let nicheActiveIdx = -1;
