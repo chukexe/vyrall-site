@@ -886,6 +886,15 @@ if ('serviceWorker' in navigator) {
       </div>
       <div class="scores-list" id="m-scoresList"></div>
       <div class="vrin-pills" id="m-vrinPills"></div>
+      <div class="m-spread-row" id="m-spreadRow" style="display:none">
+        <div class="m-spread-cell"><div class="m-spread-ltr">S</div><div class="m-spread-word">Socially useful</div><div class="m-spread-bar-w"><div class="m-spread-bar" id="m-spb-s"></div></div><div class="m-spread-val" id="m-spv-s">—</div></div>
+        <div class="m-spread-cell"><div class="m-spread-ltr">P</div><div class="m-spread-word">Provocative</div><div class="m-spread-bar-w"><div class="m-spread-bar" id="m-spb-p"></div></div><div class="m-spread-val" id="m-spv-p">—</div></div>
+        <div class="m-spread-cell"><div class="m-spread-ltr">R</div><div class="m-spread-word">Replicable</div><div class="m-spread-bar-w"><div class="m-spread-bar" id="m-spb-r"></div></div><div class="m-spread-val" id="m-spv-r">—</div></div>
+        <div class="m-spread-cell"><div class="m-spread-ltr">E</div><div class="m-spread-word">Emotional</div><div class="m-spread-bar-w"><div class="m-spread-bar" id="m-spb-e"></div></div><div class="m-spread-val" id="m-spv-e">—</div></div>
+        <div class="m-spread-cell"><div class="m-spread-ltr">A</div><div class="m-spread-word">Ambiguous</div><div class="m-spread-bar-w"><div class="m-spread-bar" id="m-spb-a"></div></div><div class="m-spread-val" id="m-spv-a">—</div></div>
+        <div class="m-spread-cell"><div class="m-spread-ltr">D</div><div class="m-spread-word">Distributive</div><div class="m-spread-bar-w"><div class="m-spread-bar" id="m-spb-d"></div></div><div class="m-spread-val" id="m-spv-d">—</div></div>
+      </div>
+      <div class="m-spread-verdict" id="m-spreadVerdict" style="display:none"></div>
       <div class="ai-sel-list" id="m-aiSelList"></div>
       <div class="insights-m" id="m-insights"></div>
       <div id="m-platTips"></div>
@@ -1445,6 +1454,24 @@ function mRenderAnalysis(data, platVal, platTxt) {
   document.getElementById('m-insights').innerHTML = (data.insights||[]).map(i =>
     `<span class="insight-pill ${i.type}">${i.type==='good'?'✓':i.type==='warn'?'⚠':'→'} ${i.text}</span>`
   ).join('');
+
+  // SPREAD Score — HBR 2025
+  const sp = data.spread_score;
+  if (sp) {
+    const row     = document.getElementById('m-spreadRow');
+    const verdict = document.getElementById('m-spreadVerdict');
+    if (row) row.style.display = 'grid';
+    if (verdict) { verdict.style.display = 'block'; verdict.innerHTML = '<strong>SPREAD:</strong> ' + (sp.verdict || ''); }
+    [['s','S'],['p','P'],['r','R'],['e','E'],['a','A'],['d','D']].forEach(([el,key]) => {
+      const pct = Math.round((sp[key] || 0) * 10);
+      setTimeout(() => {
+        const bar = document.getElementById(`m-spb-${el}`);
+        const val = document.getElementById(`m-spv-${el}`);
+        if (bar) bar.style.width = pct + '%';
+        if (val) val.textContent = sp[key] + '/10';
+      }, 300);
+    });
+  }
 
   const tips = PLAT_TIPS[platVal] || [];
   const pt = document.getElementById('m-platTips');
