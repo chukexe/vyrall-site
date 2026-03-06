@@ -2430,7 +2430,7 @@ function mNicheSearch(val) {
       lastGroup = n.group;
     }
     const hl = q ? n.label.replace(new RegExp(`(${q})`, 'gi'), '<mark>$1</mark>') : n.label;
-    html += `<div class="m-niche-dd-opt" data-val="${n.label.replace(/"/g, '&quot;')}" onmousedown="mNicheSelectEl(this)" ontouchend="mNicheSelectEl(this)">${hl}</div>`;
+    html += `<div class="m-niche-dd-opt" data-val="${n.label.replace(/"/g, '&quot;')}" onclick="mNicheSelectEl(this)">${hl}</div>`;
   });
   dd.innerHTML = html;
   dd.classList.add('open');
@@ -2445,7 +2445,7 @@ function mNicheSelectEl(el) {
   dd.classList.remove('open');
 }
 
-document.addEventListener('click', e => {
+document.addEventListener('mousedown', e => {
   if (!e.target.closest('#mNicheCombo')) {
     const dd = document.getElementById('mNicheDd');
     if (dd) dd.classList.remove('open');

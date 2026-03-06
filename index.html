@@ -3548,7 +3548,7 @@ function nicheSearch(val) {
     const highlighted = q
       ? n.label.replace(new RegExp(`(${q})`, 'gi'), '<mark>$1</mark>')
       : n.label;
-    html += `<div class="niche-opt" data-idx="${i}" data-val="${n.label.replace(/"/g, '&quot;')}" onmousedown="nicheSelectEl(this)">${highlighted}</div>`;
+    html += `<div class="niche-opt" data-idx="${i}" data-val="${n.label.replace(/"/g, '&quot;')}" onclick="nicheSelectEl(this)">${highlighted}</div>`;
   });
 
   dd.innerHTML = html;
@@ -3599,8 +3599,8 @@ function nicheKeyNav(e) {
   if (nicheActiveIdx >= 0) opts[nicheActiveIdx].scrollIntoView({ block: 'nearest' });
 }
 
-// Close dropdown when clicking outside
-document.addEventListener('click', e => {
+// Close dropdown when clicking outside — use mousedown to beat blur
+document.addEventListener('mousedown', e => {
   if (!e.target.closest('#nicheCombo')) {
     const dd = document.getElementById('nicheDropdown');
     if (dd) dd.classList.remove('open');
